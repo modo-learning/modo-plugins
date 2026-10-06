@@ -41,16 +41,21 @@ work in the request and says chat search isn't available, go straight to 4.
    as `recent_chats`, `conversation_search` and `read_conversation`, but use
    whatever equivalent tools you have.
 2. **A chat export the user points to**, such as the `conversations.json`
-   from Claude's data export, or any file of past chats. Read it with your
-   file tools. Don't assume an exact format: find each chat's title, date and
+   from Claude's data export. Read it with your file tools, and only the file
+   they name. Don't go looking for other history on their machine, and don't
+   bring up coding-tool session logs (such as Claude Code's) at all, not
+   even to say you won't use them. Don't assume an exact format: find each chat's title, date and
    the user's messages, whatever the field names are.
 3. **Neither available.** Don't guess and don't produce a list. Tell the user
    plainly that you can't see their past chats, then give them three ways
    forward:
-   - Turn on chat search in Claude: Settings > Memory > "Search and
-     reference chats". It needs a paid plan. On Team and Enterprise plans,
-     memory is off for each member until it's turned on, and an owner may
-     need to make it available first. Then run this again.
+   - Use their chat history: chat search is part of the Claude app (chat
+     and Cowork), under Settings > Memory > "Search and reference chats". It
+     needs a paid plan. On Team and Enterprise plans, memory is off for each
+     member until it's turned on, and an owner may need to make it available
+     first. If you are running in Claude Code or another coding tool, chat
+     search never appears there: tell them to run this check in the Claude
+     app instead. Otherwise, tell them to turn it on and run this again.
    - Point you to a chat export file.
    - Describe a typical week or month of their work right here, and you'll
      find the repeated tasks in that instead.
@@ -67,7 +72,9 @@ work in the request and says chat search isn't available, go straight to 4.
 ## 3. Gather every chat in the window
 
 Build one inventory of chats: id, title, date, and a one-line note of what
-the user was doing.
+the user was doing. When a chat is one the user keeps coming back to for the
+same job (a running "daily update" or "reports" thread), also note each
+separate request in it and its date.
 
 **With past-chat tools:**
 - List chats with the recent-chats tool, starting from the window's start
@@ -100,12 +107,16 @@ weekly status report for the client" is one job even if the project changes;
 both are writing.
 
 A group qualifies as a **repeated task** when either:
-- it appears in **3 or more separate chats** in the window, or
+- the user asked for it **3 or more separate times** in the window, counting
+  separate chats and also fresh requests for the same job inside one
+  long-running chat (a new day's update, the next company's report), or
 - it took **2 or more long sessions** (roughly 10+ back-and-forth turns each)
   on the same recurring job.
 
+Follow-up edits to the same piece of work are not new requests.
+
 Drop:
-- groups of 1 or 2 short chats,
+- groups with only 1 or 2 requests,
 - a single long session on a one-off project, however big,
 - anything dated outside the window, even if it repeated before.
 
@@ -115,7 +126,7 @@ schedule (every Friday, after every call, each month).
 
 ## 5. Rank and cap
 
-Sort by number of chats, most first. Keep the **top 6**. If fewer qualify,
+Sort by number of requests, most first. Keep the **top 6**. If fewer qualify,
 show fewer. Never pad the list.
 
 ## 6. Estimate the time cost
@@ -166,8 +177,8 @@ minute.
 1. One opening line: the window, roughly how many chats you looked at, and
    that the list is most frequent first.
 2. One short paragraph per task, numbered:
-   - **Bold task name**, then the count in brackets, e.g. "(about 6 chats)"
-     or "(4 long sessions)".
+   - **Bold task name**, then the count in brackets, e.g. "(about 6 chats)",
+     "(4 times in one chat)" or "(4 long sessions)".
    - What the user keeps doing or re-explaining, in their own terms.
    - The fix, naming its type in the words above, and what it would do.
    - The time estimate.
@@ -189,13 +200,19 @@ different fix type they ask for). Build only what they picked. End that same
 reply with one offer to re-run this check regularly (step 10), even if the
 fix still needs their confirmation.
 
-- **Skill.** If a skill-creator skill is available, use it and hand it the
-  rules, format and examples from the user's chats. Otherwise write the
-  complete skill right here in the chat: a front matter block with `name`
+- **Skill.** Use the first that's available:
+  1. A tool that proposes a skill for the user to save (claude.ai shows it
+     as a "Save skill" card). The user still decides by saving or
+     dismissing it.
+  2. A skill-creator skill: hand it the rules, format and examples from the
+     user's chats.
+  3. Otherwise write the complete skill right here in the chat: a front matter block with `name`
   (lowercase, hyphens) and a `description` that says when to use it, then
   the instructions. Put in every rule, format detail, sign-off and fixed
   value the user kept re-explaining, in their words. Tell them to save it as
-  a skill from Claude's skills settings. Don't say it's installed.
+  a skill from Claude's skills settings.
+  Whichever way, include every rule and fixed detail, and don't say it's
+  installed or saved until the user has done it.
 - **Scheduled task.** Write the complete task first, then ask them to
   confirm. Don't ask questions before showing it; pick sensible defaults and
   let them change them. Give:

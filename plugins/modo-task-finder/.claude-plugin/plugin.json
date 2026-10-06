@@ -1,7 +1,7 @@
 {
   "name": "modo-task-finder",
   "displayName": "Modo Task Finder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Finds the tasks you keep repeating across your Claude chats and suggests a skill, scheduled task or connector for each.",
   "author": {
     "name": "Modo",

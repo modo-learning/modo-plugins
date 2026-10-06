@@ -634,6 +634,54 @@
   ]
  },
  {
+  "uuid": "nl-0",
+  "name": "Team newsletter",
+  "created_at": "2026-09-07T09:00:00Z",
+  "updated_at": "2026-09-28T09:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Same as last week: turn these notes into the internal team newsletter. Friendly tone, max 250 words, sections Wins / Shout-outs / Coming up, and end with the office plant joke.",
+    "created_at": "2026-09-07T09:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here's this week's newsletter (2026-09-07)...",
+    "created_at": "2026-09-07T09:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Same as last week: turn these notes into the internal team newsletter. Friendly tone, max 250 words, sections Wins / Shout-outs / Coming up, and end with the office plant joke.",
+    "created_at": "2026-09-14T09:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here's this week's newsletter (2026-09-14)...",
+    "created_at": "2026-09-14T09:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Same as last week: turn these notes into the internal team newsletter. Friendly tone, max 250 words, sections Wins / Shout-outs / Coming up, and end with the office plant joke.",
+    "created_at": "2026-09-21T09:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here's this week's newsletter (2026-09-21)...",
+    "created_at": "2026-09-21T09:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Same as last week: turn these notes into the internal team newsletter. Friendly tone, max 250 words, sections Wins / Shout-outs / Coming up, and end with the office plant joke.",
+    "created_at": "2026-09-28T09:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here's this week's newsletter (2026-09-28)...",
+    "created_at": "2026-09-28T09:00:00Z"
+   }
+  ]
+ },
+ {
   "uuid": "mi-1",
   "name": "Fix Python KeyError in a script",
   "created_at": "2026-09-06T10:00:00Z",

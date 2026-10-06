@@ -73,7 +73,9 @@ In Claude chat or Cowork, ask in plain words, for example:
 - "Where is my time going in my chats? Look at the last 3 months."
 
 In Claude Code, run `/modo-task-finder:my-tasks`, optionally with a window:
-`/modo-task-finder:my-tasks 3 months`.
+`/modo-task-finder:my-tasks 3 months`. Claude Code can't search your Claude
+chats, so there it works from a chat export file or a description of your
+week. For your chat history, run it in the Claude app.
 
 The default window is the last 30 days. You can give another one, such as
 "3 months" or "since Sep 1".
@@ -82,6 +84,7 @@ The default window is the last 30 days. You can give another one, such as
 
 - A paid Claude plan (Pro, Max, Team or Enterprise) for chat search.
 - Chat search turned on: Settings > Memory > "Search and reference chats".
+  Chat search is part of the Claude app (chat and Cowork), not Claude Code.
 
 Without chat search, it can still work from a chat export file you point it
 to, or from a description of your typical week.
@@ -100,8 +103,11 @@ to, or from a description of your typical week.
   search doesn't return. In Cowork, chat search doesn't include older Cowork
   tasks.
 - **When it writes something:** only when you say yes to a fix. It then
-  writes that skill or scheduled task in the chat, and you decide whether to
-  save or create it.
+  proposes that skill or scheduled task, and you decide whether to save or
+  create it. In the Claude app a skill appears as a Save skill card you can
+  save or dismiss.
+- **What it doesn't look for:** it reads only the export file you name, and
+  never searches your computer for other history such as coding-tool logs.
 
 The plugin is a set of instructions for Claude. It contains no code, no
 connectors and no background processes. You can read all of it in
@@ -116,8 +122,14 @@ connectors and no background processes. You can read all of it in
 - **Fewer chats than expected.** Chat search only returns chats from your
   account that it can see. Chats inside a project are searched within that
   project; run it there too.
-- **A task is missing.** It needs to come up in at least 3 chats (or 2 long
-  sessions) in the window. Try a longer window, such as "3 months".
+- **A task is missing.** You need to have asked for it at least 3 times in
+  the window (in separate chats, or as fresh requests inside one long chat),
+  or spent 2 long sessions on it. Try a longer window, such as "3 months".
+- **Claude Code says it can't add the marketplace because "its source
+  doesn't match"**. The marketplace is already registered, for example by
+  the desktop app's Code tab. Update it instead:
+  `claude plugin marketplace update modo-plugins`, then
+  `claude plugin update modo-task-finder@modo-plugins`.
 - **The fix type looks wrong.** Say so ("make that one a scheduled task")
   and it will build that instead.
 

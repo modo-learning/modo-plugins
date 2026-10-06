@@ -11,7 +11,7 @@
       "name": "modo-task-finder",
       "description": "Finds the tasks you keep repeating across your Claude chats and suggests a skill, scheduled task or connector for each.",
       "source": "./plugins/modo-task-finder",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "license": "MIT",
       "category": "productivity"
     }

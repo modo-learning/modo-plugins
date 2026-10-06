@@ -8,6 +8,7 @@ Planted, inside the window (2026-09-01 .. 2026-09-30):
   outreach        5 chats  candidate outreach with the same rules        -> skill
   expenses        4 chats  expense reconciliation from Xero (not linked) -> needs a connector first
   investor        3 chats  monthly investor update (skill installed)     -> already covered
+  newsletter      1 chat   team newsletter asked 4 times in one long chat -> kept (repeated requests)
   menu            2 chats  translating a cafe menu                       -> excluded (below 3)
   pricing         1 chat   long one-off pricing model build             -> excluded (one-off)
   misc            8 chats  unrelated one-offs                            -> excluded
@@ -77,6 +78,18 @@ for i, day in enumerate(["2026-09-01", "2026-09-14", "2026-09-30"]):
          "the personalised versions.",
          "Drafted the update with the investor-update skill..."),
     ]))
+
+# newsletter: one long-running chat the user keeps coming back to, 4 requests
+news_msgs = []
+for n, day in enumerate(["2026-09-07", "2026-09-14", "2026-09-21", "2026-09-28"]):
+    t = f"{day}T09:00:00Z"
+    news_msgs.append(msg("human",
+        "Same as last week: turn these notes into the internal team newsletter. "
+        "Friendly tone, max 250 words, sections Wins / Shout-outs / Coming up, "
+        "and end with the office plant joke.", t))
+    news_msgs.append(msg("assistant", f"Here's this week's newsletter ({day})...", t))
+chats.append({"uuid": "nl-0", "name": "Team newsletter", "created_at": "2026-09-07T09:00:00Z",
+              "updated_at": "2026-09-28T09:00:00Z", "chat_messages": news_msgs})
 
 # menu: only two chats, must be excluded
 for i, day in enumerate(["2026-09-08", "2026-09-23"]):
