@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: no-history
+description: No past-chat tools and no export; must explain how to enable chat search and offer the describe-your-week fallback without inventing a list.
+runs: 2
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

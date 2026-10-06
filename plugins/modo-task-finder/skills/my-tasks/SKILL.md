@@ -33,7 +33,8 @@ short accurate list beats a long plausible one.
 
 ## 2. Find the chat history
 
-Use the first source that works:
+Use the first source that works. If the user has already described their
+work in the request and says chat search isn't available, go straight to 4.
 
 1. **Claude's past-chat tools.** Look for tools that list recent chats,
    search past chats, or open a past chat. In claude.ai they have been seen
@@ -43,11 +44,25 @@ Use the first source that works:
    from Claude's data export, or any file of past chats. Read it with your
    file tools. Don't assume an exact format: find each chat's title, date and
    the user's messages, whatever the field names are.
-3. **Neither available.** Tell the user plainly that you can't see their past
-   chats. Explain that in Claude they can turn on Settings > Memory >
-   "Search and reference chats" (on Team and Enterprise plans an owner may
-   need to enable memory first), or point you to a chat export. Then stop.
-   Don't produce a list.
+3. **Neither available.** Don't guess and don't produce a list. Tell the user
+   plainly that you can't see their past chats, then give them three ways
+   forward:
+   - Turn on chat search in Claude: Settings > Memory > "Search and
+     reference chats". It needs a paid plan. On Team and Enterprise plans,
+     memory is off for each member until it's turned on, and an owner may
+     need to make it available first. Then run this again.
+   - Point you to a chat export file.
+   - Describe a typical week or month of their work right here, and you'll
+     find the repeated tasks in that instead.
+   Then wait for their answer.
+4. **The user describes their work** (now, or up front). Run steps 4 to 8 on
+   their description instead of on chats. Treat each thing they say happens
+   regularly ("every Monday", "most days", "before each call") as a
+   candidate. Use their stated frequency in place of a chat count, for
+   example "(every Monday)" or "(about 4 a week)", and skip chat examples as
+   evidence. Say in the opening line that the list is based on what they
+   described, not on their chat history. Something they did once is a
+   one-off, however big.
 
 ## 3. Gather every chat in the window
 
