@@ -47,6 +47,12 @@ def main(folder: str) -> None:
         if "license" not in data and not (root / "LICENSE").is_file():
             problems.append("no LICENSE file and no license in plugin.json")
 
+    manifests = [p for p in files if p.name == "plugin.json" and p.parent.name == ".claude-plugin"]
+    if len(manifests) > 1:
+        problems.append("more than one .claude-plugin/plugin.json in the plugin folder "
+                        "(claude.ai marketplace sync and upload expect exactly one): "
+                        + ", ".join(str(m) for m in manifests))
+
     readme = root / "README.md"
     if not readme.is_file():
         problems.append("missing README.md")
