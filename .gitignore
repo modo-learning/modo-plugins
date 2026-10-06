@@ -1,0 +1,8 @@
+.DS_Store
+Thumbs.db
+desktop.ini
+__MACOSX/
+*.zip
+drafts/
+# Local reference only: contains real business details from internal chats
+docs/prompt-response.md

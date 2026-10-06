@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "modo-plugins",
+  "description": "Plugins from Modo for Claude.",
+  "owner": {
+    "name": "Modo",
+    "url": "https://github.com/modo-learning"
+  },
+  "plugins": [
+    {
+      "name": "modo-task-finder",
+      "description": "Finds the tasks you keep repeating across your Claude chats and suggests a skill, scheduled task or connector for each.",
+      "source": "./plugins/modo-task-finder",
+      "version": "0.1.0",
+      "license": "MIT",
+      "category": "productivity"
+    }
+  ]
+}

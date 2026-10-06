@@ -1,0 +1,10 @@
+{
+  "name": "modo-task-finder",
+  "version": "0.1.0",
+  "description": "Finds the tasks you keep repeating across your Claude chats and suggests a skill, scheduled task or connector for each.",
+  "author": {
+    "name": "Modo",
+    "url": "https://github.com/modo-learning"
+  },
+  "license": "MIT"
+}
