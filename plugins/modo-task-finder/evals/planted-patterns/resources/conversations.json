@@ -1,0 +1,836 @@
+[
+ {
+  "uuid": "sr-5",
+  "name": "Acme weekly status report 2026-09-30",
+  "created_at": "2026-09-30T16:00:00Z",
+  "updated_at": "2026-09-30T16:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Here are this week's Jira notes for the Acme project. Turn them into the weekly client status report. Same format as always: three sections (done, in progress, risks), max one page, no internal ticket numbers, and end with next week's milestones. It goes to Dana at Acme every Friday.",
+    "created_at": "2026-09-30T16:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here is the Acme weekly status report in the usual three-section format...",
+    "created_at": "2026-09-30T16:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Shorten the risks part and make the tone less alarming.",
+    "created_at": "2026-09-30T16:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Updated the risks section...",
+    "created_at": "2026-09-30T16:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "iv-2",
+  "name": "Investor update draft 3",
+  "created_at": "2026-09-30T10:00:00Z",
+  "updated_at": "2026-09-30T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Use my investor-update skill to draft this month's investor update from these metrics. The team's edits came in late again so I need to redo the personalised versions.",
+    "created_at": "2026-09-30T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Drafted the update with the investor-update skill...",
+    "created_at": "2026-09-30T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "sr-4",
+  "name": "Acme weekly status report 2026-09-29",
+  "created_at": "2026-09-29T16:00:00Z",
+  "updated_at": "2026-09-29T16:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Here are this week's Jira notes for the Acme project. Turn them into the weekly client status report. Same format as always: three sections (done, in progress, risks), max one page, no internal ticket numbers, and end with next week's milestones. It goes to Dana at Acme every Friday.",
+    "created_at": "2026-09-29T16:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here is the Acme weekly status report in the usual three-section format...",
+    "created_at": "2026-09-29T16:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Shorten the risks part and make the tone less alarming.",
+    "created_at": "2026-09-29T16:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Updated the risks section...",
+    "created_at": "2026-09-29T16:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "or-4",
+  "name": "Candidate outreach message 5",
+  "created_at": "2026-09-28T10:00:00Z",
+  "updated_at": "2026-09-28T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Write a LinkedIn outreach message to this backend engineer candidate. Rules: under 90 words, mention one specific thing from their profile, say the salary band up front (90-110k), no buzzwords, sign off as Priya from Northwind.",
+    "created_at": "2026-09-28T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Hi Sam, I saw your talk on Postgres partitioning...",
+    "created_at": "2026-09-28T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-7",
+  "name": "Compare two laptops",
+  "created_at": "2026-09-27T10:00:00Z",
+  "updated_at": "2026-09-27T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Compare two laptops, please.",
+    "created_at": "2026-09-27T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-27T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "ex-3",
+  "name": "Reconcile team expenses week 4",
+  "created_at": "2026-09-26T10:00:00Z",
+  "updated_at": "2026-09-26T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "I exported this week's card transactions from Xero again and pasted them below. Match them to the receipts list, flag anything without a receipt, and group by cost centre.",
+    "created_at": "2026-09-26T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Matched 41 of 44 transactions. Three have no receipt...",
+    "created_at": "2026-09-26T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Can you also total by cost centre?",
+    "created_at": "2026-09-26T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Totals by cost centre...",
+    "created_at": "2026-09-26T10:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "sr-3",
+  "name": "Acme weekly status report 2026-09-25",
+  "created_at": "2026-09-25T16:00:00Z",
+  "updated_at": "2026-09-25T16:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Here are this week's Jira notes for the Acme project. Turn them into the weekly client status report. Same format as always: three sections (done, in progress, risks), max one page, no internal ticket numbers, and end with next week's milestones. It goes to Dana at Acme every Friday.",
+    "created_at": "2026-09-25T16:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here is the Acme weekly status report in the usual three-section format...",
+    "created_at": "2026-09-25T16:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Shorten the risks part and make the tone less alarming.",
+    "created_at": "2026-09-25T16:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Updated the risks section...",
+    "created_at": "2026-09-25T16:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-6",
+  "name": "Draft a toast for a wedding",
+  "created_at": "2026-09-24T10:00:00Z",
+  "updated_at": "2026-09-24T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Draft a toast for a wedding, please.",
+    "created_at": "2026-09-24T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-24T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mn-1",
+  "name": "Translate cafe menu to Spanish 2",
+  "created_at": "2026-09-23T10:00:00Z",
+  "updated_at": "2026-09-23T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Translate this cafe menu into Spanish.",
+    "created_at": "2026-09-23T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Aquí está el menú...",
+    "created_at": "2026-09-23T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "or-3",
+  "name": "Candidate outreach message 4",
+  "created_at": "2026-09-22T10:00:00Z",
+  "updated_at": "2026-09-22T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Write a LinkedIn outreach message to this backend engineer candidate. Rules: under 90 words, mention one specific thing from their profile, say the salary band up front (90-110k), no buzzwords, sign off as Priya from Northwind.",
+    "created_at": "2026-09-22T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Hi Sam, I saw your talk on Postgres partitioning...",
+    "created_at": "2026-09-22T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-5",
+  "name": "Explain how index funds work",
+  "created_at": "2026-09-20T10:00:00Z",
+  "updated_at": "2026-09-20T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Explain how index funds work, please.",
+    "created_at": "2026-09-20T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-20T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "ex-2",
+  "name": "Reconcile team expenses week 3",
+  "created_at": "2026-09-19T10:00:00Z",
+  "updated_at": "2026-09-19T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "I exported this week's card transactions from Xero again and pasted them below. Match them to the receipts list, flag anything without a receipt, and group by cost centre.",
+    "created_at": "2026-09-19T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Matched 41 of 44 transactions. Three have no receipt...",
+    "created_at": "2026-09-19T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Can you also total by cost centre?",
+    "created_at": "2026-09-19T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Totals by cost centre...",
+    "created_at": "2026-09-19T10:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "sr-2",
+  "name": "Acme weekly status report 2026-09-18",
+  "created_at": "2026-09-18T16:00:00Z",
+  "updated_at": "2026-09-18T16:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Here are this week's Jira notes for the Acme project. Turn them into the weekly client status report. Same format as always: three sections (done, in progress, risks), max one page, no internal ticket numbers, and end with next week's milestones. It goes to Dana at Acme every Friday.",
+    "created_at": "2026-09-18T16:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here is the Acme weekly status report in the usual three-section format...",
+    "created_at": "2026-09-18T16:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Shorten the risks part and make the tone less alarming.",
+    "created_at": "2026-09-18T16:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Updated the risks section...",
+    "created_at": "2026-09-18T16:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "pr-0",
+  "name": "Build 2027 pricing model",
+  "created_at": "2026-09-17T10:00:00Z",
+  "updated_at": "2026-09-17T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Pricing model step 1: adjust the tier assumptions and recompute margins for scenario 1.",
+    "created_at": "2026-09-17T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 1...",
+    "created_at": "2026-09-17T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 2: adjust the tier assumptions and recompute margins for scenario 2.",
+    "created_at": "2026-09-17T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 2...",
+    "created_at": "2026-09-17T10:02:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 3: adjust the tier assumptions and recompute margins for scenario 3.",
+    "created_at": "2026-09-17T10:04:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 3...",
+    "created_at": "2026-09-17T10:04:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 4: adjust the tier assumptions and recompute margins for scenario 4.",
+    "created_at": "2026-09-17T10:06:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 4...",
+    "created_at": "2026-09-17T10:06:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 5: adjust the tier assumptions and recompute margins for scenario 5.",
+    "created_at": "2026-09-17T10:08:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 5...",
+    "created_at": "2026-09-17T10:08:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 6: adjust the tier assumptions and recompute margins for scenario 6.",
+    "created_at": "2026-09-17T10:10:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 6...",
+    "created_at": "2026-09-17T10:10:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 7: adjust the tier assumptions and recompute margins for scenario 7.",
+    "created_at": "2026-09-17T10:12:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 7...",
+    "created_at": "2026-09-17T10:12:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 8: adjust the tier assumptions and recompute margins for scenario 8.",
+    "created_at": "2026-09-17T10:14:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 8...",
+    "created_at": "2026-09-17T10:14:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 9: adjust the tier assumptions and recompute margins for scenario 9.",
+    "created_at": "2026-09-17T10:16:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 9...",
+    "created_at": "2026-09-17T10:16:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 10: adjust the tier assumptions and recompute margins for scenario 10.",
+    "created_at": "2026-09-17T10:18:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 10...",
+    "created_at": "2026-09-17T10:18:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 11: adjust the tier assumptions and recompute margins for scenario 11.",
+    "created_at": "2026-09-17T10:20:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 11...",
+    "created_at": "2026-09-17T10:20:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 12: adjust the tier assumptions and recompute margins for scenario 12.",
+    "created_at": "2026-09-17T10:22:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 12...",
+    "created_at": "2026-09-17T10:22:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 13: adjust the tier assumptions and recompute margins for scenario 13.",
+    "created_at": "2026-09-17T10:24:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 13...",
+    "created_at": "2026-09-17T10:24:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 14: adjust the tier assumptions and recompute margins for scenario 14.",
+    "created_at": "2026-09-17T10:26:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 14...",
+    "created_at": "2026-09-17T10:26:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Pricing model step 15: adjust the tier assumptions and recompute margins for scenario 15.",
+    "created_at": "2026-09-17T10:28:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Recomputed scenario 15...",
+    "created_at": "2026-09-17T10:28:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-4",
+  "name": "Weekend recipe with chickpeas",
+  "created_at": "2026-09-16T10:00:00Z",
+  "updated_at": "2026-09-16T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Weekend recipe with chickpeas, please.",
+    "created_at": "2026-09-16T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-16T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "or-2",
+  "name": "Candidate outreach message 3",
+  "created_at": "2026-09-15T10:00:00Z",
+  "updated_at": "2026-09-15T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Write a LinkedIn outreach message to this backend engineer candidate. Rules: under 90 words, mention one specific thing from their profile, say the salary band up front (90-110k), no buzzwords, sign off as Priya from Northwind.",
+    "created_at": "2026-09-15T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Hi Sam, I saw your talk on Postgres partitioning...",
+    "created_at": "2026-09-15T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "iv-1",
+  "name": "Investor update draft 2",
+  "created_at": "2026-09-14T10:00:00Z",
+  "updated_at": "2026-09-14T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Use my investor-update skill to draft this month's investor update from these metrics. The team's edits came in late again so I need to redo the personalised versions.",
+    "created_at": "2026-09-14T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Drafted the update with the investor-update skill...",
+    "created_at": "2026-09-14T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-3",
+  "name": "Summarise an article on remote work",
+  "created_at": "2026-09-13T10:00:00Z",
+  "updated_at": "2026-09-13T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Summarise an article on remote work, please.",
+    "created_at": "2026-09-13T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-13T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "ex-1",
+  "name": "Reconcile team expenses week 2",
+  "created_at": "2026-09-12T10:00:00Z",
+  "updated_at": "2026-09-12T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "I exported this week's card transactions from Xero again and pasted them below. Match them to the receipts list, flag anything without a receipt, and group by cost centre.",
+    "created_at": "2026-09-12T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Matched 41 of 44 transactions. Three have no receipt...",
+    "created_at": "2026-09-12T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Can you also total by cost centre?",
+    "created_at": "2026-09-12T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Totals by cost centre...",
+    "created_at": "2026-09-12T10:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "sr-1",
+  "name": "Acme weekly status report 2026-09-11",
+  "created_at": "2026-09-11T16:00:00Z",
+  "updated_at": "2026-09-11T16:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Here are this week's Jira notes for the Acme project. Turn them into the weekly client status report. Same format as always: three sections (done, in progress, risks), max one page, no internal ticket numbers, and end with next week's milestones. It goes to Dana at Acme every Friday.",
+    "created_at": "2026-09-11T16:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here is the Acme weekly status report in the usual three-section format...",
+    "created_at": "2026-09-11T16:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Shorten the risks part and make the tone less alarming.",
+    "created_at": "2026-09-11T16:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Updated the risks section...",
+    "created_at": "2026-09-11T16:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-2",
+  "name": "Visa requirements for Japan",
+  "created_at": "2026-09-10T10:00:00Z",
+  "updated_at": "2026-09-10T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Visa requirements for Japan, please.",
+    "created_at": "2026-09-10T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-10T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "or-1",
+  "name": "Candidate outreach message 2",
+  "created_at": "2026-09-09T10:00:00Z",
+  "updated_at": "2026-09-09T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Write a LinkedIn outreach message to this backend engineer candidate. Rules: under 90 words, mention one specific thing from their profile, say the salary band up front (90-110k), no buzzwords, sign off as Priya from Northwind.",
+    "created_at": "2026-09-09T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Hi Sam, I saw your talk on Postgres partitioning...",
+    "created_at": "2026-09-09T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mn-0",
+  "name": "Translate cafe menu to Spanish 1",
+  "created_at": "2026-09-08T10:00:00Z",
+  "updated_at": "2026-09-08T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Translate this cafe menu into Spanish.",
+    "created_at": "2026-09-08T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Aquí está el menú...",
+    "created_at": "2026-09-08T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-1",
+  "name": "Fix Python KeyError in a script",
+  "created_at": "2026-09-06T10:00:00Z",
+  "updated_at": "2026-09-06T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Fix Python KeyError in a script, please.",
+    "created_at": "2026-09-06T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-06T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "ex-0",
+  "name": "Reconcile team expenses week 1",
+  "created_at": "2026-09-05T10:00:00Z",
+  "updated_at": "2026-09-05T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "I exported this week's card transactions from Xero again and pasted them below. Match them to the receipts list, flag anything without a receipt, and group by cost centre.",
+    "created_at": "2026-09-05T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Matched 41 of 44 transactions. Three have no receipt...",
+    "created_at": "2026-09-05T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Can you also total by cost centre?",
+    "created_at": "2026-09-05T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Totals by cost centre...",
+    "created_at": "2026-09-05T10:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "sr-0",
+  "name": "Acme weekly status report 2026-09-04",
+  "created_at": "2026-09-04T16:00:00Z",
+  "updated_at": "2026-09-04T16:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Here are this week's Jira notes for the Acme project. Turn them into the weekly client status report. Same format as always: three sections (done, in progress, risks), max one page, no internal ticket numbers, and end with next week's milestones. It goes to Dana at Acme every Friday.",
+    "created_at": "2026-09-04T16:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Here is the Acme weekly status report in the usual three-section format...",
+    "created_at": "2026-09-04T16:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Shorten the risks part and make the tone less alarming.",
+    "created_at": "2026-09-04T16:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Updated the risks section...",
+    "created_at": "2026-09-04T16:02:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "mi-0",
+  "name": "Birthday gift ideas for my dad",
+  "created_at": "2026-09-03T10:00:00Z",
+  "updated_at": "2026-09-03T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Birthday gift ideas for my dad, please.",
+    "created_at": "2026-09-03T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Sure...",
+    "created_at": "2026-09-03T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "or-0",
+  "name": "Candidate outreach message 1",
+  "created_at": "2026-09-02T10:00:00Z",
+  "updated_at": "2026-09-02T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Write a LinkedIn outreach message to this backend engineer candidate. Rules: under 90 words, mention one specific thing from their profile, say the salary band up front (90-110k), no buzzwords, sign off as Priya from Northwind.",
+    "created_at": "2026-09-02T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Hi Sam, I saw your talk on Postgres partitioning...",
+    "created_at": "2026-09-02T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "iv-0",
+  "name": "Investor update draft 1",
+  "created_at": "2026-09-01T10:00:00Z",
+  "updated_at": "2026-09-01T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Use my investor-update skill to draft this month's investor update from these metrics. The team's edits came in late again so I need to redo the personalised versions.",
+    "created_at": "2026-09-01T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Drafted the update with the investor-update skill...",
+    "created_at": "2026-09-01T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "tp-3",
+  "name": "Conference talk prep 4",
+  "created_at": "2026-08-26T10:00:00Z",
+  "updated_at": "2026-08-26T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Help me rehearse my conference talk on data pipelines. Same structure: hook, three lessons, demo, Q&A prep.",
+    "created_at": "2026-08-26T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Let's go through the hook...",
+    "created_at": "2026-08-26T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "tp-2",
+  "name": "Conference talk prep 3",
+  "created_at": "2026-08-19T10:00:00Z",
+  "updated_at": "2026-08-19T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Help me rehearse my conference talk on data pipelines. Same structure: hook, three lessons, demo, Q&A prep.",
+    "created_at": "2026-08-19T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Let's go through the hook...",
+    "created_at": "2026-08-19T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "tp-1",
+  "name": "Conference talk prep 2",
+  "created_at": "2026-08-12T10:00:00Z",
+  "updated_at": "2026-08-12T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Help me rehearse my conference talk on data pipelines. Same structure: hook, three lessons, demo, Q&A prep.",
+    "created_at": "2026-08-12T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Let's go through the hook...",
+    "created_at": "2026-08-12T10:00:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "tp-0",
+  "name": "Conference talk prep 1",
+  "created_at": "2026-08-05T10:00:00Z",
+  "updated_at": "2026-08-05T10:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Help me rehearse my conference talk on data pipelines. Same structure: hook, three lessons, demo, Q&A prep.",
+    "created_at": "2026-08-05T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Let's go through the hook...",
+    "created_at": "2026-08-05T10:00:00Z"
+   }
+  ]
+ }
+]
