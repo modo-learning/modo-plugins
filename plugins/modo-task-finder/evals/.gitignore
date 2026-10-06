@@ -1,1 +1,4 @@
 results/
+# Session files the eval runner writes beside resumed cases (raw, not scrubbed)
+*/*-*-*-*-*.jsonl
+*/*-*-*-*-*/

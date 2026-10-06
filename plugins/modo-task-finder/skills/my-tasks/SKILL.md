@@ -144,6 +144,18 @@ Choose the single best fix:
   You can't see scheduled tasks, so if one seems likely, add "if you already
   have a scheduled task for this, ignore this one".
 
+When more than one could fit, decide in this order:
+
+1. Something already handles it: **already covered**.
+2. The main pain is moving data in by hand (exporting, copying, pasting from
+   a tool), and the instructions around it are simple: **needs a connector
+   first**.
+3. The main pain is re-explaining rules, format or voice: **skill**, even if
+   the user also pastes data in. Mention the connector or a schedule as a
+   later upgrade in one clause.
+4. It's time-triggered and could run unattended with what Claude can
+   already reach: **scheduled task**.
+
 Don't offer alternatives ("a skill or maybe a scheduled task"). Commit to one.
 
 ## 8. Write the answer
@@ -166,3 +178,49 @@ minute.
    scheduled task...") and a single question offering to build the top one.
 
 Don't build anything until the user says yes.
+
+## 9. When the user answers
+
+**No, or not now.** Accept it in one line and stop. Don't draft anything,
+don't argue, don't repeat the list.
+
+**Yes** (to the offered fix, or to another item they name, or with a
+different fix type they ask for). Build only what they picked. End that same
+reply with one offer to re-run this check regularly (step 10), even if the
+fix still needs their confirmation.
+
+- **Skill.** If a skill-creator skill is available, use it and hand it the
+  rules, format and examples from the user's chats. Otherwise write the
+  complete skill right here in the chat: a front matter block with `name`
+  (lowercase, hyphens) and a `description` that says when to use it, then
+  the instructions. Put in every rule, format detail, sign-off and fixed
+  value the user kept re-explaining, in their words. Tell them to save it as
+  a skill from Claude's skills settings. Don't say it's installed.
+- **Scheduled task.** Write the complete task first, then ask them to
+  confirm. Don't ask questions before showing it; pick sensible defaults and
+  let them change them. Give:
+  - a short name,
+  - the full prompt the task will run, with every rule and format detail
+    from their chats,
+  - the schedule (day, time, how often), matching what the chats show,
+  - what the task needs to get its inputs. If the inputs come from a tool
+    Claude isn't connected to (the user pastes them in by hand), say so and
+    suggest connecting it, or say how the input should reach the task.
+  If you have a tool that creates scheduled tasks, ask before using it. If
+  you don't, tell them where to create it (in Cowork: Scheduled in the sidebar,
+  then New task, and paste the prompt). Never say it's scheduled unless a tool
+  actually created it.
+- **Needs a connector first.** Name the connector and say to add it from
+  Claude's connector settings. Explain what you'll be able to automate once
+  it's connected, and offer to set that up after.
+- **Tweak to something already covered.** Write the exact change: the new
+  or changed instruction, and where it goes.
+
+## 10. Offer a regular re-run
+
+In the reply that delivers or proposes a fix, add one closing sentence
+offering to run this check on a schedule, for example weekly, so new
+repeated tasks are caught. If you are also asking them to confirm the fix,
+put both in that last sentence or the two last sentences. If
+they say yes, set it up as a scheduled task the same way as above, with this
+check as the prompt. Don't offer it again in the same conversation.
