@@ -1,52 +1,52 @@
 {
   "latest": {
     "problem_solving": {
-      "level": 4,
+      "level": 3,
       "confidence": "medium",
-      "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
-      "session_date": "2026-10-20",
+      "assessment_id": "2fda9db3-a075-4476-ab50-e6d89bf9ee4a",
+      "session_date": "2026-10-27",
       "rubric_version": "v1"
     },
     "verification": {
-      "level": 4,
-      "confidence": "high",
-      "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
-      "session_date": "2026-10-20",
+      "level": 5,
+      "confidence": "medium",
+      "assessment_id": "2fda9db3-a075-4476-ab50-e6d89bf9ee4a",
+      "session_date": "2026-10-27",
       "rubric_version": "v1"
     },
     "workflow_design": {
       "level": 2,
       "confidence": "medium",
-      "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
-      "session_date": "2026-10-20",
+      "assessment_id": "2fda9db3-a075-4476-ab50-e6d89bf9ee4a",
+      "session_date": "2026-10-27",
       "rubric_version": "v1"
     },
     "delegation": {
-      "level": 1,
+      "level": 2,
       "confidence": "medium",
-      "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
-      "session_date": "2026-10-20",
+      "assessment_id": "2fda9db3-a075-4476-ab50-e6d89bf9ee4a",
+      "session_date": "2026-10-27",
       "rubric_version": "v1"
     },
     "strategic_thinking": {
       "level": 2,
       "confidence": "low",
-      "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
-      "session_date": "2026-10-20",
+      "assessment_id": "2fda9db3-a075-4476-ab50-e6d89bf9ee4a",
+      "session_date": "2026-10-27",
       "rubric_version": "v1"
     }
   },
   "history": [
     {
-      "id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
+      "id": "2fda9db3-a075-4476-ab50-e6d89bf9ee4a",
       "session_title": "Q3 pricing analysis for the board",
-      "session_date": "2026-10-20",
+      "session_date": "2026-10-27",
       "rubric_version": "v1",
       "levels": {
-        "problem_solving": 4,
-        "verification": 4,
+        "problem_solving": 3,
+        "verification": 5,
         "workflow_design": 2,
-        "delegation": 1,
+        "delegation": 2,
         "strategic_thinking": 2
       }
     }

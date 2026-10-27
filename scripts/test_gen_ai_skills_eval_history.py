@@ -2,6 +2,7 @@
 
 The save cases' mocks of the Modo connector (ticket 10)."""
 
+import json
 import pathlib
 import sys
 import unittest
@@ -37,6 +38,19 @@ class CommittedMocks(unittest.TestCase):
             with self.subTest(case=case):
                 path = EVALS / case / "mocks" / "modo" / f"{gen.SAVE_TOOL}.md"
                 self.assertEqual(path.read_text(), gen.case_save_mock(case))
+
+    def test_committed_passport_mocks_match_the_generator(self):
+        for case in gen.CONNECTOR_CASES:
+            with self.subTest(case=case):
+                path = EVALS / case / "mocks" / "modo" / f"{gen.PASSPORT_TOOL}.md"
+                self.assertEqual(path.read_text(), gen.case_passport_mock(case))
+
+    def test_passport_shown_returns_the_save_its_history_recorded(self):
+        # The id and date the recorded save returned (passport-shown/history.jsonl).
+        passport = json.loads(gen.case_passport_mock("passport-shown"))
+        self.assertEqual([(h["id"], h["session_date"]) for h in passport["history"]],
+                         [("2fda9db3-a075-4476-ab50-e6d89bf9ee4a", "2026-10-27")])
+        self.assertEqual(passport["latest"]["verification"]["level"], 5)
 
     def test_only_connector_cases_have_the_connector(self):
         with_mocks = sorted(p.parent.parent.name for p in EVALS.glob("*/mocks/modo"))

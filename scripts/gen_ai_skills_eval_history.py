@@ -20,7 +20,7 @@ import sys
 import uuid
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from check_eval_records import EXPECT_SAVE_QUOTES, SAVE_TOOL  # noqa: E402
+from check_eval_records import EXPECT_SAVE_QUOTES, SAVE_TOOL, is_save  # noqa: E402
 from validate_assessment_record import CAPABILITIES  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills" / "evals"
@@ -249,6 +249,7 @@ CHATS["save-no-connector"] = _assessed
 CONNECTOR_CASES = ("save-offered", "save-proposes", "save-declined",
                    "save-edit-reshows", "passport-shown", *EXPECT_SAVE_QUOTES)
 PASSPORT_TOOL = "get_passport"
+PASSPORT_CASE = "passport-shown"
 REJECTED_CASE = "save-rejected"
 # save-rejected: the record is valid by the plugin's own checks, which include
 # every rule the server validates (modo-mcp ticket 09: server rules = validator
@@ -284,6 +285,40 @@ def save_mock(quotes, error=False):
     return head + (REJECTED if error else SAVED_TEXT) + "\n"
 
 
+def recorded_save(case):
+    """(record sent, tool answer) of the save recorded in the case's history."""
+    record, answers = None, {}
+    for raw in (HERE / case / "history.jsonl").read_text().splitlines():
+        content = json.loads(raw)["message"].get("content")
+        for b in content if isinstance(content, list) else []:
+            if b.get("type") == "tool_use" and is_save(b.get("name")):
+                record, use_id = b["input"], b["id"]
+            elif b.get("type") == "tool_result":
+                answers[b["tool_use_id"]] = b["content"]
+    return record, json.loads(answers[use_id])
+
+
+def passport_after(record, saved):
+    """What get_passport returns after this one save (modo-mcp, ticket 09)."""
+    caps = record["capabilities"]
+    return {
+        "latest": {k: None if caps[k]["level"] == "not_shown" else
+                   {"level": caps[k]["level"], "confidence": caps[k]["confidence"],
+                    "assessment_id": saved["id"], "session_date": record["session_date"],
+                    "rubric_version": record["rubric_version"]} for k in CAPABILITIES},
+        "history": [{"id": saved["id"], "session_title": record["session_title"],
+                     "session_date": record["session_date"], "rubric_version": record["rubric_version"],
+                     "levels": {k: caps[k]["level"] for k in CAPABILITIES}}],
+    }
+
+
+def case_passport_mock(case):
+    """passport-shown resumes a recorded save, so its passport holds exactly that
+    save; the other cases never ask for the passport and get the fixed one."""
+    passport = passport_after(*recorded_save(case)) if case == PASSPORT_CASE else PASSPORT
+    return json.dumps(passport, indent=2) + "\n"
+
+
 def case_save_mock(case):
     return save_mock(EXPECT_SAVE_QUOTES.get(case), error=case == REJECTED_CASE)
 
@@ -293,7 +328,7 @@ def write_mocks():
         d = HERE / case / "mocks" / "modo"
         d.mkdir(parents=True, exist_ok=True)
         (d / f"{SAVE_TOOL}.md").write_text(case_save_mock(case))
-        (d / f"{PASSPORT_TOOL}.md").write_text(json.dumps(PASSPORT, indent=2) + "\n")
+        (d / f"{PASSPORT_TOOL}.md").write_text(case_passport_mock(case))
         (d / "_tools.json").write_text(TOOLS_JSON.read_text())
         print(d)
 
