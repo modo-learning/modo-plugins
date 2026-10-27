@@ -6,7 +6,8 @@ This does not replace the developer portal's Validate button; run that too
 before submitting.
 
 Two repo checks are added: when the plugin holds more than one rubric-v*.md,
-the copies must be identical (scripts/check_rubric_sync.py, blocking); and raw
+the copies must be identical, and so must the copies of the assessment record
+files (scripts/check_rubric_sync.py, blocking); and raw
 eval run files left beside cases are reported with the command that removes
 them (scripts/clean_eval_runs.py, not blocking: they are git-ignored).
 
@@ -99,7 +100,7 @@ def check(root: pathlib.Path, run_validate: bool = True):
         holds.append(f"{file_count} files (over 512), held for review")
 
     if len(list(root.rglob("rubric-v*.md"))) > 1:
-        problems.extend("rubric copies differ: " + p for p in check_rubric_sync.check(root))
+        problems.extend("rubric or record copies differ: " + p for p in check_rubric_sync.check(root))
 
     runs = clean_eval_runs.raw_runs(root)
     if runs:
