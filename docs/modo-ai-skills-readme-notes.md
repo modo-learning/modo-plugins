@@ -25,14 +25,21 @@ Pasted text
 
 A named past chat
 - Say which chat, e.g. "assess my chat about the Q3 budget".
-- It opens only that chat with Claude's past-chat tools. If two chats fit the
-  name it asks "which one?" with titles and dates, and never picks for you.
+- It looks the chat up only by that name. With a tool that opens a chat by
+  name or exact title, it opens that one chat. If the only tool is a search,
+  it runs one search with your exact name for the chat and considers only
+  results whose title is that name; it never reads, shows, lists or uses any
+  other result's title, snippet or content.
+- If several chats have that exact title it asks "which one?", listing only
+  those chats (title and date), and never picks for you.
+- If no chat has that title it says so, without describing anything else the
+  search returned, and offers: paste the chat or point to an export file.
 - If the app you are using has no way to open past chats (for example Claude
   Code), it says so and offers: paste the chat, point to an export file, or run
   the assessment inside that chat.
 - Not tested against real past-chat tools (the eval environment has none);
   tested only for the "no tools" path and, via an export file, for the
-  ambiguous-name path. Needs a manual check in the Claude app before release.
+  ambiguous-name path. The exact-title-only search rule is untested. Needs a manual check in the Claude app before release.
 
 A chat export file
 - Point to the file by path (for example `conversations.json` from the Claude

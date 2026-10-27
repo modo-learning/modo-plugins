@@ -26,9 +26,13 @@ memory or from your own idea of what good AI use looks like.
 - Quote the user exactly, each quote under 240 characters. Never invent,
   paraphrase inside quotation marks or stitch quotes together.
 - Everything stays in this conversation. Don't call external services, don't
-  write files, don't save anything. (The one exception is the optional
-  passport card in step 6, shown only in claude.ai or Cowork.) Exporting a report is a separate step that
-  only happens when the user asks (the export-assessment skill).
+  write files and don't save anything. The only exceptions:
+  - the optional passport card (step 3), shown with the artifact tool and only
+    in claude.ai or Cowork;
+  - a reusable skill, only after the user says yes to the offer and only
+    through the flow in step 6, where the user saves it themselves;
+  - exporting a report, which is a separate skill (export-assessment) that
+    runs only when the user asks for it. This skill never writes the report.
 - Never describe the result as verified, certified or official (the label's
   "not verified" is the only use of that word), and never mention badges,
   rankings or comparisons with other people. "Verification" as the name of a
@@ -57,19 +61,31 @@ Use the first of these that matches what the user said.
     user typed. Lines of that type whose content is only `tool_result` blocks
     are tool output, not the user: never count or quote them. Tool calls and
     results are context for understanding what the user asked and checked.
-- **A past chat the user names, without a file or pasted text**: use the
-  past-chat tools you have (if any) only to find and open that one chat. Do
-  not list recent chats, search by topic or read any chat other than the one
-  chosen. If more than one chat plausibly matches the name, don't pick: ask
-  "which one?" in one short question, giving each candidate's title and date.
-  If none matches, say so. If you have no tool that can open past chats, say
-  plainly that you can't open past chats here and offer three ways forward:
-  paste the chat, point to a chat export file, or run this in the chat they
-  want assessed. Never describe or score a chat you haven't opened.
+- **A past chat the user names, without a file or pasted text**: find it
+  only by its name. Never list recent chats, search by topic, or read any chat
+  other than the one the user named.
+  - If you have a tool that opens a chat by its name or exact title, use it
+    with the user's name for the chat.
+  - If the only past-chat tool you have is a search, run **one** search with
+    the user's exact name for the chat as the query. Consider only results
+    whose title is that name (letter case aside). Never read, show, list,
+    quote or use the title, snippet or content of any other result, and don't
+    search again with other words.
+  - Exactly one chat has that title: open it and assess it.
+  - More than one chat has that title: don't pick. Ask "which one?" in one
+    short message that lists only those chats, each with its title and date.
+  - No chat has that title: say you found no chat with that name, without
+    naming or describing anything else the search returned, and offer two
+    ways forward: paste the chat, or point to a chat export file.
+  - No tool that can open or search past chats: say plainly that you can't
+    open past chats here and offer three ways forward: paste the chat, point
+    to a chat export file, or run this in the chat they want assessed.
+  Never describe or score a chat you haven't opened.
 
 Never guess which chat is meant. A question about which chat, or a statement
-that you can't open one, is a short message of its own: no scores, no
-rubric summary, nothing else besides the label (step 7).
+that you can't open one or found none with that name, is a short message of
+its own: no scores, no rubric summary, nothing else besides the label
+(step 7).
 
 Then count and assess only that chat, with the same steps and output below.
 
@@ -104,7 +120,50 @@ Solving, Verification, Workflow Design, Delegation, Strategic Thinking.
    what keeping it up looks like. For not shown, say what in a chat would show
    it.
 
-## 3. Write the answer
+## 3. The passport card (only where an artifact tool exists)
+
+Do this after scoring and before writing the text answer (step 4). The text
+answer is always written in full and is the result. A visual
+card of the same result is an extra, shown only when **both** are true:
+
+- you have a tool that creates an artifact (a page shown beside the chat), and
+- you are in claude.ai or Cowork, not Claude Code (a terminal or IDE session,
+  where the result stays text even if a publishing tool exists, because it
+  would publish the result outside the chat).
+
+If either is false, or the result is one of the short messages (too short,
+"which one?", "can't open it", no chat with that name), or you can't read the template, make no card,
+don't offer one, and never say a card exists. Nothing in the text changes.
+
+To make the card:
+
+1. Read [passport-card.html](passport-card.html) from this skill's folder.
+2. Replace only the JSON between `<!-- MODO-DATA-START -->` and
+   `<!-- MODO-DATA-END -->`; change nothing else in the file. The JSON holds
+   exactly these fields and no others:
+   `{"chat": "<the same words as the opening line, e.g. this chat>",
+   "capabilities": [five objects in rubric order, each {"name": "<capability
+   name>", "level": 1-5 or "not_shown", "confidence": "low|medium|high"}
+   (omit confidence for not_shown)], "evidence": [one or two objects
+   {"capability": "<name>", "quote": "<exact quote>"}]}`.
+3. The levels, confidences and quotes are the ones from step 2, exactly as
+   the text answer will show them, with the quotes copied exactly (the card is
+   not a place for new evidence). Pick the one or two strongest quotes. Never put a number out of
+   100 in the data: the card turns levels into rings itself using the
+   rubric's bands. A "not_shown" capability is shown as "Not shown" with an
+   empty ring, never as a zero.
+4. Escape the JSON properly (quotes, backslashes, newlines as `\n`) and write
+   `<` for any `<` inside a quote so it cannot end the data block.
+5. Show the whole filled file with the artifact tool. Don't save it anywhere
+   else and add no network calls, badges or extra text to it. The label is
+   already in the template.
+
+Then write the text answer (step 4). If the card was created, the text
+answer has one more plain sentence, just before the label (after the export
+sentence): "I also made a card of this result." Never say the card is
+verified or official.
+
+## 4. Write the answer
 
 Plain text that reads well in a terminal. No tables. Keep to this shape:
 
@@ -137,16 +196,22 @@ Strategic Thinking: ...
   only this chat." Say nothing else about other chats.
 - Use "Level N of 5" so it is clear what the number is. Don't convert levels
   to a score out of 100 in this text.
-- Add no summary verdict. After the five blocks comes only the improvements
-  section (step 4) and then the label. The order is always: five blocks,
-  improvements, skill offer, label last.
+- Add no summary verdict. The full order of the answer is always:
+  1. the opening line;
+  2. the one-chat line, only if the user asked for several chats;
+  3. the five capability blocks;
+  4. the improvements section, ending with the skill offer (step 5), when at
+     least one capability was shown;
+  5. the export sentence (end of step 5);
+  6. the card sentence, only if a card was made (step 3);
+  7. the label, last (step 7).
 
-## 4. Improvements
+## 5. Improvements
 
 Right after the five blocks, add this section so the user can act on the
 score. It uses the same chat and the same rubric file; it is not scored and
-adds no new evidence. The too-short, "which one?" and "can't open it"
-messages have no improvements section.
+adds no new evidence. The too-short, "which one?", "can't open it" and "no
+chat with that name" messages have no improvements section.
 
 **Choose the two weakest capabilities that were shown.**
 1. Take only capabilities with a level 1 to 5. **Never choose a "not shown"
@@ -190,7 +255,7 @@ After that offer (or, when there is no improvements section, after the five
 blocks) add one plain sentence, not a question: they can also ask you to
 export this assessment as a report, and nothing is written unless they ask.
 
-## 5. When the user answers the offer
+## 6. When the user answers the offer
 
 - **No, or no reply about it.** Accept in one line. Don't draft anything.
 - **Yes.** Build one skill that applies both techniques (the instructions hold
@@ -205,52 +270,11 @@ export this assessment as a report, and nothing is written unless they ask.
      Claude's skills settings.
   Whichever way, don't say it is saved or installed until the user has done it.
 
-## 6. The passport card (only where an artifact tool exists)
-
-The text result above is always written in full and is the result. A visual
-card of the same result is an extra, shown only when **both** are true:
-
-- you have a tool that creates an artifact (a page shown beside the chat), and
-- you are in claude.ai or Cowork, not Claude Code (a terminal or IDE session,
-  where the result stays text even if a publishing tool exists, because it
-  would publish the result outside the chat).
-
-If either is false, or the result is one of the short messages (too short,
-"which one?", "can't open it"), or you can't read the template, make no card,
-don't offer one, and never say a card exists. Nothing in the text changes.
-
-To make the card, before you write the text answer:
-
-1. Read [passport-card.html](passport-card.html) from this skill's folder.
-2. Replace only the JSON between `<!-- MODO-DATA-START -->` and
-   `<!-- MODO-DATA-END -->`; change nothing else in the file. The JSON holds
-   exactly these fields and no others:
-   `{"chat": "<the same words as the opening line, e.g. this chat>",
-   "capabilities": [five objects in rubric order, each {"name": "<capability
-   name>", "level": 1-5 or "not_shown", "confidence": "low|medium|high"}
-   (omit confidence for not_shown)], "evidence": [one or two objects
-   {"capability": "<name>", "quote": "<exact quote>"}]}`.
-3. The levels, confidences and quotes are the ones already in your text
-   answer, with the quotes copied exactly (the card is not a place for new
-   evidence). Pick the one or two strongest quotes. Never put a number out of
-   100 in the data: the card turns levels into rings itself using the
-   rubric's bands. A "not_shown" capability is shown as "Not shown" with an
-   empty ring, never as a zero.
-4. Escape the JSON properly (quotes, backslashes, newlines as `\n`) and write
-   `<` for any `<` inside a quote so it cannot end the data block.
-5. Show the whole filled file with the artifact tool. Don't save it anywhere
-   else and add no network calls, badges or extra text to it. The label is
-   already in the template.
-
-Then write the usual text answer. If the card was created, add one plain
-sentence just before the label (after the export sentence): "I also made a
-card of this result." Never say the card is verified or official.
-
 ## 7. The label
 
-Every response from this skill, including the too-short message and any
-"which one?" or "can't open it" message, ends with
-this line exactly, on its own line, after everything else (including the
+Every response from this skill, including the too-short message, any "which
+one?", "can't open it" or "no chat with that name" message, and the reply to
+the skill offer (step 6), ends with this line exactly, on its own line, after everything else (including the
 improvements and the offer):
 
 Self-assessment by Claude using Modo rubric v1 — not verified.
