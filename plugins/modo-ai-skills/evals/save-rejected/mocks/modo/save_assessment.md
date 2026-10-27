@@ -26,4 +26,4 @@ expect:
   evidence.4.quote: /^.{1,240}$/s
   evidence.4.capability: [problem_solving, verification, workflow_design, delegation, strategic_thinking]
 ---
-Input validation error: Invalid arguments for tool save_assessment: rubric_version: must be a rubric version this server knows ("v2")
+save_assessment failed: the assessment could not be stored. Nothing was saved; try again later.

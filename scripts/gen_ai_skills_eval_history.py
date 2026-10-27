@@ -16,7 +16,12 @@ under assessment is exactly the turns written here. Re-run after editing:
 
 import json
 import pathlib
+import sys
 import uuid
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from check_eval_records import EXPECT_SAVE_QUOTES, SAVE_TOOL  # noqa: E402
+from validate_assessment_record import CAPABILITIES  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills" / "evals"
 
@@ -225,7 +230,6 @@ CHATS["export-not-shown"] = CHATS["no-strategy"] + [
 # The cases that resume after the record was shown (confirm, decline, drop a
 # quote, scores only, rejected, show the passport) resume real recorded turns:
 # see scripts/record_ai_skills_eval_history.py --save.
-CAPS = ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")
 STRONG_LEVELS = {"problem_solving": (4, "medium"), "verification": (4, "high"),
                  "workflow_design": (2, "medium"), "delegation": (1, "medium"),
                  "strategic_thinking": (2, "low")}
@@ -241,14 +245,16 @@ CHATS["save-no-connector"] = _assessed
 # per case (never suite-wide), so every other case keeps running without it.
 # _tools.json is the real tools/list answer of modo-mcp (save_assessment and
 # get_passport), so the model sees the real descriptions and schemas.
-CONNECTOR_CASES = {
-    # case: indices of the quotes the save call must carry (None: no save expected)
-    "save-offered": None, "save-proposes": None, "save-declined": None,
-    "save-edit-reshows": None, "passport-shown": None,
-    "save-confirmed": 5, "save-rejected": 5, "save-quote-dropped": 4, "save-scores-only": 0,
-}
-REJECTED = ('Input validation error: Invalid arguments for tool save_assessment: '
-            'rubric_version: must be a rubric version this server knows ("v2")')
+# The cases that save take their quote counts from EXPECT_SAVE_QUOTES.
+CONNECTOR_CASES = ("save-offered", "save-proposes", "save-declined",
+                   "save-edit-reshows", "passport-shown", *EXPECT_SAVE_QUOTES)
+PASSPORT_TOOL = "get_passport"
+REJECTED_CASE = "save-rejected"
+# save-rejected: the record is valid by the plugin's own checks, which include
+# every rule the server validates (modo-mcp ticket 09: server rules = validator
+# --spec-only), so a validation error is not plausible. The server's other
+# error is a store failure; this is its exact text.
+REJECTED = "save_assessment failed: the assessment could not be stored. Nothing was saved; try again later."
 SAVED_TEXT = 'Saved assessment 3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42: "{{input.session_title}}" ({{input.session_date}}).'
 PASSPORT = {
     "latest": {k: {"level": l, "confidence": c, "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
@@ -262,25 +268,32 @@ TOOLS_JSON = pathlib.Path(__file__).resolve().parent / "modo_mcp_tools.json"
 
 
 def save_mock(quotes, error=False):
-    """The save_assessment mock: expect: guards abort the run on a bad call."""
+    """The save_assessment mock: expect: guards abort the run on a bad call.
+
+    quotes: how many quotes the save call must carry (None: no save expected,
+    so no quote is guarded)."""
     guards = ["rubric_version: v1", "session_title: /^.{1,120}$/s",
               r"session_date: /^\d{4}-\d{2}-\d{2}$/", "evidence: array"]
-    for k in CAPS:
+    for k in CAPABILITIES:
         guards.append(f'capabilities.{k}.level: ["1", "2", "3", "4", "5", not_shown]')
         guards.append(f"capabilities.{k}.confidence: [low, medium, high]")
     for i in range(quotes or 0):
         guards.append(f"evidence.{i}.quote: /^.{{1,240}}$/s")
-        guards.append(f"evidence.{i}.capability: [{', '.join(CAPS)}]")
+        guards.append(f"evidence.{i}.capability: [{', '.join(CAPABILITIES)}]")
     head = "---\n" + ("error: true\n" if error else "") + "expect:\n" + "".join(f"  {g}\n" for g in guards) + "---\n"
     return head + (REJECTED if error else SAVED_TEXT) + "\n"
 
 
+def case_save_mock(case):
+    return save_mock(EXPECT_SAVE_QUOTES.get(case), error=case == REJECTED_CASE)
+
+
 def write_mocks():
-    for case, quotes in CONNECTOR_CASES.items():
+    for case in CONNECTOR_CASES:
         d = HERE / case / "mocks" / "modo"
         d.mkdir(parents=True, exist_ok=True)
-        (d / "save_assessment.md").write_text(save_mock(quotes, error=case == "save-rejected"))
-        (d / "get_passport.md").write_text(json.dumps(PASSPORT, indent=2) + "\n")
+        (d / f"{SAVE_TOOL}.md").write_text(case_save_mock(case))
+        (d / f"{PASSPORT_TOOL}.md").write_text(json.dumps(PASSPORT, indent=2) + "\n")
         (d / "_tools.json").write_text(TOOLS_JSON.read_text())
         print(d)
 
@@ -302,8 +315,6 @@ def _check_quotes():
                     assert any(q in u for u in users), f"quote not in chat {chat}: {q!r}"
                     assert len(q) <= 240, q
 
-
-_check_quotes()
 
 # Distractors for the export file. Distinctive phrases let regex graders prove
 # that only the chosen chat was read.
@@ -465,20 +476,28 @@ def row(role, text, parent, n, session):
     }
 
 
-for case, turns in CHATS.items():
-    session = str(uuid.uuid5(uuid.NAMESPACE_URL, case))
-    rows, parent, n = [], None, 0
-    for user, assistant in turns:
-        for role, text in (("user", user), ("assistant", assistant)):
-            n += 1
-            r = row(role, text, parent, n, session)
-            rows.append(r)
-            parent = r["uuid"]
-    out = HERE / case / "history.jsonl"
-    out.parent.mkdir(exist_ok=True)
-    out.write_text("".join(json.dumps(r) + "\n" for r in rows))
-    print(out, len(rows))
+def write_histories():
+    for case, turns in CHATS.items():
+        session = str(uuid.uuid5(uuid.NAMESPACE_URL, case))
+        rows, parent, n = [], None, 0
+        for user, assistant in turns:
+            for role, text in (("user", user), ("assistant", assistant)):
+                n += 1
+                r = row(role, text, parent, n, session)
+                rows.append(r)
+                parent = r["uuid"]
+        out = HERE / case / "history.jsonl"
+        out.parent.mkdir(exist_ok=True)
+        out.write_text("".join(json.dumps(r) + "\n" for r in rows))
+        print(out, len(rows))
 
 
-write_extras()
-write_mocks()
+def main():
+    _check_quotes()
+    write_histories()
+    write_extras()
+    write_mocks()
+
+
+if __name__ == "__main__":
+    main()

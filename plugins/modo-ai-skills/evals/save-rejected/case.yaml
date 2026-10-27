@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: save-rejected
-description: "Third turn: the user confirms; the server rejects the record (rubric version); Claude explains, does not retry or alter the record."
+description: "Third turn: the user confirms; the server fails to store the record; Claude says nothing was saved and to try again later, does not retry or alter the record."
 plugins: ["../.."]
 runs: 2
 context:

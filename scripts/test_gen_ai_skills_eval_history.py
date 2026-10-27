@@ -1,0 +1,47 @@
+"""python3 -m unittest scripts/test_gen_ai_skills_eval_history.py
+
+The save cases' mocks of the Modo connector (ticket 10)."""
+
+import pathlib
+import sys
+import unittest
+
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+import gen_ai_skills_eval_history as gen  # noqa: E402
+
+EVALS = pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills" / "evals"
+
+# modo-mcp's answer when its store fails (modo-mcp, ticket 09: save_assessment
+# handler; copied by hand, not from the generator).
+STORE_FAILURE = "save_assessment failed: the assessment could not be stored. Nothing was saved; try again later."
+
+
+class SaveMock(unittest.TestCase):
+    def test_guards_every_expected_quote_and_no_more(self):
+        mock = gen.save_mock(4)
+        self.assertIn("evidence.3.quote:", mock)
+        self.assertNotIn("evidence.4.quote:", mock)
+
+    def test_no_quote_guards_when_no_save_is_expected(self):
+        self.assertNotIn("evidence.0.quote:", gen.save_mock(None))
+
+    def test_rejection_is_the_real_store_failure(self):
+        mock = gen.save_mock(5, error=True)
+        self.assertIn("error: true\n", mock)
+        self.assertTrue(mock.endswith("---\n" + STORE_FAILURE + "\n"))
+
+
+class CommittedMocks(unittest.TestCase):
+    def test_committed_save_mocks_match_the_generator(self):
+        for case in gen.CONNECTOR_CASES:
+            with self.subTest(case=case):
+                path = EVALS / case / "mocks" / "modo" / f"{gen.SAVE_TOOL}.md"
+                self.assertEqual(path.read_text(), gen.case_save_mock(case))
+
+    def test_only_connector_cases_have_the_connector(self):
+        with_mocks = sorted(p.parent.parent.name for p in EVALS.glob("*/mocks/modo"))
+        self.assertEqual(with_mocks, sorted(gen.CONNECTOR_CASES))
+
+
+if __name__ == "__main__":
+    unittest.main()
