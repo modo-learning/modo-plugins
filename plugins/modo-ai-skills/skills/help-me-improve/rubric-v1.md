@@ -51,10 +51,11 @@ user's words, Strategic Thinking is not shown.
 
 ### Level to 0-100 bands
 
-Used only where a 0-100 display is needed (such as a ring on a card). The text
-result shows the level, not a number out of 100.
+Used only to draw a visual (such as the ring on a card): the band value sets
+how full the ring is. No number out of 100 is shown anywhere. The card shows
+the level digit inside the ring, and the text result shows the level.
 
-| Level | Band | Shown as |
+| Level | Band | Ring fill |
 |---|---|---|
 | 1 | 0-20 | 10 |
 | 2 | 21-40 | 30 |
@@ -63,8 +64,9 @@ result shows the level, not a number out of 100.
 | 5 | 81-100 | 90 |
 | not shown | no score | no ring |
 
-A band is a range of possible values; the "shown as" value is its midpoint and
-is what a card displays. Nothing finer than a level is claimed.
+A band is a range of possible values; the ring-fill value is its midpoint and
+only sets how much of the ring is drawn. Nothing finer than a level is
+claimed.
 
 ---
 
@@ -139,6 +141,6 @@ changed:
 - Level 1 requires a quotable low-level moment. "Nothing shown" is not level 1.
 - High confidence needs at least 3 moments and at least 6 user messages. These
   thresholds are a judgement call and are not taken from any source.
-- The 0-100 bands are equal fifths. The shown-as value is the band midpoint.
+- The 0-100 bands are equal fifths. The ring-fill value is the band midpoint.
 - Changing any wording means a new version string (v2); results always record
   the rubric version they used.
