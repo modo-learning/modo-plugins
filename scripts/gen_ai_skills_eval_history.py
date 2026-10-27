@@ -217,6 +217,11 @@ for _case in ("export-approved", "export-quote-dropped", "export-scores-only",
 CHATS["export-not-shown"] = CHATS["no-strategy"] + [
     (ASSESS_REQUEST, ASSESSMENT_TACTICAL), (EXPORT_REQUEST, PROPOSAL_TACTICAL)]
 
+# Second-turn decline cases: the user says no to the skill offer (after the
+# assessment) or to the export (after the plan).
+CHATS["improve-decline"] = CHATS["export-proposes"]
+CHATS["export-decline"] = _strong_plan
+
 
 def _check_quotes():
     """Every quote in the planted texts must be a word-for-word user excerpt."""
@@ -282,10 +287,12 @@ def export_json(include_launch=True):
     return json.dumps(chats, indent=1)
 
 
-def session_rows():
-    """A Claude Code style session: 5 typed user messages, plus user-role rows
-    that only carry tool_result blocks (not written by the user)."""
-    sid = str(uuid.uuid5(uuid.NAMESPACE_URL, "session-file"))
+def _session(name):
+    """Row builders for a Claude Code style session named `name`.
+
+    Returns (rows, add, tool_use, tool_result); tool_result rows are
+    user-role rows that only carry tool output (not written by the user)."""
+    sid = str(uuid.uuid5(uuid.NAMESPACE_URL, name))
     rows, parent, n = [], None, 0
 
     def add(kind, content):
@@ -309,7 +316,32 @@ def session_rows():
     def tool_result(i, out):
         add("user", [{"type": "tool_result", "tool_use_id": f"toolu_{i}", "content": out}])
 
-    add("user", "The test tests/test_totals.py::test_discount_rounding fails in this repo. Find out why before changing anything, and show me the failing output first.")
+    return rows, add, tool_use, tool_result
+
+
+def short_session_rows():
+    """A session too short to judge: 2 typed user messages, 3 tool_result rows
+    (5 user-role rows in all, so counting tool output would pass the minimum)."""
+    rows, add, tool_use, tool_result = _session("session-too-short")
+    add("user", "Rename the function calc_total to order_total everywhere in this repo.")
+    tool_use(1, "Grep", {"pattern": "calc_total"}, "Finding every use first.")
+    tool_result(1, "shop/totals.py:3\nshop/cart.py:18\ntests/test_totals.py:5")
+    tool_use(2, "Edit", {"file_path": "/home/dev/shop/shop/totals.py", "old_string": "def calc_total", "new_string": "def order_total"})
+    tool_result(2, "The file /home/dev/shop/shop/totals.py has been updated.")
+    tool_use(3, "Bash", {"command": "sed -i 's/calc_total/order_total/g' shop/cart.py tests/test_totals.py"})
+    tool_result(3, "")
+    add("assistant", [{"type": "text", "text": "Renamed in totals.py, cart.py and the tests."}])
+    add("user", "Thanks, commit it with a short message.")
+    add("assistant", [{"type": "text", "text": "Committed as 'Rename calc_total to order_total'."}])
+    return rows
+
+
+def session_rows():
+    """A Claude Code style session: 5 typed user messages, plus user-role rows
+    that only carry tool_result blocks (not written by the user)."""
+    rows, add, tool_use, tool_result = _session("session-file")
+
+    add("user","The test tests/test_totals.py::test_discount_rounding fails in this repo. Find out why before changing anything, and show me the failing output first.")
     tool_use(1, "Bash", {"command": "pytest tests/test_totals.py::test_discount_rounding -x"}, "Running the failing test first.")
     tool_result(1, "FAILED tests/test_totals.py::test_discount_rounding - assert 10.01 == 10.0")
     tool_use(2, "Read", {"file_path": "/home/dev/shop/totals.py"})
@@ -348,6 +380,13 @@ def write_extras():
     put("export-file", "conversations.json", export_json())
     put("export-ambiguous", "conversations.json", export_json(include_launch=False))
     put("session-file", "session.jsonl", "".join(json.dumps(r) + "\n" for r in session_rows()))
+    put("export-too-short", "conversations.json", json.dumps([
+        _export_chat("c-cover", "Cover letter draft", "10-15",
+                     [u for u, _ in CHATS["too-short"]], [a for _, a in CHATS["too-short"]]),
+        _export_chat("c-lease", "Lease question", "10-12", LEASE_CHAT),
+    ], indent=1))
+    put("session-too-short", "session.jsonl",
+        "".join(json.dumps(r) + "\n" for r in short_session_rows()))
 
 
 def row(role, text, parent, n, session):
