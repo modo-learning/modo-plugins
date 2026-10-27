@@ -76,6 +76,10 @@ title or date.
   in a chat export, past chat or session file; for a chat that was pasted or
   is the current one and shows no date, today's date if your context gives it.
   If you have no date at all, ask for one in the same message.
+- If you already showed a title and date earlier in this conversation (for
+  example in an export plan), use exactly those in the report and record
+  unless the user changed them. Don't swap in today's date or comment on the
+  date.
 
 ## 3. The user decides
 
@@ -152,7 +156,10 @@ because no moment in the chat supports a level.
 
 Put one short line **before** the report (the record block must be the last
 thing in your message, with at most the label after it), depending on your
-tools:
+tools. Decide this from the tools you actually have in this session: you can
+create files only if one of them writes files (a file-writing or
+file-creation tool). Reading and searching tools don't count. If you are not
+sure you have one, you don't, and you must not offer to save a file or a PDF:
 
 - **You can create files here.** "This is exactly what would be saved as
   `modo-assessment-<session_date>.md` in the current folder. Say 'save it' (or
