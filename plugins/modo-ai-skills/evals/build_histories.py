@@ -58,6 +58,138 @@ CHATS = {
 }
 
 
+# ---- Extra sources (ticket 02): files and text that the cases point at -----
+
+# A normal chat with 5 user messages, used pasted, inside an export and as the
+# current chat of the no-browse case.
+LAUNCH_CHAT = [
+    ("Write the launch email for our new invoice reminders feature. Audience: existing customers on the Team plan, who pay by card. Tone: plain and friendly, under 120 words, one call to action.",
+     "Subject: Invoice reminders are here. Hi there, you can now send automatic reminders for unpaid invoices. Turn them on in Settings > Billing and we'll nudge late payers for you. Try it today."),
+    ("The call to action should link to the settings page, not the homepage. Also you said 'we'll nudge late payers for you' but reminders only go out to customers who have an email on file. Say that.",
+     "Subject: Invoice reminders are here. You can now send automatic reminders for unpaid invoices to customers who have an email on file. Turn them on at the link to your billing settings."),
+    ("Good. I need the same email for the Starter plan, but they pay by bank transfer, so drop the card line and keep everything else identical.",
+     "Here is the Starter version: same copy, with the card line removed."),
+    ("Before I send it, list every claim in the email that I should confirm with the product team.",
+     "Claims to confirm: (1) reminders go only to customers with an email on file; (2) the setting lives under Settings > Billing; (3) it is available on Starter and Team."),
+    ("Confirmed 1 and 2 with product, 3 is wrong, Starter doesn't get it until November. Remove that and give me a one-line subject for each plan.",
+     "Team: Invoice reminders are here. Starter: coming in November."),
+]
+
+# Current chat for the no-browse case (5 user messages).
+CHATS["current-chat-only"] = LAUNCH_CHAT
+
+# Distractors for the export file. Distinctive phrases let regex graders prove
+# that only the chosen chat was read.
+LEASE_CHAT = [
+    "Can you explain the zebra-lease-clause in my flat contract?",
+    "What does 'quiet enjoyment' mean there?",
+    "Summarise my notice period obligations.",
+    "Draft a polite email asking the landlord to fix the boiler.",
+]
+BUDGET_AUG = [
+    "Build a budget template for the design team for August.",
+    "Add a row for contractors.",
+    "Totals are wrong, the sum of column C should be 41,200.",
+    "Fine, export it as CSV.",
+]
+BUDGET_SEP = [
+    "Build a budget template for the design team for September.",
+    "Add a travel row.",
+    "Rename the sheet to sep-budget-final.",
+    "Fine, export it as CSV.",
+]
+
+
+def _export_chat(uuid_, name, day, users, assistants=None):
+    msgs = []
+    for i, u in enumerate(users):
+        t = f"2026-{day}T10:{i * 2:02d}:00Z"
+        msgs.append({"sender": "human", "text": u, "created_at": t})
+        a = assistants[i] if assistants else "Done."
+        msgs.append({"sender": "assistant", "text": a, "created_at": t})
+    return {"uuid": uuid_, "name": name, "created_at": f"2026-{day}T10:00:00Z",
+            "updated_at": f"2026-{day}T11:00:00Z", "chat_messages": msgs}
+
+
+def export_json(include_launch=True):
+    chats = []
+    if include_launch:
+        chats.append(_export_chat("c-launch", "Launch email copy", "10-14",
+                                  [u for u, _ in LAUNCH_CHAT], [a for _, a in LAUNCH_CHAT]))
+    chats.append(_export_chat("c-lease", "Lease question", "10-12", LEASE_CHAT))
+    chats.append(_export_chat("c-bud-aug", "Budget review", "08-20", BUDGET_AUG))
+    chats.append(_export_chat("c-bud-sep", "Budget review", "09-18", BUDGET_SEP))
+    return json.dumps(chats, indent=1)
+
+
+def session_rows():
+    """A Claude Code style session: 5 typed user messages, plus user-role rows
+    that only carry tool_result blocks (not written by the user)."""
+    sid = str(uuid.uuid5(uuid.NAMESPACE_URL, "session-file"))
+    rows, parent, n = [], None, 0
+
+    def add(kind, content):
+        nonlocal parent, n
+        n += 1
+        r = {
+            "parentUuid": parent, "isSidechain": False, "type": kind,
+            "message": {"role": kind, "content": content},
+            "uuid": str(uuid.uuid5(uuid.NAMESPACE_URL, f"{sid}-{n}")),
+            "timestamp": f"2026-10-21T09:{n:02d}:00.000Z",
+            "cwd": "/home/dev/shop", "sessionId": sid, "version": "2.0.0",
+        }
+        rows.append(r)
+        parent = r["uuid"]
+
+    def tool_use(i, name, inp, text=""):
+        blocks = [{"type": "text", "text": text}] if text else []
+        blocks.append({"type": "tool_use", "id": f"toolu_{i}", "name": name, "input": inp})
+        add("assistant", blocks)
+
+    def tool_result(i, out):
+        add("user", [{"type": "tool_result", "tool_use_id": f"toolu_{i}", "content": out}])
+
+    add("user", "The test tests/test_totals.py::test_discount_rounding fails in this repo. Find out why before changing anything, and show me the failing output first.")
+    tool_use(1, "Bash", {"command": "pytest tests/test_totals.py::test_discount_rounding -x"}, "Running the failing test first.")
+    tool_result(1, "FAILED tests/test_totals.py::test_discount_rounding - assert 10.01 == 10.0")
+    tool_use(2, "Read", {"file_path": "/home/dev/shop/totals.py"})
+    tool_result(2, "def discount(price, pct):\n    return round(price * pct / 100, 2)\n")
+    add("assistant", [{"type": "text", "text": "The discount is rounded after multiplying, so 10.005 becomes 10.01. I suggest rounding half down."}])
+    add("user", "Don't pick that yet. The spec in docs/pricing.md says half-up to the cent. Check what the spec actually says and quote the line before you change the code.")
+    tool_use(3, "Read", {"file_path": "/home/dev/shop/docs/pricing.md"})
+    tool_result(3, "Discounts are rounded half-up to the nearest cent, after summing line items.")
+    add("assistant", [{"type": "text", "text": "The spec says: 'Discounts are rounded half-up to the nearest cent, after summing line items.' The bug is that rounding happens per line item."}])
+    add("user", "Good. Fix it so rounding happens once, after summing. Add two edge-case tests first: a total of 10.005 and a total of 0.")
+    tool_use(4, "Edit", {"file_path": "/home/dev/shop/tests/test_totals.py", "old_string": "# edge cases", "new_string": "def test_half_up():\n    assert total([10.005]) == 10.01\n\ndef test_zero():\n    assert total([]) == 0"})
+    tool_result(4, "The file /home/dev/shop/tests/test_totals.py has been updated.")
+    tool_use(5, "Bash", {"command": "pytest tests/test_totals.py"}, "Now the fix, then the run.")
+    tool_result(5, "3 passed in 0.04s")
+    add("assistant", [{"type": "text", "text": "Rounding now happens once after summing; all three tests pass."}])
+    add("user", "Run the whole suite, not just that file. I want to see the summary line, and tell me if anything else changed behaviour.")
+    tool_use(6, "Bash", {"command": "pytest"})
+    tool_result(6, "42 passed, 1 skipped in 1.9s")
+    add("assistant", [{"type": "text", "text": "42 passed, 1 skipped. The skipped test was already skipped before my change."}])
+    add("user", "Show me that the skipped test was skipped before, with git stash and a run on the old code, I don't take it on trust.")
+    tool_use(7, "Bash", {"command": "git stash && pytest -rs && git stash pop"})
+    tool_result(7, "SKIPPED [1] tests/test_export.py:12: needs network\n42 passed, 1 skipped")
+    add("assistant", [{"type": "text", "text": "Confirmed: the same test is skipped on the old code, for needing network."}])
+    return rows
+
+
+def write_extras():
+    cases = HERE
+    # pasted text has no file; its prompt is written by hand.
+    def put(case, name, text):
+        d = cases / case / "resources"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / name).write_text(text)
+        print(d / name)
+
+    put("export-file", "conversations.json", export_json())
+    put("export-ambiguous", "conversations.json", export_json(include_launch=False))
+    put("session-file", "session.jsonl", "".join(json.dumps(r) + "\n" for r in session_rows()))
+
+
 def row(role, text, parent, n, session):
     content = text if role == "user" else [{"type": "text", "text": text}]
     return {
@@ -85,3 +217,6 @@ for case, turns in CHATS.items():
     out.parent.mkdir(exist_ok=True)
     out.write_text("".join(json.dumps(r) + "\n" for r in rows))
     print(out, len(rows))
+
+
+write_extras()

@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: pasted-text
+description: Chat pasted into the prompt (5 user messages); assessed with the usual output and an opening line saying it was the pasted chat.
+plugins: ["../.."]
+runs: 2
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

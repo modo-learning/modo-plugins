@@ -1,6 +1,6 @@
 ---
 name: assess-my-ai-work
-description: Assess how well the user works with AI in the current chat, scored against Modo's public rubric on five capabilities (Problem Solving, Verification, Workflow Design, Delegation, Strategic Thinking), with a level, a confidence label, quotes from the chat as evidence and what the next level looks like. Use when the user runs /assess-my-ai-work, or asks how good they are at using AI, to assess or score this chat or their AI skills, or how well they prompt, verify or delegate to Claude.
+description: Assess how well the user works with AI in one chat (the current chat, a past chat they name, a chat they paste, a chat export file or a Claude Code session file they point to), scored against Modo's public rubric on five capabilities (Problem Solving, Verification, Workflow Design, Delegation, Strategic Thinking), with a level, a confidence label, quotes from the chat as evidence and what the next level looks like. Use when the user runs /assess-my-ai-work, or asks how good they are at using AI, to assess or score this chat, a named chat, pasted text or a file, or their AI skills, or how well they prompt, verify or delegate to Claude.
 ---
 
 # Assess my AI work
@@ -16,11 +16,12 @@ memory or from your own idea of what good AI use looks like.
 
 ## Ground rules
 
-- This version assesses **the current chat only**: the messages exchanged here
-  before the user asked for the assessment. Don't search, list or open any
-  other chat, and don't look for files or logs. If the user asks about a
-  different chat or a file, say this version assesses the chat they are in,
-  and suggest they run it inside the chat they want assessed.
+- Assess **exactly one chat**, the one the user chose. Never search, list,
+  skim or open any other chat, and never look around for files or logs. Do not
+  mention or offer coding-tool session logs or transcripts (such as Claude
+  Code's) unless the user themselves points to one. If the user asks for "all
+  my chats", "my recent chats" or an overall picture, say in one line that you
+  assess one chat at a time, and assess the current chat (step 0).
 - Only the **user's own messages** are evidence. Claude's replies are context.
 - Quote the user exactly, each quote under 240 characters. Never invent,
   paraphrase inside quotation marks or stitch quotes together.
@@ -31,14 +32,53 @@ memory or from your own idea of what good AI use looks like.
   rankings or comparisons with other people. "Verification" as the name of a
   capability is fine.
 
+## 0. Find the chat
+
+Use the first of these that matches what the user said.
+
+- **No source named**: the current chat, meaning the messages exchanged here
+  before the request to assess it.
+- **Pasted text**: the chat the user pasted into their message. Their messages
+  are the parts labelled as theirs ("You", "Me", "User", "Human" or similar).
+  If you can't tell which parts are theirs, ask in one short question.
+- **A file the user names** (a chat export such as `conversations.json`, or a
+  Claude Code session file `.jsonl`): read only that file with your file
+  tools, by the exact path given. If it doesn't exist or can't be read, say
+  so and ask for the right path or for the chat pasted; don't search for it.
+  - *Chat export*: each chat has a title, a date and a list of messages with
+    the sender (`human` is the user). If the user named one chat, use the one
+    whose title matches. If the file holds several chats and none was named,
+    ask "which one?" and list the titles with dates. If it holds exactly one,
+    use it.
+  - *Claude Code session file*: one JSON object per line. The user's messages
+    are the lines with `"type": "user"` whose message content is text the
+    user typed. Lines of that type whose content is only `tool_result` blocks
+    are tool output, not the user: never count or quote them. Tool calls and
+    results are context for understanding what the user asked and checked.
+- **A past chat the user names, without a file or pasted text**: use the
+  past-chat tools you have (if any) only to find and open that one chat. Do
+  not list recent chats, search by topic or read any chat other than the one
+  chosen. If more than one chat plausibly matches the name, don't pick: ask
+  "which one?" in one short question, giving each candidate's title and date.
+  If none matches, say so. If you have no tool that can open past chats, say
+  plainly that you can't open past chats here and offer three ways forward:
+  paste the chat, point to a chat export file, or run this in the chat they
+  want assessed. Never describe or score a chat you haven't opened.
+
+Never guess which chat is meant. A question about which chat, or a statement
+that you can't open one, is a short message of its own: no scores, no
+rubric summary, nothing else besides the label (step 4).
+
+Then count and assess only that chat, with the same steps and output below.
+
 ## 1. Count the user's messages
 
-Count the messages the user wrote in this chat **before** the request to
-assess it. Don't count that request, pasted tool output, or anything Claude
-wrote.
+Count the messages the user wrote in the chosen chat. For the current chat,
+that means before the request to assess it. Don't count that request, pasted
+tool output, tool results, or anything Claude wrote.
 
 **Fewer than 4: stop here.** Don't score, don't hint at a level, don't give a
-verdict. Say plainly that the chat is too short to judge (give the count and
+verdict. Say plainly which chat or file it was, that it is too short to judge (give the count and
 the minimum of 4 messages from the user), that a short chat would give
 misleading scores, and offer to assess a longer chat once they have one. End
 with the label (see step 4).
@@ -67,7 +107,7 @@ Solving, Verification, Workflow Design, Delegation, Strategic Thinking.
 Plain text that reads well in a terminal. No tables. Keep to this shape:
 
 ```
-Assessment of this chat (<n> messages from you), against Modo rubric v1.
+Assessment of <which chat> (<n> messages from you), against Modo rubric v1.
 
 Problem Solving: Level 3 of 5 (confidence: medium)
   Evidence: "<exact quote>"; "<exact quote>"
@@ -86,6 +126,13 @@ Strategic Thinking: ...
 <the label>
 ```
 
+- The opening line always says which chat or file was assessed, in these
+  forms: "this chat", "the chat you pasted", `your chat "<title>" (<date>)`
+  from an export or a past chat, or "the Claude Code session file <name>".
+  Use the same words in the too-short message.
+- If the user asked for several chats or an overall picture, add one line
+  right after the opening line: "I assess one chat at a time, so this covers
+  only this chat." Say nothing else about other chats.
 - Use "Level N of 5" so it is clear what the number is. Don't convert levels
   to a score out of 100 in this text.
 - After the five capabilities, add no summary verdict, advice or offers
@@ -93,7 +140,8 @@ Strategic Thinking: ...
 
 ## 4. The label
 
-Every response from this skill, including the too-short message, ends with
+Every response from this skill, including the too-short message and any
+"which one?" or "can't open it" message, ends with
 this line exactly, on its own line:
 
 Self-assessment by Claude using Modo rubric v1 — not verified.

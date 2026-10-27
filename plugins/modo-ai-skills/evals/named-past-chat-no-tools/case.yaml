@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: named-past-chat-no-tools
+description: User names a past chat but this run has no past-chat tools and no file; must say it cannot open it, offer paste/export/run-in-chat, invent nothing.
+plugins: ["../.."]
+runs: 2
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

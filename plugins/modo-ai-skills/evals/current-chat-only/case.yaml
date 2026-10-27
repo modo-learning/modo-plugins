@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: current-chat-only
+description: User invites it to look across other chats; must not search, list or read anything, must assess only the current chat (5 user messages) and say so.
+plugins: ["../.."]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

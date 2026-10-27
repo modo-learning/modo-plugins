@@ -1,0 +1,146 @@
+[
+ {
+  "uuid": "c-lease",
+  "name": "Lease question",
+  "created_at": "2026-10-12T10:00:00Z",
+  "updated_at": "2026-10-12T11:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Can you explain the zebra-lease-clause in my flat contract?",
+    "created_at": "2026-10-12T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-10-12T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "What does 'quiet enjoyment' mean there?",
+    "created_at": "2026-10-12T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-10-12T10:02:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Summarise my notice period obligations.",
+    "created_at": "2026-10-12T10:04:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-10-12T10:04:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Draft a polite email asking the landlord to fix the boiler.",
+    "created_at": "2026-10-12T10:06:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-10-12T10:06:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "c-bud-aug",
+  "name": "Budget review",
+  "created_at": "2026-08-20T10:00:00Z",
+  "updated_at": "2026-08-20T11:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Build a budget template for the design team for August.",
+    "created_at": "2026-08-20T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-08-20T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Add a row for contractors.",
+    "created_at": "2026-08-20T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-08-20T10:02:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Totals are wrong, the sum of column C should be 41,200.",
+    "created_at": "2026-08-20T10:04:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-08-20T10:04:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Fine, export it as CSV.",
+    "created_at": "2026-08-20T10:06:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-08-20T10:06:00Z"
+   }
+  ]
+ },
+ {
+  "uuid": "c-bud-sep",
+  "name": "Budget review",
+  "created_at": "2026-09-18T10:00:00Z",
+  "updated_at": "2026-09-18T11:00:00Z",
+  "chat_messages": [
+   {
+    "sender": "human",
+    "text": "Build a budget template for the design team for September.",
+    "created_at": "2026-09-18T10:00:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-09-18T10:00:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Add a travel row.",
+    "created_at": "2026-09-18T10:02:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-09-18T10:02:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Rename the sheet to sep-budget-final.",
+    "created_at": "2026-09-18T10:04:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-09-18T10:04:00Z"
+   },
+   {
+    "sender": "human",
+    "text": "Fine, export it as CSV.",
+    "created_at": "2026-09-18T10:06:00Z"
+   },
+   {
+    "sender": "assistant",
+    "text": "Done.",
+    "created_at": "2026-09-18T10:06:00Z"
+   }
+  ]
+ }
+]
