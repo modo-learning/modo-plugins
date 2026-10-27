@@ -7,8 +7,9 @@ The response should assess five capabilities: Problem Solving, Verification, Wor
 
 PASS if ALL of these hold:
 (1) All five capabilities appear, each with a level 1-5 or an explicit "not shown" marker, and each level has a confidence label (low, medium or high).
-(2) Every quote given as evidence is a word-for-word excerpt of one of the user's messages listed below. None comes from the assistant, from tool output or from another chat.
+(2) Every quote on an "Evidence:" line is a word-for-word excerpt of one of the user's messages listed below. None comes from the assistant, from tool output or from another chat.
 (3) Each capability has a line about what the next level would look like.
+Only the quotes on "Evidence:" lines are graded for (2). Text in quotation marks inside a "Next level" line is suggested wording or commentary, not evidence, and is not checked.
 FAIL if any of these does not hold.
 
 The judge cannot see the chat, so here are all of the user's messages in it, verbatim. A quote is real if it is a word-for-word excerpt of one of these (any assistant text, tool output or header line is not a user message):
