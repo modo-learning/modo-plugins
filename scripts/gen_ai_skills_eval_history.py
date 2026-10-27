@@ -1,17 +1,24 @@
-"""Writes the hand-written "current chat" transcripts the eval cases resume.
+"""Write the hand-written chats the modo-ai-skills eval cases use.
+
+Writes plugins/modo-ai-skills/evals/<case>/history.jsonl (the "current chat"
+transcripts the cases resume) and the files under <case>/resources/ that the
+file-source cases copy in with scaffold.sh. Every name, company and figure here
+is invented.
 
 Each case's history.jsonl is a minimal Claude Code session file (user and
 assistant turns only). The case prompt becomes the next user turn, so the chat
 under assessment is exactly the turns written here. Re-run after editing:
 
-    python3 -I plugins/modo-ai-skills/evals/build_histories.py
+    python3 -I scripts/gen_ai_skills_eval_history.py
+
+(from any folder; paths are resolved from this file's location)
 """
 
 import json
 import pathlib
 import uuid
 
-HERE = pathlib.Path(__file__).parent
+HERE = pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills" / "evals"
 
 CHATS = {
     # Strong verification, weak delegation, ad hoc workflow (7 user messages).
