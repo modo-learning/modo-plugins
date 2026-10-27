@@ -32,8 +32,8 @@ concrete to keep.
 - **A card** in claude.ai and Cowork (see [The card](#the-card)).
 - **An export** when you ask for one (see [Export a report](#export-a-report)).
 - **Saving to your Modo passport**, only where the Modo connector is
-  connected, which is not yet the case for anyone outside Modo's developers
-  (see [Save to your Modo passport](#save-to-your-modo-passport)).
+  connected. The connector is not published; without it, the plugin offers
+  the export only (see [Save to your Modo passport](#save-to-your-modo-passport)).
 
 Every result ends with this label:
 
@@ -203,9 +203,9 @@ export is the Markdown report, and a PDF on request.
 
 ## Save to your Modo passport
 
-This needs the **Modo connector**, which is not published yet: the plugin
-ships without it, and saving is offered only in a session where it has been
-added (see [For developers: add the connector](#for-developers-add-the-connector)).
+Saving needs the **Modo connector**, which is not published; without it, the
+plugin offers export only. The plugin ships without a connector entry, and
+saving is offered only in a session where the connector has been added.
 Claude recognises the connector by its tools, `save_assessment` and
 `get_passport`, whatever name the connector was added under.
 
@@ -239,7 +239,8 @@ If the server rejects the record, Claude says nothing was saved and what the
 server said. It does not send it again on its own and never changes the
 record to get it accepted (for example to another rubric version). If a
 change you can make would fix it, such as dropping a quote, it shows the new
-record for your yes; otherwise it offers the export.
+record for your yes. If the server could not store the record, Claude says
+you can try again later and offers the export; otherwise it offers the export.
 
 **Your passport.** Ask "show my Modo passport" (or say yes after a save).
 Claude calls `get_passport` and shows the latest level and confidence for
@@ -254,21 +255,6 @@ machine-readable block, described in
 scores only), `session_title` (at most 120 characters) and `session_date`. It
 never sends the chat, a summary, Claude's replies, the next-level notes, the
 improvements or the prompts.
-
-### For developers: add the connector
-
-The connector is the Modo MCP server (`modo-mcp`), which today runs locally
-with a development token; it has no public address yet. Run it as its README
-says, then add it to Claude Code:
-
-```
-claude mcp add --transport http modo http://127.0.0.1:8787/mcp \
-  --header "Authorization: Bearer <MODO_MCP_DEV_TOKEN>"
-```
-
-Remove it with `claude mcp remove modo`. The plugin itself gets no connector
-entry until a real endpoint exists, so users never see a connector that
-doesn't work.
 
 ## What it reads, what it sends, and your privacy
 
