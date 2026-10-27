@@ -50,7 +50,10 @@ Solving, Verification, Workflow Design, Delegation, Strategic Thinking.
 
 1. Find the user's messages that bear on it.
 2. Pick the level (1 to 5) per the rubric, or **not shown** if nothing in
-   their messages bears on it. Don't fill a gap with a middle score.
+   their messages bears on it. Don't fill a gap with a middle score, and
+   don't give level 1 for a lack of evidence: level 1 needs a quote that
+   shows the low-level behaviour itself. Never use a quote as evidence for a
+   capability it doesn't bear on.
 3. Set confidence (low, medium, high) using the rubric's definitions.
 4. Choose one or two exact quotes from the user's messages that justify that
    level.

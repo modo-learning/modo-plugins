@@ -36,7 +36,10 @@ verified."
 
 Use **not shown** when nothing in the user's messages bears on the capability,
 so any level would be a guess. Missing evidence is not level 1. Level 1 needs
-a quotable moment where the low-level behaviour appears.
+a quotable moment where the low-level behaviour appears. Doing small,
+well-specified tasks is not itself low-level behaviour in a capability: when a
+chat is only mechanical tasks with no goal, choice, trade-off or handoff in the
+user's words, Strategic Thinking is not shown.
 
 ### Confidence
 
@@ -120,7 +123,7 @@ Deciding where AI is worth using, and tying the work to a larger goal.
 
 | Level | What the user's messages show |
 |---|---|
-| 1 | Uses Claude for the immediate task only, and leaves the choice of approach to Claude without stating a goal beyond it. |
+| 1 | Explicitly leaves the choice of approach or direction to Claude (for example "whatever you think is best") without stating a goal beyond the task. |
 | 2 | Mentions the purpose or audience in passing. Does not weigh alternatives or consequences. |
 | 3 | Connects the task to a goal beyond the chat (a decision, a deadline, an audience) and uses it to decide what to prioritise. |
 | 4 | Weighs options and trade-offs (time, cost, risk, quality) and uses Claude to test the plan: alternatives, counter-arguments, risks. |
