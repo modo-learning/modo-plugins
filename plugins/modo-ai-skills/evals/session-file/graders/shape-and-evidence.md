@@ -19,3 +19,5 @@ The judge cannot see the chat, so here are all of the user's messages in it, ver
 3. Good. Fix it so rounding happens once, after summing. Add two edge-case tests first: a total of 10.005 and a total of 0.
 4. Run the whole suite, not just that file. I want to see the summary line, and tell me if anything else changed behaviour.
 5. Show me that the skipped test was skipped before, with git stash and a run on the old code, I don't take it on trust.
+
+An "Improvements" section after the five capability blocks (techniques, copy-ready prompts, a skill offer) is not one of the five blocks; ignore it for this check.

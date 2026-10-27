@@ -22,11 +22,19 @@ Ask "how good am I at using AI?" or "assess this chat", or in Claude Code run
 `/modo-ai-skills:assess-my-ai-work`. It reads only the chat you are in, and
 needs at least 4 messages from you to give scores.
 
+After the scores, the assessment names your two weakest shown capabilities
+and gives each a technique and a prompt to try next time, then offers (only
+offers) to turn them into a reusable skill. To work on one capability without
+an assessment, ask "how do I get better at verification?" or run
+`/modo-ai-skills:help-me-improve`.
+
 ## The rubric
 
 The rubric is public and versioned:
 [skills/assess-my-ai-work/rubric-v1.md](skills/assess-my-ai-work/rubric-v1.md).
-Every result is labelled "Self-assessment by Claude using Modo rubric v1 — not
+The help-me-improve skill keeps an identical copy so each skill folder is
+self-contained; `python3 scripts/check_rubric_sync.py plugins/modo-ai-skills`
+fails if the two differ. Every result is labelled "Self-assessment by Claude using Modo rubric v1 — not
 verified."
 
 ## License

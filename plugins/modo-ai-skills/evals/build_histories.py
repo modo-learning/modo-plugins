@@ -14,7 +14,9 @@ import uuid
 HERE = pathlib.Path(__file__).parent
 
 CHATS = {
-    # Strong verification, weak delegation (7 user messages).
+    # Strong verification, weak delegation, ad hoc workflow (7 user messages).
+    # Steps are taken one at a time with the setup repeated (message 6), no plan
+    # or reusable process. Used by the assess case and the improvement cases.
     "strong-verify-weak-delegate": [
         ("Write up my Q3 pricing analysis for the board. Revenue by tier. Q3: Starter $120k, Team $310k, Enterprise $570k. Q2: Starter $110k, Team $280k, Enterprise $450k.",
          "Q3 revenue was $1,000k against $840k in Q2, up 19.0%.\n\n| Tier | Q2 | Q3 | Growth |\n|---|---|---|---|\n| Starter | $110k | $120k | 9.1% |\n| Team | $280k | $310k | 14.3% |\n| Enterprise | $450k | $570k | 26.7% |\n\nEnterprise tiers typically grow 20-25% quarter on quarter in SaaS, so 26.7% is ahead of the norm."),
@@ -26,7 +28,7 @@ CHATS = {
          "Recommendations: (1) raise Starter by 10%, (2) offer an annual-billing discount on Team, (3) add a premium support add-on to Enterprise. Together these should add about $45k per quarter."),
         ("Where does the $45k come from? Walk me through the arithmetic with the numbers I gave you, and tell me which assumptions you made that I didn't give you.",
          "The $45k assumes Starter keeps 100% of its users after the increase (+$12k), 30% of Team customers take the annual discount at a 5% cost (-$4.6k) and a 15% attach rate for support add-ons on Enterprise (+$38k). The attach rate and the Team take-up are my assumptions, not from your data."),
-        ("Those assumptions aren't in my data. Rerun it three ways: no change in churn, 5% extra churn, 10% extra churn. I'll check the three results against my own spreadsheet before they go in the deck.",
+        ("Those assumptions aren't in my data. Same board pricing analysis as before, Starter $120k, Team $310k, Enterprise $570k in Q3 and $110k, $280k, $450k in Q2. Rerun it three ways: no change in churn, 5% extra churn, 10% extra churn. I'll check the three results against my own spreadsheet before they go in the deck.",
          "No extra churn: +$45.4k per quarter. 5% extra churn: +$24.9k. 10% extra churn: +$4.4k."),
         ("The first two match my spreadsheet within rounding, the third is off by $2k, so fix that one. Then finish the rest of the deck, all the slides.",
          "Corrected the 10% churn case to +$2.4k. Here is a full ten-slide deck outline with speaker notes for each slide."),
@@ -74,6 +76,10 @@ LAUNCH_CHAT = [
     ("Confirmed 1 and 2 with product, 3 is wrong, Starter doesn't get it until November. Remove that and give me a one-line subject for each plan.",
      "Team: Invoice reminders are here. Starter: coming in November."),
 ]
+
+# Ticket 03: the improvement cases assess the same planted chats as above.
+CHATS["improve-weak-capabilities"] = CHATS["strong-verify-weak-delegate"]
+CHATS["improve-not-shown"] = CHATS["no-strategy"]
 
 # Current chat for the no-browse case (5 user messages).
 CHATS["current-chat-only"] = LAUNCH_CHAT

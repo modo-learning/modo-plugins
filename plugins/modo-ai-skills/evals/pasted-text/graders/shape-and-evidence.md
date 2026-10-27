@@ -19,3 +19,5 @@ The judge cannot see the chat, so here are all of the user's messages in it, ver
 3. Good. I need the same email for the Starter plan, but they pay by bank transfer, so drop the card line and keep everything else identical.
 4. Before I send it, list every claim in the email that I should confirm with the product team.
 5. Confirmed 1 and 2 with product, 3 is wrong, Starter doesn't get it until November. Remove that and give me a one-line subject for each plan.
+
+An "Improvements" section after the five capability blocks (techniques, copy-ready prompts, a skill offer) is not one of the five blocks; ignore it for this check.

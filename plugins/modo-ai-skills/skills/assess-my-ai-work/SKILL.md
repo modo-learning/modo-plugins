@@ -67,7 +67,7 @@ Use the first of these that matches what the user said.
 
 Never guess which chat is meant. A question about which chat, or a statement
 that you can't open one, is a short message of its own: no scores, no
-rubric summary, nothing else besides the label (step 4).
+rubric summary, nothing else besides the label (step 6).
 
 Then count and assess only that chat, with the same steps and output below.
 
@@ -81,7 +81,7 @@ tool output, tool results, or anything Claude wrote.
 verdict. Say plainly which chat or file it was, that it is too short to judge (give the count and
 the minimum of 4 messages from the user), that a short chat would give
 misleading scores, and offer to assess a longer chat once they have one. End
-with the label (see step 4).
+with the label (see step 6).
 
 ## 2. Score each capability
 
@@ -135,13 +135,73 @@ Strategic Thinking: ...
   only this chat." Say nothing else about other chats.
 - Use "Level N of 5" so it is clear what the number is. Don't convert levels
   to a score out of 100 in this text.
-- After the five capabilities, add no summary verdict, advice or offers
-  beyond what the rubric asks. The five blocks and the label are the result.
+- Add no summary verdict. After the five blocks comes only the improvements
+  section (step 4) and then the label. The order is always: five blocks,
+  improvements, skill offer, label last.
 
-## 4. The label
+## 4. Improvements
+
+Right after the five blocks, add this section so the user can act on the
+score. It uses the same chat and the same rubric file; it is not scored and
+adds no new evidence. The too-short, "which one?" and "can't open it"
+messages have no improvements section.
+
+**Choose the two weakest capabilities that were shown.**
+1. Take only capabilities with a level 1 to 5. **Never choose a "not shown"
+   one**: there is nothing to improve from, and no technique or prompt for it
+   appears anywhere in the section.
+2. Rank by level, lowest first.
+3. Tie on level: the one with the **higher confidence** goes first (a firmly
+   shown weakness is the better thing to work on than a doubtful one). Still
+   tied: take the earlier one in rubric order (Problem Solving, Verification,
+   Workflow Design, Delegation, Strategic Thinking).
+4. If only one capability was shown, improve that one. If none, skip this
+   section (and the skill offer) and go straight to the label.
+
+Write it in this shape, once per chosen capability:
+
+```
+Improvements
+
+1. <Capability> (Level N of 5 now)
+   Technique: <what to do differently, taken from the rubric's next level up>
+   Try this next time: "<a prompt the user can copy and paste as it stands>"
+
+2. <Capability> ...
+```
+
+- The **technique** is the step to the next level of that capability in the
+  rubric file, in its terms and tied to this chat (for example the moment you
+  quoted). For level 5, say how to keep it up. No generic advice ("be
+  clearer") that you can't trace to a line of the rubric.
+- The **prompt** is written to Claude, ready to paste, using this user's own
+  subject matter from the chat where it helps. Leave no placeholders except
+  clearly marked names or numbers only the user can supply.
+
+Then end the section with one offer, as a question: do they want these turned
+into one reusable skill they can keep. Say that nothing is saved unless they
+choose. Create nothing yet.
+
+## 5. When the user answers the offer
+
+- **No, or no reply about it.** Accept in one line. Don't draft anything.
+- **Yes.** Build one skill that applies both techniques (the instructions hold
+  the technique and the prompt for each capability, in the user's own subject
+  area). Use the first of these that is available:
+  1. A tool that proposes a skill for the user to save (claude.ai shows it as
+     a "Save skill" card). The user still decides by saving or dismissing it.
+  2. A skill-creator skill: hand it the techniques and prompts.
+  3. Otherwise write the complete skill here in the chat: a front matter
+     block with `name` (lowercase, hyphens) and a `description` saying when
+     to use it, then the instructions. Tell them to save it as a skill from
+     Claude's skills settings.
+  Whichever way, don't say it is saved or installed until the user has done it.
+
+## 6. The label
 
 Every response from this skill, including the too-short message and any
 "which one?" or "can't open it" message, ends with
-this line exactly, on its own line:
+this line exactly, on its own line, after everything else (including the
+improvements and the offer):
 
 Self-assessment by Claude using Modo rubric v1 — not verified.
