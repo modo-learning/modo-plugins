@@ -51,9 +51,9 @@ is in [skills/export-assessment/RECORD.md](skills/export-assessment/RECORD.md).
 The rubric is public and versioned:
 [skills/assess-my-ai-work/rubric-v1.md](skills/assess-my-ai-work/rubric-v1.md).
 The help-me-improve skill keeps an identical copy so each skill folder is
-self-contained; `python3 scripts/check_rubric_sync.py plugins/modo-ai-skills`
-fails if the two differ. Every result is labelled "Self-assessment by Claude using Modo rubric v1 — not
-verified."
+self-contained; a check in the plugin's source repository keeps the two
+copies identical. Every assessment and export result is labelled
+"Self-assessment by Claude using Modo rubric v1 — not verified."
 
 ## License
 

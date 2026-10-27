@@ -5,6 +5,11 @@ Source: https://claude.com/docs/plugins/pre-submission-checklist
 This does not replace the developer portal's Validate button; run that too
 before submitting.
 
+Two repo checks are added: when the plugin holds more than one rubric-v*.md,
+the copies must be identical (scripts/check_rubric_sync.py, blocking); and raw
+eval run files left beside cases are reported with the command that removes
+them (scripts/clean_eval_runs.py, not blocking: they are git-ignored).
+
 Usage: python3 scripts/check_store_ready.py plugins/modo-task-finder
 """
 
@@ -13,6 +18,10 @@ import pathlib
 import re
 import subprocess
 import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import check_rubric_sync  # noqa: E402
+import clean_eval_runs  # noqa: E402
 
 JUNK = {".DS_Store", "Thumbs.db", "desktop.ini", "__MACOSX"}
 NAME = re.compile(r"^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$")
@@ -26,8 +35,8 @@ def readme_words(text: str) -> int:
     return len(re.findall(r"\b\w+\b", text))
 
 
-def main(folder: str) -> None:
-    root = pathlib.Path(folder)
+def check(root: pathlib.Path, run_validate: bool = True):
+    """Return (blocking problems, holds and warnings, file count) for one plugin."""
     problems, holds = [], []
     files = [p for p in root.rglob("*") if ".git" not in p.parts]
 
@@ -89,11 +98,25 @@ def main(folder: str) -> None:
     if file_count > 512:
         holds.append(f"{file_count} files (over 512), held for review")
 
-    result = subprocess.run(["claude", "plugin", "validate", str(root)],
-                            capture_output=True, text=True)
-    if result.returncode != 0:
-        problems.append("claude plugin validate failed:\n" + result.stdout + result.stderr)
+    if len(list(root.rglob("rubric-v*.md"))) > 1:
+        problems.extend("rubric copies differ: " + p for p in check_rubric_sync.check(root))
 
+    runs = clean_eval_runs.raw_runs(root)
+    if runs:
+        holds.append(f"{len(runs)} raw eval run file(s) or folder(s) under {root / 'evals'} "
+                     "(git-ignored, not shipped); remove them with "
+                     "python3 scripts/clean_eval_runs.py --delete")
+
+    if run_validate:
+        result = subprocess.run(["claude", "plugin", "validate", str(root)],
+                                capture_output=True, text=True)
+        if result.returncode != 0:
+            problems.append("claude plugin validate failed:\n" + result.stdout + result.stderr)
+    return problems, holds, file_count
+
+
+def main(folder: str) -> None:
+    problems, holds, file_count = check(pathlib.Path(folder))
     for h in holds:
         print("HOLD/WARN:", h)
     for p in problems:
