@@ -217,10 +217,8 @@ for _case in ("export-approved", "export-quote-dropped", "export-scores-only",
 CHATS["export-not-shown"] = CHATS["no-strategy"] + [
     (ASSESS_REQUEST, ASSESSMENT_TACTICAL), (EXPORT_REQUEST, PROPOSAL_TACTICAL)]
 
-# Second-turn decline cases: the user says no to the skill offer (after the
-# assessment) or to the export (after the plan).
-CHATS["improve-decline"] = CHATS["export-proposes"]
-CHATS["export-decline"] = _strong_plan
+# The decline cases (improve-decline, export-decline) resume real recorded
+# turns instead: see scripts/record_ai_skills_eval_history.py.
 
 
 def _check_quotes():
