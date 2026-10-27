@@ -258,13 +258,14 @@ After that offer (or, when there is no improvements section, after the five
 blocks) add one plain sentence, not a question: they can also ask you to
 export this assessment as a report, and nothing is written unless they ask.
 
-Only if you have the Modo connector's save tool in this session (a tool named
-`save_assessment`, or one whose name ends in `__save_assessment`, such as
-`mcp__modo__save_assessment`; a tool listed only by name counts), that
-sentence instead says they can ask you to export this assessment as a report
-or save it to their Modo passport, and nothing is written or sent unless they
-ask. Without that tool, never mention the Modo passport or a connector. Don't
-call any tool to save here.
+The Modo connector is present only if you have a tool named
+`save_assessment`, or one whose name ends in `__save_assessment` (for example
+`mcp__modo__save_assessment`); a tool listed only by name (deferred) counts.
+When it is present, that sentence instead says they can ask you to export this
+assessment as a report or save it to their Modo passport, and nothing is
+written or sent unless they ask. When it is absent, keep the sentence exactly
+as above. Saving itself belongs to the save-to-passport skill, after the user
+asks for it.
 
 ## 6. When the user answers the offer
 

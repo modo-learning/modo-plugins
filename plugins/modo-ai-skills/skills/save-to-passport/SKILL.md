@@ -17,12 +17,12 @@ the save tool: nothing else is ever sent.
 ## Ground rules
 
 - **Is the Modo connector here?** Look at the tools you have in this session.
-  The connector is present only if you have a tool named `save_assessment`, or
-  one whose name ends in `__save_assessment` (for example
-  `mcp__modo__save_assessment`); the passport tool is `get_passport` (or ends
-  in `__get_passport`) on the same connector. A tool listed only by name
-  (deferred) counts; load it the way your session loads deferred tools before
-  calling it. Never guess a tool name and never call a tool you don't have.
+  The Modo connector is present only if you have a tool named
+  `save_assessment`, or one whose name ends in `__save_assessment` (for example
+  `mcp__modo__save_assessment`); a tool listed only by name (deferred) counts.
+  Its passport tool is `get_passport`, or the name ending in `__get_passport`
+  on the same connector. Call each tool by the exact name your session lists,
+  loading a deferred tool first the way your session loads deferred tools.
 - **No connector**: say in one line that the Modo connector isn't connected in
   this session, so you can't save to or show the Modo passport here; offer the
   export instead (the user can ask to export the assessment as a report).
@@ -125,14 +125,17 @@ list and the block must show the same quotes in the same order.
   with the title and date the tool returned. Then ask whether they want to see
   their passport. Don't show it unless they say yes.
 - **The tool returns an error**: say plainly that nothing was saved and what
-  the server said, in plain words (for example, which field broke which rule;
-  quote the server's message). **Don't call it again on your own**, and never
-  change the record to get it accepted (no other rubric version, no shortened
-  quote, no edited level). If a change the user could make would fix it
-  (dropping a quote, a shorter title), propose it as a new record and go back
-  to step 3. If nothing the user can change fixes it (for example the server
-  doesn't accept this rubric version, or it couldn't store the record), say so
-  and offer the export instead. A storage error means: try again later.
+  the server said, in plain words (quote the server's message). The next call
+  waits for the user to ask, and it sends the record exactly as last shown and
+  confirmed: never another rubric version, a shortened quote or an edited
+  level to get it accepted. Then, by the error:
+  - **A rule the user can meet by a change** (dropping a quote, a shorter
+    title): propose that change as a new record and go back to step 3.
+  - **The server could not store it** ("could not be stored", "try again
+    later"): tell the user they can ask you to try again later, and offer the
+    export to keep the assessment now.
+  - **Anything else** (for example the server doesn't accept this rubric
+    version): say so and offer the export instead.
 - **Saved with no clear result** (no error, no confirmation): say you can't
   tell whether it was saved, and don't call it again unless the user asks.
 
