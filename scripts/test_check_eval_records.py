@@ -11,7 +11,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from check_eval_records import check, check_reshown, check_saves  # noqa: E402
+from check_eval_records import check, check_reshown, check_saves, main, without_quote  # noqa: E402
 from test_validate_assessment_record import GOOD  # noqa: E402
 
 
@@ -185,6 +185,32 @@ class CheckReshown(unittest.TestCase):
 
     def test_no_record_shown_fails(self):
         self.assertEqual(len(self.run_reshown("Saved it.")), 1)
+
+
+class WithoutQuote(unittest.TestCase):
+    def test_drops_the_quote_by_the_number_the_user_saw(self):
+        record = dict(GOOD, evidence=FIVE)
+        self.assertEqual([q["quote"] for q in without_quote(record, 4)["evidence"]],
+                         ["quote 0", "quote 1", "quote 2", "quote 4"])
+        self.assertEqual(record["evidence"], FIVE)
+
+
+class Main(unittest.TestCase):
+    def run_main(self, data, *flags):
+        with tempfile.TemporaryDirectory() as t:
+            p = pathlib.Path(t) / "out.json"
+            p.write_text(json.dumps(data))
+            return main([str(p), *flags])
+
+    def test_exit_0_when_every_record_is_valid(self):
+        self.assertEqual(self.run_main(result("export-approved", [message(GOOD)])), 0)
+
+    def test_exit_1_on_an_invalid_record(self):
+        bad = dict(GOOD, transcript="User: hi")
+        self.assertEqual(self.run_main(result("export-approved", [message(bad)])), 1)
+
+    def test_exit_2_without_a_file(self):
+        self.assertEqual(main([]), 2)
 
 
 if __name__ == "__main__":
