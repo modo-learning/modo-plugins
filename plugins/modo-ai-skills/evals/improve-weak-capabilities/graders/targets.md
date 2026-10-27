@@ -9,5 +9,5 @@ Rubric ground truth for the step up. Delegation: level 1 hands over a whole job 
 
 The response should contain assessment blocks for the five capabilities, followed by an improvements section for exactly two capabilities.
 
-PASS if the improvements section (after the five blocks) covers exactly two capabilities, they are Delegation and Workflow Design, and Verification is NOT one of them. (If the response's own assessment marks Workflow Design "not shown", the second one may instead be the shown capability the response itself scored lowest after Delegation, but never Verification.)
+PASS if the improvements section (after the five blocks) covers exactly two capabilities, Verification is NOT one of them, and each of the two is one the response itself scored at the lowest levels among the capabilities it marked as shown (Delegation and Workflow Design are the planted weak ones; Strategic Thinking is an acceptable alternative only if the response scored it at the same level as, or lower than, one of them).
 FAIL if Verification gets an improvement, if more than two capabilities get one, if a capability the response itself marked "not shown" gets one, or if there is no improvements section.

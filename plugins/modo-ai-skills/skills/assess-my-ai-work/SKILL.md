@@ -175,8 +175,10 @@ Improvements
   quoted). For level 5, say how to keep it up. No generic advice ("be
   clearer") that you can't trace to a line of the rubric.
 - The **prompt** is written to Claude, ready to paste, using this user's own
-  subject matter from the chat where it helps. Leave no placeholders except
-  clearly marked names or numbers only the user can supply.
+  subject matter from the chat where it helps. Fill in every goal, decision,
+  number and name the chat already shows; a bracketed slot is only for a fact
+  the chat does not contain and only the user can supply (such as pasted
+  data), and no prompt should need more than one.
 
 Then end the section with one offer, as a question: do they want these turned
 into one reusable skill they can keep. Say that nothing is saved unless they

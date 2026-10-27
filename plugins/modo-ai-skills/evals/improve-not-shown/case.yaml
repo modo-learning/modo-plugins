@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: improve-not-shown
-description: Planted tactical chat where Strategic Thinking is not shown: improvements never target a not-shown capability, and each has a technique and copy-ready prompt.
+description: "Planted tactical chat where Strategic Thinking is not shown: improvements never target a not-shown capability, and each has a technique and copy-ready prompt."
 plugins: ["../.."]
 runs: 2
 context:

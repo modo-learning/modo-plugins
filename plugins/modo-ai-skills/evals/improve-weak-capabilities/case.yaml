@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: improve-weak-capabilities
-description: Planted chat (strong verification, weak delegation and workflow): improvements target the two weakest shown capabilities, each with a technique and a copy-ready prompt, then an optional skill offer, label last.
+description: "Planted chat (strong verification, weak delegation and workflow): improvements target the two weakest shown capabilities, each with a technique and a copy-ready prompt, then an optional skill offer, label last."
 plugins: ["../.."]
 runs: 2
 context:
