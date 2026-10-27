@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: export-pdf
+description: "Second turn: user approves all and asks for a PDF in a session with no file tools; Claude must not claim a PDF exists, says it can't, and gives the Markdown report ending in the record block."
+plugins: ["../.."]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

@@ -84,6 +84,150 @@ CHATS["improve-not-shown"] = CHATS["no-strategy"]
 # Current chat for the no-browse case (5 user messages).
 CHATS["current-chat-only"] = LAUNCH_CHAT
 
+# ---- Ticket 04: second-turn export cases ------------------------------------
+# History = the planted chat, then an assessment already given (assistant turn),
+# then for most cases the user's "export" request and Claude's export plan.
+# The case prompt is the user's reply. The assessment text follows the output
+# shape in skills/assess-my-ai-work/SKILL.md; every quote must be a word-for-word
+# excerpt of the planted chat (checked below).
+LABEL = "Self-assessment by Claude using Modo rubric v1 — not verified."
+ASSESS_REQUEST = "How good am I at using AI? Judge this chat."
+EXPORT_REQUEST = "Export this as a report."
+
+ASSESSMENT_STRONG = """Assessment of this chat (7 messages from you), against Modo rubric v1.
+
+Problem Solving: Level 4 of 5 (confidence: medium)
+  Evidence: "Show your calculation for every percentage and fix the table."; "Rerun it three ways: no change in churn, 5% extra churn, 10% extra churn."
+  Next level: Question the framing itself and say what a good board analysis must show before you start.
+
+Verification: Level 4 of 5 (confidence: high)
+  Evidence: "Before I use any of this I recomputed the tier growth myself. Team is 310 against 280, which is 10.7%, not 14.3%."; "I'll check the three results against my own spreadsheet before they go in the deck."
+  Next level: Set the acceptance checks before the first draft and say what has and has not been verified.
+
+Workflow Design: Level 2 of 5 (confidence: medium)
+  Evidence: "Same board pricing analysis as before, Starter $120k, Team $310k, Enterprise $570k in Q3 and $110k, $280k, $450k in Q2."
+  Next level: Lay out the steps up front and feed earlier outputs into later ones instead of repeating the setup.
+
+Delegation: Level 1 of 5 (confidence: medium)
+  Evidence: "whatever pricing changes you think are best, I don't have time to think about it."; "Then finish the rest of the deck, all the slides."
+  Next level: Give a clear task with scope and output format and keep some decisions for yourself.
+
+Strategic Thinking: Level 2 of 5 (confidence: low)
+  Evidence: "Write up my Q3 pricing analysis for the board."
+  Next level: Connect the work to the decision the board has to make and use that to prioritise.
+
+Improvements
+
+1. Delegation (Level 1 of 5 now)
+   Technique: Hand over a scoped task and keep the decision.
+   Try this next time: "Draft three pricing options for the board with the revenue effect of each, and I will choose one."
+
+2. Workflow Design (Level 2 of 5 now)
+   Technique: State the steps once, then reuse the outputs.
+   Try this next time: "Step 1: confirm the Q2 and Q3 figures. Step 2: compute growth per tier. Step 3: draft the recommendations from step 2."
+
+Do you want these turned into one reusable skill you can keep? Nothing is saved unless you choose to save it.
+
+You can also ask me to export this assessment as a report; nothing is written unless you ask.
+
+""" + LABEL
+
+PROPOSAL_STRONG = """Export plan for this chat. Nothing has been written.
+
+Quotes I would include (up to 5, each tied to a capability, word for word from your messages):
+1. Problem Solving: "Show your calculation for every percentage and fix the table."
+2. Verification: "Before I use any of this I recomputed the tier growth myself. Team is 310 against 280, which is 10.7%, not 14.3%."
+3. Workflow Design: "Same board pricing analysis as before, Starter $120k, Team $310k, Enterprise $570k in Q3 and $110k, $280k, $450k in Q2."
+4. Delegation: "whatever pricing changes you think are best, I don't have time to think about it."
+5. Strategic Thinking: "Write up my Q3 pricing analysis for the board."
+
+Session title: Q3 pricing analysis for the board
+Session date: 2026-10-20
+
+Reply with the numbers to drop, "scores only" for no quotes, or any change to the title or date.
+
+""" + LABEL
+
+ASSESSMENT_TACTICAL = """Assessment of this chat (7 messages from you), against Modo rubric v1.
+
+Problem Solving: Level 3 of 5 (confidence: medium)
+  Evidence: "They're UK format, day first. Redo."; "It throws a ValueError on a blank cell. Fix it."
+  Next level: Break the problem into parts and say what a good answer looks like before the first attempt.
+
+Verification: Level 3 of 5 (confidence: low)
+  Evidence: "That matches 'SW1A 1AA' but not 'sw1a1aa'. Make it case-insensitive and allow no space."
+  Next level: Check more than once and test edge cases before relying on a result.
+
+Workflow Design: Not shown in this chat
+  Next level: A chat where you define a repeatable process or reuse earlier outputs would show it.
+
+Delegation: Level 3 of 5 (confidence: low)
+  Evidence: "Now give me a pandas one-liner that does that for a column called order_date."
+  Next level: Give a role, inputs and what done looks like, and set a review step.
+
+Strategic Thinking: Not shown in this chat
+  Next level: A chat where you state a goal, a trade-off or a decision would show it.
+
+Improvements
+
+1. Problem Solving (Level 3 of 5 now)
+   Technique: State constraints up front.
+   Try this next time: "Convert these dates to YYYY-MM-DD. They are UK day-first and some cells are blank; leave blanks empty."
+
+2. Verification (Level 3 of 5 now)
+   Technique: Test edge cases before relying on the result.
+   Try this next time: "Give me five postcodes that should match and five that should not, then run the regex against them."
+
+Do you want these turned into one reusable skill you can keep? Nothing is saved unless you choose to save it.
+
+You can also ask me to export this assessment as a report; nothing is written unless you ask.
+
+""" + LABEL
+
+PROPOSAL_TACTICAL = """Export plan for this chat. Nothing has been written.
+
+Quotes I would include (up to 5, each tied to a capability, word for word from your messages):
+1. Problem Solving: "It throws a ValueError on a blank cell. Fix it."
+2. Verification: "That matches 'SW1A 1AA' but not 'sw1a1aa'. Make it case-insensitive and allow no space."
+3. Delegation: "Now give me a pandas one-liner that does that for a column called order_date."
+4. Problem Solving: "They're UK format, day first. Redo."
+
+Session title: Date and text cleanup tasks
+Session date: 2026-10-20
+
+Reply with the numbers to drop, "scores only" for no quotes, or any change to the title or date.
+
+""" + LABEL
+
+CHATS["export-proposes"] = CHATS["strong-verify-weak-delegate"] + [(ASSESS_REQUEST, ASSESSMENT_STRONG)]
+_strong_plan = CHATS["export-proposes"] + [(EXPORT_REQUEST, PROPOSAL_STRONG)]
+for _case in ("export-approved", "export-quote-dropped", "export-scores-only",
+              "export-no-transcript", "export-pdf"):
+    CHATS[_case] = _strong_plan
+CHATS["export-not-shown"] = CHATS["no-strategy"] + [
+    (ASSESS_REQUEST, ASSESSMENT_TACTICAL), (EXPORT_REQUEST, PROPOSAL_TACTICAL)]
+
+
+def _check_quotes():
+    """Every quote in the planted texts must be a word-for-word user excerpt."""
+    import re
+    for chat, texts in (("strong-verify-weak-delegate", (ASSESSMENT_STRONG, PROPOSAL_STRONG)),
+                        ("no-strategy", (ASSESSMENT_TACTICAL, PROPOSAL_TACTICAL))):
+        users = [u for u, _ in CHATS[chat]]
+        for text in texts:
+            for line in text.splitlines():
+                quotes = []
+                if line.lstrip().startswith("Evidence:"):
+                    quotes = re.findall(r'"(.+?)"(?=;|$)', line.split("Evidence:", 1)[1].strip())
+                elif re.match(r'\d\. [\w ]+: "', line):
+                    quotes = [line.split(': "', 1)[1].rstrip('"')]
+                for q in quotes:
+                    assert any(q in u for u in users), f"quote not in chat {chat}: {q!r}"
+                    assert len(q) <= 240, q
+
+
+_check_quotes()
+
 # Distractors for the export file. Distinctive phrases let regex graders prove
 # that only the chosen chat was read.
 LEASE_CHAT = [

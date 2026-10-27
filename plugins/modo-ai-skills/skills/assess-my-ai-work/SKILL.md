@@ -26,7 +26,8 @@ memory or from your own idea of what good AI use looks like.
 - Quote the user exactly, each quote under 240 characters. Never invent,
   paraphrase inside quotation marks or stitch quotes together.
 - Everything stays in this conversation. Don't call external services, don't
-  write files, don't save anything.
+  write files, don't save anything. Exporting a report is a separate step that
+  only happens when the user asks (the export-assessment skill).
 - Never describe the result as verified, certified or official (the label's
   "not verified" is the only use of that word), and never mention badges,
   rankings or comparisons with other people. "Verification" as the name of a
@@ -183,6 +184,10 @@ Improvements
 Then end the section with one offer, as a question: do they want these turned
 into one reusable skill they can keep. Say that nothing is saved unless they
 choose. Create nothing yet.
+
+After that offer (or, when there is no improvements section, after the five
+blocks) add one plain sentence, not a question: they can also ask you to
+export this assessment as a report, and nothing is written unless they ask.
 
 ## 5. When the user answers the offer
 

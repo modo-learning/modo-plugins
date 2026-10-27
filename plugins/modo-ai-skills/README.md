@@ -28,6 +28,18 @@ offers) to turn them into a reusable skill. To work on one capability without
 an assessment, ask "how do I get better at verification?" or run
 `/modo-ai-skills:help-me-improve`.
 
+## Export a report
+
+After an assessment, ask "export this" (or run
+`/modo-ai-skills:export-assessment`). Claude first proposes up to 5 quotes from
+your own messages, a title and a date, and you approve, drop quotes or choose
+scores only. It then shows the exact report; nothing is written until you ask.
+The report is Markdown, readable on its own, and ends with one machine-readable
+block with only: rubric version, the five levels and confidence, the quotes you
+approved, the title and the date. No transcript is included. A PDF is made only
+if you ask and only if Claude can create files in your session. The exact shape
+is in [skills/export-assessment/RECORD.md](skills/export-assessment/RECORD.md).
+
 ## The rubric
 
 The rubric is public and versioned:
