@@ -8,6 +8,7 @@ it once, then install any plugin listed in it.
 | Plugin | What it does |
 |---|---|
 | [modo-task-finder](plugins/modo-task-finder) | Finds the tasks you keep repeating across your Claude chats, estimates the time they take, and suggests a skill, scheduled task or connector for each. See its [README](plugins/modo-task-finder/README.md) for what it reads and how your data is handled. |
+| [modo-ai-skills](plugins/modo-ai-skills) | Assesses how well you work with AI in one chat you choose, against Modo's public rubric: a level, confidence and quoted evidence for five capabilities, two improvements, and a report you can export. See its [README](plugins/modo-ai-skills/README.md) for exactly what it reads and what it sends. |
 
 ## Add this marketplace
 
@@ -16,13 +17,14 @@ it once, then install any plugin listed in it.
 ```
 claude plugin marketplace add modo-learning/modo-plugins
 claude plugin install modo-task-finder@modo-plugins
+claude plugin install modo-ai-skills@modo-plugins
 ```
 
 **Claude (web, desktop, Cowork)**
 
 Open Customize, then Plugins, choose Add marketplace, and paste
 `https://github.com/modo-learning/modo-plugins`. Then install Modo Task
-Finder from the list.
+Finder from the list. Modo AI Skills is installed from the same list.
 
 ## License
 
