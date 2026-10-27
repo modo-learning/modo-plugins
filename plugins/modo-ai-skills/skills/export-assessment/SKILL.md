@@ -36,10 +36,13 @@ limits exactly.
 
 ## 1. Is there something to export?
 
-Use the most recent assessment in this conversation. If there is none, or the
-last result was a "too short to judge" or "which one?" message, say in one
-line that there is nothing to export yet and offer to assess a chat first
-(the assess-my-ai-work skill). No report, no scores. If several different
+Use the most recent assessment in this conversation: a response with the
+five capability blocks. There is nothing to export when there is none, or when
+the last assess-my-ai-work response was only a short message ("too short to
+judge", "which one?", "can't open that chat" or "no chat with that name")
+with no scores. Then say in one line that there is nothing to export yet and
+offer to assess a chat first (the assess-my-ai-work skill). No report, no
+scores, no plan, and never build one from a chat that was not opened. If several different
 chats were assessed here and the user didn't say which, ask which, listing
 them. Messages from this skill that are short questions or refusals end with
 the label (step 7).
