@@ -31,6 +31,9 @@ concrete to keep.
   reusable skill.
 - **A card** in claude.ai and Cowork (see [The card](#the-card)).
 - **An export** when you ask for one (see [Export a report](#export-a-report)).
+- **Saving to your Modo passport**, only where the Modo connector is
+  connected, which is not yet the case for anyone outside Modo's developers
+  (see [Save to your Modo passport](#save-to-your-modo-passport)).
 
 Every result ends with this label:
 
@@ -66,6 +69,7 @@ In Claude chat or Cowork, ask in plain words, for example:
 - 'Assess my chat called "Q3 budget review".'
 - "How do I get better at verification?"
 - "Export this assessment."
+- "Save this to my Modo passport." (only with the Modo connector)
 
 Or run the skills by name. In Claude Code, and from the `/` menu in the Claude
 app:
@@ -75,6 +79,7 @@ app:
 | `/modo-ai-skills:assess-my-ai-work` | Assess one chat |
 | `/modo-ai-skills:help-me-improve` | Help with one capability, without an assessment |
 | `/modo-ai-skills:export-assessment` | Export the assessment you were just given |
+| `/modo-ai-skills:save-to-passport` | Save the assessment to your Modo passport, or show the passport (needs the Modo connector) |
 
 ## Which chat it reads
 
@@ -196,27 +201,95 @@ The plugin never uploads the report. You upload it to Modo yourself. Which
 file the Modo upload page accepts is not specified yet; until it is, the
 export is the Markdown report, and a PDF on request.
 
+## Save to your Modo passport
+
+This needs the **Modo connector**, which is not published yet: the plugin
+ships without it, and saving is offered only in a session where it has been
+added (see [For developers: add the connector](#for-developers-add-the-connector)).
+Claude recognises the connector by its tools, `save_assessment` and
+`get_passport`, whatever name the connector was added under.
+
+- **Without the connector** nothing changes: the assessment ends by offering
+  the export only. If you ask to save to your Modo passport, Claude says the
+  Modo connector isn't connected in this session and offers the export
+  instead.
+- **With the connector**, the assessment's last sentence also says you can ask
+  to save it to your Modo passport. Nothing is sent unless you ask.
+
+When you ask ("save this to my Modo passport" or
+`/modo-ai-skills:save-to-passport`):
+
+1. Claude shows **exactly the record it would send**: the quotes it proposes,
+   numbered, and the record itself as JSON (rubric version, the five levels
+   and confidence labels, the quotes, the session title and the session
+   date). The quotes, title and date are chosen the same way as for an
+   export. Nothing has been sent yet.
+2. You decide: say "send it", drop quotes by number, say "scores only" for no
+   quotes, change the title or date, or say no. **After any change Claude
+   shows the whole updated record again and waits for your yes**, even if you
+   said "drop quote 4 and save it". A "no", or anything that isn't a clear
+   yes, sends nothing.
+3. Only after your yes does Claude call `save_assessment`, once, with exactly
+   the record you saw. Claude's own tool-approval prompt, if your app shows
+   one, is a second check.
+4. Claude says it was saved (with the title and date the server returned) and
+   asks whether you want to see your passport.
+
+If the server rejects the record, Claude says nothing was saved and what the
+server said. It does not send it again on its own and never changes the
+record to get it accepted (for example to another rubric version). If a
+change you can make would fix it, such as dropping a quote, it shows the new
+record for your yes; otherwise it offers the export.
+
+**Your passport.** Ask "show my Modo passport" (or say yes after a save).
+Claude calls `get_passport` and shows the latest level and confidence for
+each capability and your saved assessments, newest first, with their titles,
+dates and levels. The passport does not return your quotes.
+
+**What is sent, and nothing else:** the same record as the export's
+machine-readable block, described in
+[skills/save-to-passport/RECORD.md](skills/save-to-passport/RECORD.md):
+`rubric_version`, the five `capabilities` (level and confidence), `evidence`
+(the quotes you approved, at most 5, each at most 240 characters; empty for
+scores only), `session_title` (at most 120 characters) and `session_date`. It
+never sends the chat, a summary, Claude's replies, the next-level notes, the
+improvements or the prompts.
+
+### For developers: add the connector
+
+The connector is the Modo MCP server (`modo-mcp`), which today runs locally
+with a development token; it has no public address yet. Run it as its README
+says, then add it to Claude Code:
+
+```
+claude mcp add --transport http modo http://127.0.0.1:8787/mcp \
+  --header "Authorization: Bearer <MODO_MCP_DEV_TOKEN>"
+```
+
+Remove it with `claude mcp remove modo`. The plugin itself gets no connector
+entry until a real endpoint exists, so users never see a connector that
+doesn't work.
+
 ## What it reads, what it sends, and your privacy
 
 - **What it reads:** only the one chat you pick, in one of the ways above. For
-  an export, it reads the assessment already in your conversation and, to
+  an export or a save, it reads the assessment already in your conversation and, to
   check your quotes, the chat that was assessed. It does not read any other
   chat or file.
 - **What it never does:** browse or search your chat history, list your
   chats, look for files or logs on your computer, or mention coding-tool
   session logs unless you point to one.
-- **What it sends:** nothing. It calls no outside service. Everything happens
-  inside your conversation with Claude. No transcript and no other chat is
-  ever sent anywhere.
+- **What it sends:** nothing, unless the Modo connector is connected and you
+  say yes to saving: then exactly the record you were shown goes to your
+  Modo passport, and nothing else (see
+  [Save to your Modo passport](#save-to-your-modo-passport)). Apart from that
+  it calls no outside service. No transcript and no other chat is ever sent
+  anywhere.
 - **What it writes:** nothing, unless you ask. The only exceptions are the
   card in claude.ai and Cowork (shown beside the chat), a skill you choose to
   save, and an export file you ask for.
-- **Saving to Modo:** not available yet. A Modo connector that saves an
-  assessment to your Modo passport is planned for a later release. When it
-  comes, Claude will show you the exact record it would send (the same fields
-  as the export: levels, confidence, the quotes it proposes, title and date),
-  let you drop quotes or choose scores only, and send it only after you
-  confirm. It will never send a transcript.
+- **Saving to Modo:** only through the Modo connector, which is not
+  published yet, and only after you have seen the exact record and said yes.
 
 The plugin is a set of instructions for Claude, plus the card template (an
 HTML page whose small script draws the rings and makes no network calls). It
