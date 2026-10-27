@@ -1,0 +1,11 @@
+{
+  "name": "modo-ai-skills",
+  "displayName": "Modo AI Skills",
+  "version": "0.1.0",
+  "description": "Assess how well you work with AI against Modo's public rubric: a level, confidence and quoted evidence for five capabilities, from one chat you choose.",
+  "author": {
+    "name": "Modo",
+    "url": "https://github.com/modo-learning"
+  },
+  "license": "MIT"
+}
