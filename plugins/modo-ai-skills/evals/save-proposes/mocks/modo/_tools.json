@@ -1,0 +1,636 @@
+{
+ "tools": [
+  {
+   "name": "save_assessment",
+   "title": "Save an assessment to the Modo passport",
+   "description": "Saves one Modo AI Skills assessment record (levels, confidence, user-approved quotes, title, date) to the user's Modo passport. Call only after the user has seen the exact record and confirmed. Send no other fields: the whole call is rejected if any field is unknown or any limit is broken.",
+   "inputSchema": {
+    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+     "rubric_version": {
+      "type": "string",
+      "enum": [
+       "v1"
+      ],
+      "description": "The rubric version the assessment was scored with, from get_rubric."
+     },
+     "capabilities": {
+      "type": "object",
+      "properties": {
+       "problem_solving": {
+        "type": "object",
+        "properties": {
+         "level": {
+          "anyOf": [
+           {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           {
+            "type": "string",
+            "const": "not_shown"
+           }
+          ],
+          "description": "1 to 5, or \"not_shown\" when the chat did not show the capability"
+         },
+         "confidence": {
+          "type": "string",
+          "enum": [
+           "low",
+           "medium",
+           "high"
+          ]
+         }
+        },
+        "required": [
+         "level",
+         "confidence"
+        ],
+        "additionalProperties": false
+       },
+       "verification": {
+        "type": "object",
+        "properties": {
+         "level": {
+          "anyOf": [
+           {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           {
+            "type": "string",
+            "const": "not_shown"
+           }
+          ],
+          "description": "1 to 5, or \"not_shown\" when the chat did not show the capability"
+         },
+         "confidence": {
+          "type": "string",
+          "enum": [
+           "low",
+           "medium",
+           "high"
+          ]
+         }
+        },
+        "required": [
+         "level",
+         "confidence"
+        ],
+        "additionalProperties": false
+       },
+       "workflow_design": {
+        "type": "object",
+        "properties": {
+         "level": {
+          "anyOf": [
+           {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           {
+            "type": "string",
+            "const": "not_shown"
+           }
+          ],
+          "description": "1 to 5, or \"not_shown\" when the chat did not show the capability"
+         },
+         "confidence": {
+          "type": "string",
+          "enum": [
+           "low",
+           "medium",
+           "high"
+          ]
+         }
+        },
+        "required": [
+         "level",
+         "confidence"
+        ],
+        "additionalProperties": false
+       },
+       "delegation": {
+        "type": "object",
+        "properties": {
+         "level": {
+          "anyOf": [
+           {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           {
+            "type": "string",
+            "const": "not_shown"
+           }
+          ],
+          "description": "1 to 5, or \"not_shown\" when the chat did not show the capability"
+         },
+         "confidence": {
+          "type": "string",
+          "enum": [
+           "low",
+           "medium",
+           "high"
+          ]
+         }
+        },
+        "required": [
+         "level",
+         "confidence"
+        ],
+        "additionalProperties": false
+       },
+       "strategic_thinking": {
+        "type": "object",
+        "properties": {
+         "level": {
+          "anyOf": [
+           {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           {
+            "type": "string",
+            "const": "not_shown"
+           }
+          ],
+          "description": "1 to 5, or \"not_shown\" when the chat did not show the capability"
+         },
+         "confidence": {
+          "type": "string",
+          "enum": [
+           "low",
+           "medium",
+           "high"
+          ]
+         }
+        },
+        "required": [
+         "level",
+         "confidence"
+        ],
+        "additionalProperties": false
+       }
+      },
+      "required": [
+       "problem_solving",
+       "verification",
+       "workflow_design",
+       "delegation",
+       "strategic_thinking"
+      ],
+      "additionalProperties": false
+     },
+     "evidence": {
+      "maxItems": 5,
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "capability": {
+         "type": "string",
+         "enum": [
+          "problem_solving",
+          "verification",
+          "workflow_design",
+          "delegation",
+          "strategic_thinking"
+         ]
+        },
+        "quote": {
+         "type": "string",
+         "minLength": 1,
+         "maxLength": 240,
+         "description": "A word-for-word excerpt of a message the user wrote, approved by the user."
+        }
+       },
+       "required": [
+        "capability",
+        "quote"
+       ],
+       "additionalProperties": false
+      },
+      "description": "User-approved quotes, at most 5. Empty for a scores-only save."
+     },
+     "session_title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+     },
+     "session_date": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "The day of the assessed chat."
+     }
+    },
+    "required": [
+     "rubric_version",
+     "capabilities",
+     "evidence",
+     "session_title",
+     "session_date"
+    ],
+    "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": false,
+    "openWorldHint": false
+   },
+   "outputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "description": "The id the server gave the saved assessment."
+     },
+     "session_title": {
+      "type": "string"
+     },
+     "session_date": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "session_title",
+     "session_date"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "get_passport",
+   "title": "Get my Modo passport",
+   "description": "Returns the user's Modo AI Skills passport: for each of the five capabilities the latest shown level and confidence under the current rubric version, and the history of all saved assessments (id, title, date, rubric version, levels), newest first. Takes no arguments.",
+   "inputSchema": {
+    "type": "object",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {},
+    "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
+   },
+   "outputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+     "latest": {
+      "type": "object",
+      "properties": {
+       "problem_solving": {
+        "anyOf": [
+         {
+          "type": "object",
+          "properties": {
+           "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           "confidence": {
+            "type": "string",
+            "enum": [
+             "low",
+             "medium",
+             "high"
+            ]
+           },
+           "assessment_id": {
+            "type": "string"
+           },
+           "session_date": {
+            "type": "string"
+           },
+           "rubric_version": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "level",
+           "confidence",
+           "assessment_id",
+           "session_date",
+           "rubric_version"
+          ],
+          "additionalProperties": false
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "description": "The score from the newest assessment under the current rubric version that showed this capability; null if none did."
+       },
+       "verification": {
+        "anyOf": [
+         {
+          "type": "object",
+          "properties": {
+           "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           "confidence": {
+            "type": "string",
+            "enum": [
+             "low",
+             "medium",
+             "high"
+            ]
+           },
+           "assessment_id": {
+            "type": "string"
+           },
+           "session_date": {
+            "type": "string"
+           },
+           "rubric_version": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "level",
+           "confidence",
+           "assessment_id",
+           "session_date",
+           "rubric_version"
+          ],
+          "additionalProperties": false
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "description": "The score from the newest assessment under the current rubric version that showed this capability; null if none did."
+       },
+       "workflow_design": {
+        "anyOf": [
+         {
+          "type": "object",
+          "properties": {
+           "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           "confidence": {
+            "type": "string",
+            "enum": [
+             "low",
+             "medium",
+             "high"
+            ]
+           },
+           "assessment_id": {
+            "type": "string"
+           },
+           "session_date": {
+            "type": "string"
+           },
+           "rubric_version": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "level",
+           "confidence",
+           "assessment_id",
+           "session_date",
+           "rubric_version"
+          ],
+          "additionalProperties": false
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "description": "The score from the newest assessment under the current rubric version that showed this capability; null if none did."
+       },
+       "delegation": {
+        "anyOf": [
+         {
+          "type": "object",
+          "properties": {
+           "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           "confidence": {
+            "type": "string",
+            "enum": [
+             "low",
+             "medium",
+             "high"
+            ]
+           },
+           "assessment_id": {
+            "type": "string"
+           },
+           "session_date": {
+            "type": "string"
+           },
+           "rubric_version": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "level",
+           "confidence",
+           "assessment_id",
+           "session_date",
+           "rubric_version"
+          ],
+          "additionalProperties": false
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "description": "The score from the newest assessment under the current rubric version that showed this capability; null if none did."
+       },
+       "strategic_thinking": {
+        "anyOf": [
+         {
+          "type": "object",
+          "properties": {
+           "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+           },
+           "confidence": {
+            "type": "string",
+            "enum": [
+             "low",
+             "medium",
+             "high"
+            ]
+           },
+           "assessment_id": {
+            "type": "string"
+           },
+           "session_date": {
+            "type": "string"
+           },
+           "rubric_version": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "level",
+           "confidence",
+           "assessment_id",
+           "session_date",
+           "rubric_version"
+          ],
+          "additionalProperties": false
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "description": "The score from the newest assessment under the current rubric version that showed this capability; null if none did."
+       }
+      },
+      "required": [
+       "problem_solving",
+       "verification",
+       "workflow_design",
+       "delegation",
+       "strategic_thinking"
+      ],
+      "additionalProperties": false
+     },
+     "history": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "id": {
+         "type": "string"
+        },
+        "session_title": {
+         "type": "string"
+        },
+        "session_date": {
+         "type": "string"
+        },
+        "rubric_version": {
+         "type": "string"
+        },
+        "levels": {
+         "type": "object",
+         "properties": {
+          "problem_solving": {
+           "anyOf": [
+            {
+             "type": "integer",
+             "minimum": 1,
+             "maximum": 5
+            },
+            {
+             "type": "string",
+             "const": "not_shown"
+            }
+           ]
+          },
+          "verification": {
+           "anyOf": [
+            {
+             "type": "integer",
+             "minimum": 1,
+             "maximum": 5
+            },
+            {
+             "type": "string",
+             "const": "not_shown"
+            }
+           ]
+          },
+          "workflow_design": {
+           "anyOf": [
+            {
+             "type": "integer",
+             "minimum": 1,
+             "maximum": 5
+            },
+            {
+             "type": "string",
+             "const": "not_shown"
+            }
+           ]
+          },
+          "delegation": {
+           "anyOf": [
+            {
+             "type": "integer",
+             "minimum": 1,
+             "maximum": 5
+            },
+            {
+             "type": "string",
+             "const": "not_shown"
+            }
+           ]
+          },
+          "strategic_thinking": {
+           "anyOf": [
+            {
+             "type": "integer",
+             "minimum": 1,
+             "maximum": 5
+            },
+            {
+             "type": "string",
+             "const": "not_shown"
+            }
+           ]
+          }
+         },
+         "required": [
+          "problem_solving",
+          "verification",
+          "workflow_design",
+          "delegation",
+          "strategic_thinking"
+         ],
+         "additionalProperties": false
+        }
+       },
+       "required": [
+        "id",
+        "session_title",
+        "session_date",
+        "rubric_version",
+        "levels"
+       ],
+       "additionalProperties": false
+      },
+      "description": "Every saved assessment, newest session first."
+     }
+    },
+    "required": [
+     "latest",
+     "history"
+    ],
+    "additionalProperties": false
+   }
+  }
+ ]
+}

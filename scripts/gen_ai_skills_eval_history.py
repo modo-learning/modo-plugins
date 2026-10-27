@@ -220,6 +220,70 @@ CHATS["export-not-shown"] = CHATS["no-strategy"] + [
 # The decline cases (improve-decline, export-decline) resume real recorded
 # turns instead: see scripts/record_ai_skills_eval_history.py.
 
+# ---- Ticket 10: save to the Modo passport -----------------------------------
+# Cases whose history ends at the assessment use the hand-written turns above.
+# The cases that resume after the record was shown (confirm, decline, drop a
+# quote, scores only, rejected, show the passport) resume real recorded turns:
+# see scripts/record_ai_skills_eval_history.py --save.
+CAPS = ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")
+STRONG_LEVELS = {"problem_solving": (4, "medium"), "verification": (4, "high"),
+                 "workflow_design": (2, "medium"), "delegation": (1, "medium"),
+                 "strategic_thinking": (2, "low")}
+SAVE_TITLE, SAVE_DATE = "Q3 pricing analysis for the board", "2026-10-20"
+
+_assessed = CHATS["strong-verify-weak-delegate"] + [(ASSESS_REQUEST, ASSESSMENT_STRONG)]
+CHATS["save-offered"] = CHATS["strong-verify-weak-delegate"]
+CHATS["save-not-offered"] = CHATS["strong-verify-weak-delegate"]
+CHATS["save-proposes"] = _assessed
+CHATS["save-no-connector"] = _assessed
+
+# Mocks for the cases that have the Modo connector. The connector is mocked
+# per case (never suite-wide), so every other case keeps running without it.
+# _tools.json is the real tools/list answer of modo-mcp (save_assessment and
+# get_passport), so the model sees the real descriptions and schemas.
+CONNECTOR_CASES = {
+    # case: indices of the quotes the save call must carry (None: no save expected)
+    "save-offered": None, "save-proposes": None, "save-declined": None,
+    "save-edit-reshows": None, "passport-shown": None,
+    "save-confirmed": 5, "save-rejected": 5, "save-quote-dropped": 4, "save-scores-only": 0,
+}
+REJECTED = ('Input validation error: Invalid arguments for tool save_assessment: '
+            'rubric_version: must be a rubric version this server knows ("v2")')
+SAVED_TEXT = 'Saved assessment 3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42: "{{input.session_title}}" ({{input.session_date}}).'
+PASSPORT = {
+    "latest": {k: {"level": l, "confidence": c, "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
+                   "session_date": SAVE_DATE, "rubric_version": "v1"}
+               for k, (l, c) in STRONG_LEVELS.items()},
+    "history": [{"id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42", "session_title": SAVE_TITLE,
+                 "session_date": SAVE_DATE, "rubric_version": "v1",
+                 "levels": {k: l for k, (l, _) in STRONG_LEVELS.items()}}],
+}
+TOOLS_JSON = pathlib.Path(__file__).resolve().parent / "modo_mcp_tools.json"
+
+
+def save_mock(quotes, error=False):
+    """The save_assessment mock: expect: guards abort the run on a bad call."""
+    guards = ["rubric_version: v1", "session_title: /^.{1,120}$/s",
+              r"session_date: /^\d{4}-\d{2}-\d{2}$/", "evidence: array"]
+    for k in CAPS:
+        guards.append(f'capabilities.{k}.level: ["1", "2", "3", "4", "5", not_shown]')
+        guards.append(f"capabilities.{k}.confidence: [low, medium, high]")
+    for i in range(quotes or 0):
+        guards.append(f"evidence.{i}.quote: /^.{{1,240}}$/s")
+        guards.append(f"evidence.{i}.capability: [{', '.join(CAPS)}]")
+    head = "---\n" + ("error: true\n" if error else "") + "expect:\n" + "".join(f"  {g}\n" for g in guards) + "---\n"
+    return head + (REJECTED if error else SAVED_TEXT) + "\n"
+
+
+def write_mocks():
+    for case, quotes in CONNECTOR_CASES.items():
+        d = HERE / case / "mocks" / "modo"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "save_assessment.md").write_text(save_mock(quotes, error=case == "save-rejected"))
+        (d / "get_passport.md").write_text(json.dumps(PASSPORT, indent=2) + "\n")
+        (d / "_tools.json").write_text(TOOLS_JSON.read_text())
+        print(d)
+
 
 def _check_quotes():
     """Every quote in the planted texts must be a word-for-word user excerpt."""
@@ -417,3 +481,4 @@ for case, turns in CHATS.items():
 
 
 write_extras()
+write_mocks()
