@@ -6,3 +6,5 @@ __MACOSX/
 drafts/
 # Local reference only: contains real business details from internal chats
 docs/prompt-response.md
+__pycache__/
+*.pyc
