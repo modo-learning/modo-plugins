@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/modo-learning/modo-plugins/plugins/modo-ai-skills/skills/export-assessment/assessment-record.schema.json",
   "title": "Modo AI Skills assessment record",
-  "description": "The only data that may leave Claude when an assessment is exported. See RECORD.md. The conventions that a not_shown capability records confidence low and has no quote cannot be expressed here; scripts/validate_assessment_record.py enforces them.",
+  "description": "The only data that may leave Claude when an assessment is exported. See RECORD.md. The conventions that a not_shown capability records confidence low and has no quote cannot be expressed here, and the integer type here accepts 4.0; scripts/validate_assessment_record.py enforces all three and is authoritative.",
   "type": "object",
   "additionalProperties": false,
   "required": ["rubric_version", "capabilities", "evidence", "session_title", "session_date"],

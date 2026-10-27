@@ -73,6 +73,13 @@ class Validate(unittest.TestCase):
         for ok in (1, 2, 3, 4, 5):
             self.assertEqual(validate(with_cap("verification", level=ok, confidence="low")), [], ok)
 
+    def test_level_written_as_1_point_0_rejected(self):
+        # JSON Schema's "integer" accepts 1.0; the validator, which RECORD.md
+        # makes authoritative, does not: a level is written as a bare integer.
+        text = json.dumps(GOOD).replace('"level": 4', '"level": 4.0', 1)
+        self.assertIn('"level": 4.0', text)
+        self.assertTrue(validate(json.loads(text)))
+
     def test_confidence_values(self):
         self.assertTrue(validate(with_cap("verification", level=3, confidence="certain")))
         self.assertTrue(validate(with_cap("verification", level=3)))

@@ -21,7 +21,7 @@ invalid.
 |---|---|---|
 | `rubric_version` | string | `v` followed by digits, such as `v1`. Must be a rubric version the receiver knows. |
 | `capabilities` | object | Exactly the five keys below, each present. |
-| `capabilities.<key>.level` | integer or string | An integer 1 to 5, or the string `"not_shown"`. |
+| `capabilities.<key>.level` | integer or string | An integer 1 to 5 written without a decimal point (`4`, never `4.0`), or the string `"not_shown"`. |
 | `capabilities.<key>.confidence` | string | `"low"`, `"medium"` or `"high"`. Always present, also for `not_shown`. |
 | `evidence` | array | At most 5 items. Empty (`[]`) for a scores-only export. |
 | `evidence[].capability` | string | One of the five keys. |
@@ -57,7 +57,16 @@ The five capability keys, in rubric order: `problem_solving`, `verification`,
 
 A JSON Schema for the same rules is in
 [assessment-record.schema.json](assessment-record.schema.json) (draft 2020-12).
-It cannot express the two conventions below.
+It cannot express everything, so **the validator
+(`scripts/validate_assessment_record.py`) is authoritative** where they
+differ:
+
+- The two conventions below are not in the schema.
+- A level written as `4.0`: JSON Schema's `integer` type accepts any number
+  with a zero fraction, so the schema lets `4.0` through; the validator
+  rejects it. A receiver (the Modo platform) must likewise reject a level
+  that is a non-integer JSON number token, for example by checking the parsed
+  value's type rather than relying on a schema validator alone.
 
 ## Decisions that go beyond the spec
 
