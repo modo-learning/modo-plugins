@@ -1,7 +1,8 @@
 # README notes (draft, feeds ticket 06)
 
-Not part of the shipped README. One note per chat source, written from what
-`skills/assess-my-ai-work/SKILL.md` step 0 actually does.
+Not part of the shipped README and not shipped with the plugin. One note per
+chat source, written from what
+`plugins/modo-ai-skills/skills/assess-my-ai-work/SKILL.md` step 0 actually does.
 
 Common to every source
 - One chat per run. It never lists, searches or skims other chats.
