@@ -20,8 +20,10 @@ that capability's level table. No generic tips ("double-check everything",
   rubric and from what the user tells you in this message. Do not mention or
   offer coding-tool session logs.
 - Give no level, score or confidence for the user. Nothing was assessed. Never
-  describe anything as verified or certified (only the label below uses that
-  word), and never mention badges or comparisons with other people.
+  describe anything as verified or certified, and never mention badges or
+  comparisons with other people.
+- Add no self-assessment label. That label marks an assessment result, and
+  this skill assesses nothing.
 - Write nothing to files and save nothing unless the user chooses it (step 4).
 
 ## 1. Which capability
@@ -35,7 +37,7 @@ Workflow Design, Delegation, Strategic Thinking. Everyday wording is fine
 - None named, or one that is not on the list: say the five and ask which, in
   one short message, then stop.
 
-A short question like these ends with the label (step 5) and nothing else.
+A short question like these is the whole response: nothing else.
 
 ## 2. Where to start
 
@@ -82,10 +84,3 @@ they can keep, and say that nothing is saved unless they choose.
      to use it, then the instructions. Tell them to save it as a skill from
      Claude's skills settings.
   Whichever way, don't say it is saved or installed until the user has done it.
-
-## 5. The label
-
-Every response from this skill ends with this line exactly, on its own line,
-after everything else (including the offer):
-
-Self-assessment by Claude using Modo rubric v1 — not verified.
