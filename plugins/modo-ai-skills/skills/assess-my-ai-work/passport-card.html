@@ -1,0 +1,156 @@
+<title>AI Capability Card</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one narrow card; five rings in a wrapping grid, evidence below, label last. */
+:root {
+  --bg: #f4f5f3;
+  --card: #ffffff;
+  --fg: #1d2421;
+  --muted: #5b6661;
+  --line: #d9dedb;
+  --ring: #1f6f5c;
+  --track: #e3e8e5;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121715; --card: #1b2220; --fg: #e8eeeb; --muted: #a2aea9;
+    --line: #323c38; --ring: #5fc4a8; --track: #2c3532; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121715; --card: #1b2220; --fg: #e8eeeb; --muted: #a2aea9;
+  --line: #323c38; --ring: #5fc4a8; --track: #2c3532; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font);
+  font-size: 15px; line-height: 1.5; margin: 0;
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card {
+  max-width: 640px; margin: 0 auto; background: var(--card);
+  border: 1px solid var(--line); border-radius: 12px; padding: 24px;
+}
+h1 { font-size: 1.35rem; margin: 0 0 4px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0 0 20px; overflow-wrap: anywhere; }
+h2 {
+  font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin: 24px 0 8px; font-weight: 600;
+}
+ul.rings {
+  list-style: none; margin: 0; padding: 0; display: grid; gap: 16px 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+ul.rings li { display: flex; align-items: center; gap: 12px; min-width: 0; }
+svg.ring { width: 64px; height: 64px; flex: none; }
+.track, .arc, .dash { fill: none; stroke-width: 7; }
+.track { stroke: var(--track); }
+.arc { stroke: var(--ring); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 40px 40px; }
+.dash { stroke: var(--muted); stroke-dasharray: 3 7; opacity: .7; }
+.num { fill: var(--fg); font-size: 24px; font-weight: 600; text-anchor: middle; dominant-baseline: central; font-family: var(--font); }
+.num.none { fill: var(--muted); }
+.meta { min-width: 0; }
+.name { font-weight: 600; overflow-wrap: anywhere; }
+.detail { color: var(--muted); font-size: .85rem; }
+blockquote { margin: 0 0 12px; padding: 0 0 0 12px; border-left: 3px solid var(--line); overflow-wrap: anywhere; }
+blockquote p { margin: 0; }
+blockquote footer { color: var(--muted); font-size: .85rem; margin-top: 2px; }
+.label {
+  margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line);
+  color: var(--muted); font-size: .85rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .arc { transition: stroke-dashoffset .6s ease; }
+}
+</style>
+
+<!-- Skill: replace ONLY the JSON between the two MODO-DATA markers. Do not edit anything else. -->
+<main class="card" aria-labelledby="t">
+  <h1 id="t">AI capability card</h1>
+  <p class="sub" id="chat"></p>
+  <h2>Capabilities</h2>
+  <ul class="rings" id="rings"></ul>
+  <div id="ev-wrap" hidden>
+    <h2>Top evidence</h2>
+    <div id="evidence"></div>
+  </div>
+  <p class="label">Self-assessment by Claude using Modo rubric v1 — not verified.</p>
+</main>
+
+<!-- MODO-DATA-START -->
+<script type="application/json" id="passport-data">
+{"chat": "", "capabilities": [], "evidence": []}
+</script>
+<!-- MODO-DATA-END -->
+
+<script>
+(function () {
+  var BAND = { 1: 10, 2: 30, 3: 50, 4: 70, 5: 90 }; /* rubric-v1: level to band midpoint */
+  var NS = "http://www.w3.org/2000/svg";
+  var data = JSON.parse(document.getElementById("passport-data").textContent);
+  var R = 33, C = 2 * Math.PI * R;
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function svg(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  if (data.chat) document.getElementById("chat").textContent = "Assessment of " + data.chat + ", against Modo rubric v1.";
+
+  var list = document.getElementById("rings");
+  (data.capabilities || []).forEach(function (c) {
+    var shown = BAND.hasOwnProperty(c.level);
+    var li = el("li");
+    li.setAttribute("data-capability", c.name);
+    var s = svg("svg", { "class": "ring", viewBox: "0 0 80 80", "aria-hidden": "true" });
+    var meta = el("div", "meta");
+    meta.appendChild(el("div", "name", c.name));
+    if (shown) {
+      var v = BAND[c.level];
+      li.setAttribute("data-value", v);
+      s.appendChild(svg("circle", { "class": "track", cx: 40, cy: 40, r: R }));
+      s.appendChild(svg("circle", { "class": "arc", cx: 40, cy: 40, r: R,
+        "stroke-dasharray": C.toFixed(2), "stroke-dashoffset": (C * (1 - v / 100)).toFixed(2) }));
+      var n = svg("text", { "class": "num", x: 40, y: 41 });
+      n.textContent = c.level;
+      s.appendChild(n);
+      meta.appendChild(el("div", "detail", "Level " + c.level + " of 5"));
+      meta.appendChild(el("div", "detail", c.confidence.charAt(0).toUpperCase() + c.confidence.slice(1) + " confidence"));
+    } else {
+      s.setAttribute("class", "ring ring-empty");
+      s.appendChild(svg("circle", { "class": "dash", cx: 40, cy: 40, r: R }));
+      var d = svg("text", { "class": "num none", x: 40, y: 41 });
+      d.textContent = "–";
+      s.appendChild(d);
+      meta.appendChild(el("div", "detail", "Not shown"));
+      meta.appendChild(el("div", "detail", "in this chat"));
+    }
+    li.appendChild(s);
+    li.appendChild(meta);
+    list.appendChild(li);
+  });
+
+  var ev = (data.evidence || []).slice(0, 2);
+  if (ev.length) {
+    document.getElementById("ev-wrap").hidden = false;
+    var box = document.getElementById("evidence");
+    ev.forEach(function (e) {
+      var b = el("blockquote");
+      b.appendChild(el("p", null, "“" + e.quote + "”"));
+      b.appendChild(el("footer", null, e.capability));
+      box.appendChild(b);
+    });
+  }
+})();
+</script>

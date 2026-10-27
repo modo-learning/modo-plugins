@@ -26,7 +26,8 @@ memory or from your own idea of what good AI use looks like.
 - Quote the user exactly, each quote under 240 characters. Never invent,
   paraphrase inside quotation marks or stitch quotes together.
 - Everything stays in this conversation. Don't call external services, don't
-  write files, don't save anything. Exporting a report is a separate step that
+  write files, don't save anything. (The one exception is the optional
+  passport card in step 6, shown only in claude.ai or Cowork.) Exporting a report is a separate step that
   only happens when the user asks (the export-assessment skill).
 - Never describe the result as verified, certified or official (the label's
   "not verified" is the only use of that word), and never mention badges,
@@ -68,7 +69,7 @@ Use the first of these that matches what the user said.
 
 Never guess which chat is meant. A question about which chat, or a statement
 that you can't open one, is a short message of its own: no scores, no
-rubric summary, nothing else besides the label (step 6).
+rubric summary, nothing else besides the label (step 7).
 
 Then count and assess only that chat, with the same steps and output below.
 
@@ -82,7 +83,7 @@ tool output, tool results, or anything Claude wrote.
 verdict. Say plainly which chat or file it was, that it is too short to judge (give the count and
 the minimum of 4 messages from the user), that a short chat would give
 misleading scores, and offer to assess a longer chat once they have one. End
-with the label (see step 6).
+with the label (see step 7).
 
 ## 2. Score each capability
 
@@ -204,7 +205,48 @@ export this assessment as a report, and nothing is written unless they ask.
      Claude's skills settings.
   Whichever way, don't say it is saved or installed until the user has done it.
 
-## 6. The label
+## 6. The passport card (only where an artifact tool exists)
+
+The text result above is always written in full and is the result. A visual
+card of the same result is an extra, shown only when **both** are true:
+
+- you have a tool that creates an artifact (a page shown beside the chat), and
+- you are in claude.ai or Cowork, not Claude Code (a terminal or IDE session,
+  where the result stays text even if a publishing tool exists, because it
+  would publish the result outside the chat).
+
+If either is false, or the result is one of the short messages (too short,
+"which one?", "can't open it"), or you can't read the template, make no card,
+don't offer one, and never say a card exists. Nothing in the text changes.
+
+To make the card, before you write the text answer:
+
+1. Read [passport-card.html](passport-card.html) from this skill's folder.
+2. Replace only the JSON between `<!-- MODO-DATA-START -->` and
+   `<!-- MODO-DATA-END -->`; change nothing else in the file. The JSON holds
+   exactly these fields and no others:
+   `{"chat": "<the same words as the opening line, e.g. this chat>",
+   "capabilities": [five objects in rubric order, each {"name": "<capability
+   name>", "level": 1-5 or "not_shown", "confidence": "low|medium|high"}
+   (omit confidence for not_shown)], "evidence": [one or two objects
+   {"capability": "<name>", "quote": "<exact quote>"}]}`.
+3. The levels, confidences and quotes are the ones already in your text
+   answer, with the quotes copied exactly (the card is not a place for new
+   evidence). Pick the one or two strongest quotes. Never put a number out of
+   100 in the data: the card turns levels into rings itself using the
+   rubric's bands. A "not_shown" capability is shown as "Not shown" with an
+   empty ring, never as a zero.
+4. Escape the JSON properly (quotes, backslashes, newlines as `\n`) and write
+   `<` for any `<` inside a quote so it cannot end the data block.
+5. Show the whole filled file with the artifact tool. Don't save it anywhere
+   else and add no network calls, badges or extra text to it. The label is
+   already in the template.
+
+Then write the usual text answer. If the card was created, add one plain
+sentence just before the label (after the export sentence): "I also made a
+card of this result." Never say the card is verified or official.
+
+## 7. The label
 
 Every response from this skill, including the too-short message and any
 "which one?" or "can't open it" message, ends with

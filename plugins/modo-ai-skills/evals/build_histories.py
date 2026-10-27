@@ -81,6 +81,9 @@ LAUNCH_CHAT = [
 CHATS["improve-weak-capabilities"] = CHATS["strong-verify-weak-delegate"]
 CHATS["improve-not-shown"] = CHATS["no-strategy"]
 
+# Ticket 05: the text path with no artifact tool (Claude Code) assesses the same chat.
+CHATS["no-card-in-claude-code"] = CHATS["strong-verify-weak-delegate"]
+
 # Current chat for the no-browse case (5 user messages).
 CHATS["current-chat-only"] = LAUNCH_CHAT
 

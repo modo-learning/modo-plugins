@@ -22,6 +22,12 @@ Ask "how good am I at using AI?" or "assess this chat", or in Claude Code run
 `/modo-ai-skills:assess-my-ai-work`. It reads only the chat you are in, and
 needs at least 4 messages from you to give scores.
 
+In claude.ai and Cowork, Claude can also show the result as a card (five
+rings, confidence, top quotes, the self-assessment label). A capability the
+chat did not show appears as "Not shown" with an empty ring, not as zero. In
+Claude Code the result stays plain text. A sample is in
+[docs/passport-card-sample.png](docs/passport-card-sample.png).
+
 After the scores, the assessment names your two weakest shown capabilities
 and gives each a technique and a prompt to try next time, then offers (only
 offers) to turn them into a reusable skill. To work on one capability without
