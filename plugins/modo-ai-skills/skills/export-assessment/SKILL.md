@@ -1,6 +1,6 @@
 ---
 name: export-assessment
-description: "Export an AI-work assessment that was already given in this conversation as a Markdown report (or a PDF if asked) that ends in one machine-readable record, after the user approves which of their own quotes go in or chooses scores only. Use when the user runs /export-assessment, or asks to export, save, download or keep their assessment or report, to get it as Markdown or a PDF, or to upload it to Modo."
+description: "Export an AI-work assessment that was already given in this conversation as a Markdown report (or a PDF if asked) that ends in one machine-readable record, after the user approves which of their own quotes go in or chooses scores only. Use when the user runs /export-assessment, or asks to export, save, download or keep their assessment or report, to get it as Markdown or a PDF, or to upload it to Modo. Saving to the Modo passport through the Modo connector is the save-to-passport skill, not this one."
 ---
 
 # Export assessment

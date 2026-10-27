@@ -3,7 +3,8 @@
 **Record version: matches rubric v1**
 
 The record is the only data that may leave Claude when a user exports an
-assessment (and the only input of the planned `save_assessment` tool). It holds
+assessment or saves it to their Modo passport (it is the whole input of the
+Modo connector's `save_assessment` tool). It holds
 scores, confidence, a few quotes the user approved, a title and a date. It
 never holds the chat, Claude's replies, the next-level notes or the
 improvements.
@@ -83,8 +84,9 @@ Angelina's review.
    on its capability, and `not_shown` means nothing did.
 3. **Capabilities are an object keyed by id, not a list.** This makes "exactly
    five, each once" a property of the shape. Spec wording ("each with `level`
-   and `confidence`") does not fix list or object. Not specified: what the
-   upload page and `save_assessment` expect. Align before ticket 09.
+   and `confidence`") does not fix list or object. `save_assessment` takes
+   exactly this record as its arguments (modo-mcp README). Not specified: what
+   the upload page expects.
 4. **Quote tied to a capability by key.** The spec says "tied to a capability"
    without a field name; `capability` is the plugin's choice.
 
@@ -129,6 +131,10 @@ python3 scripts/check_eval_records.py plugins/modo-ai-skills/evals/results/<time
 It reads the final message of every run of the `export-*` cases from the
 LLM-grader `evidence` fields, extracts the record and validates it with the
 script above. `export-scores-only` must also have an empty `evidence` list.
+For the `save-*` cases that send a record it reads the calls to the mocked
+`save_assessment` tool (from an LLM grader with `focus: mock_calls`), requires
+exactly one call per run and validates its input the same way, including the
+number of quotes the case expects.
 Tests: `python3 -m unittest scripts/test_check_eval_records.py`.
 
 ## Open question for Angelina
@@ -136,12 +142,14 @@ Tests: `python3 -m unittest scripts/test_check_eval_records.py`.
 What does the Modo platform upload page accept: the `.md` report, the bare
 JSON, a PDF, or only one of them? Until that is answered, the export produces
 the Markdown report (with the record last) and a PDF only on request, and the
-user uploads it themselves. Nothing in this plugin uploads anything.
+user uploads it themselves. The export never uploads anything; the only
+thing this plugin sends anywhere is this record, through the Modo connector's
+`save_assessment` tool, after the user has seen it and said yes.
 
 ## Copies
 
-The export skill folder holds the only copy. When a second skill needs the
-record (`save_assessment`, ticket 09), copy this file and the schema into that
-skill's folder (skill docs only cover files bundled in the skill's own folder)
-and extend `scripts/check_rubric_sync.py` to compare them, the same way the
-rubric copies are compared.
+This file and the schema exist twice, because skill docs only cover files
+bundled in the skill's own folder: in `skills/export-assessment/` (the source:
+edit there) and in `skills/save-to-passport/`. Copy both over after every
+edit. `scripts/check_rubric_sync.py` fails when the copies differ, the same way
+it compares the rubric copies.

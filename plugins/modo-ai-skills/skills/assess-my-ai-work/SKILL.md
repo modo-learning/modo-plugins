@@ -33,6 +33,9 @@ memory or from your own idea of what good AI use looks like.
     through the flow in step 6, where the user saves it themselves;
   - exporting a report, which is a separate skill (export-assessment) that
     runs only when the user asks for it. This skill never writes the report.
+  - saving to the user's Modo passport, which is a separate skill
+    (save-to-passport) that runs only when the user asks for it. This skill
+    never sends anything.
 - Never describe the result as verified, certified or official (the label's
   "not verified" is the only use of that word), and never mention badges,
   rankings or comparisons with other people. "Verification" as the name of a
@@ -254,6 +257,14 @@ choose. Create nothing yet.
 After that offer (or, when there is no improvements section, after the five
 blocks) add one plain sentence, not a question: they can also ask you to
 export this assessment as a report, and nothing is written unless they ask.
+
+Only if you have the Modo connector's save tool in this session (a tool named
+`save_assessment`, or one whose name ends in `__save_assessment`, such as
+`mcp__modo__save_assessment`; a tool listed only by name counts), that
+sentence instead says they can ask you to export this assessment as a report
+or save it to their Modo passport, and nothing is written or sent unless they
+ask. Without that tool, never mention the Modo passport or a connector. Don't
+call any tool to save here.
 
 ## 6. When the user answers the offer
 
