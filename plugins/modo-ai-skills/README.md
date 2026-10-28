@@ -67,7 +67,8 @@ repository. It is not on `main`, so install it from the branch.
 
 The marketplace there reads only `main`, so upload the plugin as a zip:
 
-1. Get `modo-ai-skills.zip` (shared by the Modo team). Don't use GitHub's
+1. Download [`modo-ai-skills.zip`](https://github.com/modo-learning/modo-plugins/releases/download/modo-ai-skills-v0.1.0-rc1/modo-ai-skills.zip)
+   from the [test build](https://github.com/modo-learning/modo-plugins/releases/tag/modo-ai-skills-v0.1.0-rc1). Don't use GitHub's
    "Download ZIP" for the whole repository: it holds two plugins, and the
    upload takes one. To build the zip yourself from a clone:
 
