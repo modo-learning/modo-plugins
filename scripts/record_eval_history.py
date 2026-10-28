@@ -1,9 +1,9 @@
 """Record the first /my-tasks turn used by the follow-up eval cases.
 
-The build-skill, build-scheduled and decline cases resume a conversation in
-which /my-tasks has already listed the planted-patterns tasks. That first
-turn replays the skill text as it was when recorded, so re-run this script
-after every change to the skill.
+The build-skill, build-skill-existing, build-scheduled and decline cases
+resume a conversation in which /my-tasks has already listed the
+planted-patterns tasks. That first turn replays the skill text as it was
+when recorded, so re-run this script after every change to the skill.
 
 It runs one real headless session on the planted export, keeps only the
 user and assistant messages, replaces local paths, drops lines about
@@ -26,7 +26,7 @@ import uuid
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / "plugins" / "modo-task-finder"
 PLANTED = PLUGIN / "evals" / "planted-patterns"
-FOLLOW_UPS = ["build-skill", "build-scheduled", "decline"]
+FOLLOW_UPS = ["build-skill", "build-skill-existing", "build-scheduled", "decline"]
 DROP_KEYS = ("gitBranch", "slug", "userType", "entrypoint", "version", "requestId")
 MACHINE_NOTE = re.compile(r"re-?authori[sz]|connector settings|Notion", re.I)
 LEAK = re.compile(r"/Users/|/home/|[\w.+-]+@[\w-]+\.[\w.]+")

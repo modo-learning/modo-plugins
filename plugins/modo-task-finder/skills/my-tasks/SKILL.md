@@ -150,8 +150,11 @@ Choose the single best fix:
   tool Claude isn't connected to. Name the tool. Automation comes after the
   connection.
 - **Already covered**: the user already has a skill, plugin or scheduled task
-  for this. Check the skills and plugins you can see in your context. If the
-  chats show friction anyway (late edits, redoing output), suggest one tweak.
+  for this. Check the skills and plugins you can see in your context,
+  including ones their organization shares with them. Match on the job a
+  skill's description covers, not on its name: a "sales-followups" skill
+  covers follow-up emails after demos. If the chats show friction anyway
+  (late edits, redoing output), suggest one tweak.
   You can't see scheduled tasks, so if one seems likely, add "if you already
   have a scheduled task for this, ignore this one".
 
@@ -200,7 +203,14 @@ different fix type they ask for). Build only what they picked. End that same
 reply with one offer to re-run this check regularly (step 10), even if the
 fix still needs their confirmation.
 
-- **Skill.** Use the first that's available:
+- **Skill.** First check once more for a skill that already does this job:
+  any skill or plugin you can see, including ones the user's organization
+  shares, matched on what its description covers rather than its name. If
+  one fits, don't build a duplicate. Name it, say what it already covers
+  and what the user's chats show it misses, and offer to use it as is or to
+  write a tweak for the gaps (see the last bullet below). Build a new skill
+  only if the user still wants one after that. Otherwise, use the first
+  that's available:
   1. A tool that proposes a skill for the user to save (claude.ai shows it
      as a "Save skill" card). The user still decides by saving or
      dismissing it.
@@ -212,7 +222,10 @@ fix still needs their confirmation.
   value the user kept re-explaining, in their words. Tell them to save it as
   a skill from Claude's skills settings.
   Whichever way, include every rule and fixed detail, and don't say it's
-  installed or saved until the user has done it.
+  installed or saved until the user has done it. Then add one line: if their
+  plan lets them share skills with their organization (Team and
+  Enterprise), sharing this one means colleagues can use it, and their
+  runs of this check will find it instead of building another copy.
 - **Scheduled task.** Write the complete task first, then ask them to
   confirm. Don't ask questions before showing it; pick sensible defaults and
   let them change them. Give:

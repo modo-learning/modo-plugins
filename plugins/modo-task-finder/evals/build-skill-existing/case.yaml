@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: build-skill-existing
+description: Second turn after a /my-tasks list; the user picks a skill that an org-shared skill already covers, so it must point to that one instead of building a duplicate.
+plugins: ["../..", "fixture-plugins/recruiting-messages"]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

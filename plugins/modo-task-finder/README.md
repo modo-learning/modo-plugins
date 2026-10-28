@@ -24,6 +24,12 @@ tasks. Each one shows:
 It ends by offering to build the top fix. Nothing is built unless you say
 yes. After a fix, it offers once to run the check weekly.
 
+Before building a skill, it checks the skills you can already use,
+including ones your organization shares with you. If one already does the
+job, it points you to it and offers a tweak instead of making a duplicate.
+After building a new skill, it suggests sharing it with your organization,
+so colleagues who run the check find it instead of building their own.
+
 ### Example
 
 This example is made up; the names and tasks are invented.
