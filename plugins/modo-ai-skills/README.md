@@ -39,7 +39,68 @@ Every result ends with this label:
 It is Claude's reading of one chat against a public rubric. It is not a test,
 a certificate or a comparison with other people.
 
+## How it works
+
+1. **You pick one chat.** The default is the chat you're in. You can also
+   name a past chat by its exact title, paste a chat, or point to a chat
+   export or Claude Code session file (see [Which chat it reads](#which-chat-it-reads)).
+2. **Claude reads the rubric** that ships in the plugin and checks only your
+   own messages in that chat against it.
+3. **You get the result:** which chat was assessed, a level (or "not shown")
+   and confidence for each of the five capabilities, quotes as evidence, the
+   next level, and two improvements with prompts to try.
+4. **You see a card** beside the chat in claude.ai and Cowork; in Claude Code
+   the result stays as text.
+5. **If you ask, you export it:** you approve the quotes (or choose scores
+   only), and Claude writes a Markdown report (or a PDF) that ends in one
+   machine-readable record, ready to upload to Modo.
+
+Nothing leaves your conversation. The plugin has no connector and calls no
+outside service.
+
 ## Install
+
+### While it's in review (before it's on `main`)
+
+Modo AI Skills is in review on the branch `modo-ai-skills-phase0`
+([pull request #1](https://github.com/modo-learning/modo-plugins/pull/1)).
+Until it merges, install it like this.
+
+**claude.ai, the Claude desktop app and Cowork.** The marketplace there reads
+only the `main` branch, so upload the plugin instead:
+
+1. Download `modo-ai-skills.zip` from the
+   [pre-release](https://github.com/modo-learning/modo-plugins/releases/tag/modo-ai-skills-v0.1.0-rc1).
+   Don't use GitHub's "Download ZIP" for the whole repository; it holds two
+   plugins, and the upload takes one.
+2. Open **Customize → Plugins → Add → Upload plugin** and choose the zip.
+3. To assess a past chat by its title, turn on **Settings → Memory →
+   "Search and reference chats"**.
+4. Start a new chat, work on something real for at least 4 messages, then ask
+   "how good am I at using AI in this chat?", and then "export it".
+
+**Claude Code.** Add the marketplace at the branch:
+
+```
+claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-phase0
+claude plugin install modo-ai-skills@modo-plugins
+```
+
+If you already added `modo-plugins` from `main` (for Task Finder), remove it
+first. Removing it also uninstalls Task Finder, so install that again:
+
+```
+claude plugin marketplace remove modo-plugins
+claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-phase0
+claude plugin install modo-ai-skills@modo-plugins
+claude plugin install modo-task-finder@modo-plugins
+```
+
+**After it merges,** remove the uploaded copy in claude.ai and install it
+from the marketplace (below), so you don't have two copies. In Claude Code,
+remove the marketplace and add it again without `#modo-ai-skills-phase0`.
+
+### From the marketplace
 
 **Claude Code**
 
