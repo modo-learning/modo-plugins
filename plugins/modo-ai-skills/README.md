@@ -60,26 +60,33 @@ outside service.
 
 ## Install
 
-### While it's in review (before it's on `main`)
+Modo AI Skills lives on the branch `modo-ai-skills-phase0` of this
+repository. It is not on `main`, so install it from the branch.
 
-Modo AI Skills is in review on the branch `modo-ai-skills-phase0`
-([pull request #1](https://github.com/modo-learning/modo-plugins/pull/1)).
-Until it merges, install it like this.
+### claude.ai, the Claude desktop app and Cowork
 
-**claude.ai, the Claude desktop app and Cowork.** The marketplace there reads
-only the `main` branch, so upload the plugin instead:
+The marketplace there reads only `main`, so upload the plugin as a zip:
 
-1. Download `modo-ai-skills.zip` from the
-   [pre-release](https://github.com/modo-learning/modo-plugins/releases/tag/modo-ai-skills-v0.1.0-rc1).
-   Don't use GitHub's "Download ZIP" for the whole repository; it holds two
-   plugins, and the upload takes one.
+1. Get `modo-ai-skills.zip` (shared by the Modo team). Don't use GitHub's
+   "Download ZIP" for the whole repository: it holds two plugins, and the
+   upload takes one. To build the zip yourself from a clone:
+
+   ```
+   git fetch origin modo-ai-skills-phase0
+   git archive --format=zip -o modo-ai-skills.zip origin/modo-ai-skills-phase0:plugins/modo-ai-skills -- . ':!evals'
+   ```
+
 2. Open **Customize → Plugins → Add → Upload plugin** and choose the zip.
 3. To assess a past chat by its title, turn on **Settings → Memory →
    "Search and reference chats"**.
 4. Start a new chat, work on something real for at least 4 messages, then ask
    "how good am I at using AI in this chat?", and then "export it".
 
-**Claude Code.** Add the marketplace at the branch:
+To update, remove the plugin in Customize → Plugins and upload the new zip.
+
+### Claude Code
+
+Add the marketplace at the branch:
 
 ```
 claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-phase0
@@ -87,7 +94,8 @@ claude plugin install modo-ai-skills@modo-plugins
 ```
 
 If you already added `modo-plugins` from `main` (for Task Finder), remove it
-first. Removing it also uninstalls Task Finder, so install that again:
+first. Removing it also uninstalls Task Finder, so install that again; the
+branch has it too, unchanged:
 
 ```
 claude plugin marketplace remove modo-plugins
@@ -96,27 +104,8 @@ claude plugin install modo-ai-skills@modo-plugins
 claude plugin install modo-task-finder@modo-plugins
 ```
 
-**After it merges,** remove the uploaded copy in claude.ai and install it
-from the marketplace (below), so you don't have two copies. In Claude Code,
-remove the marketplace and add it again without `#modo-ai-skills-phase0`.
-
-### From the marketplace
-
-**Claude Code**
-
-```
-claude plugin marketplace add modo-learning/modo-plugins
-claude plugin install modo-ai-skills@modo-plugins
-```
-
-**Claude (web, desktop, Cowork)**
-
-Open Customize, then Plugins, choose Add marketplace, and paste
-`https://github.com/modo-learning/modo-plugins`. Then install Modo AI Skills
-from the list.
-
-If you already have Modo Task Finder, the marketplace is already added; just
-install Modo AI Skills from it.
+To update: `claude plugin marketplace update modo-plugins`, then
+`claude plugin update modo-ai-skills@modo-plugins`.
 
 ## How to ask
 
