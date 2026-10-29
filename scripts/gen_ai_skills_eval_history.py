@@ -126,7 +126,7 @@ EXPORT_REQUEST = "Export this as a report."
 # Levels and confidence follow rubric v1.1's level rule for the behaviours
 # listed (scripts/derive_levels.py gives the same results).
 ASSESSMENT_STRONG = """Assessment of this chat (7 messages from you; based on 1 chat), against Modo rubric v1.1.
-Scored 3 times (in this one response); the runs agreed on 4 of 5 capabilities.
+Scored 3 times (in this one response); the runs agreed on 5 of 5 capabilities.
 
 Verification: Level 5 of 5 (confidence: high; 3 of 3 runs)
   Evidence (checks a fact, message 2): "Before I use any of this I recomputed the tier growth myself. Team is 310 against 280, which is 10.7%, not 14.3%."
@@ -140,16 +140,16 @@ Problem Solving: Level 4 of 5 (confidence: medium; 3 of 3 runs)
   Why this level: a tier 4 breakdown backed by a tier 3 moment.
   Next level: Set success criteria for the board analysis before the first draft.
 
+Delegation: Level 3 of 5 (confidence: medium; 3 of 3 runs)
+  Evidence (keeps the final call, message 7): "The first two match my spreadsheet within rounding, the third is off by $2k, so fix that one."
+  Evidence (vague handoff, message 4): "whatever pricing changes you think are best, I don't have time to think about it."
+  Why this level: you checked most handoffs, but "Then finish the rest of the deck, all the slides." was never checked, so at most 3.
+  Next level: Give each handoff a scope and a review point, and check what comes back before it goes in the deck.
+
 Workflow Design: Level 2 of 5 (confidence: medium; 3 of 3 runs)
   Evidence (starts from scratch, message 6): "Same board pricing analysis as before, Starter $120k, Team $310k, Enterprise $570k in Q3 and $110k, $280k, $450k in Q2."
   Why this level: next steps with no plan stated, and setup repeated once.
   Next level: State the order of steps once and feed each output into the next.
-
-Delegation: Level 2 of 5 (confidence: low; 2 of 3 runs)
-  Evidence (vague handoff, message 4): "whatever pricing changes you think are best, I don't have time to think about it."
-  Evidence (vague handoff, message 7): "Then finish the rest of the deck, all the slides."
-  Why this level: one handoff was checked, but vague handoffs are as frequent, so at most 2.
-  Next level: Hand over each piece with its scope and output format, and keep the decision.
 
 Strategic Thinking: Level 2 of 5 (confidence: low; 3 of 3 runs)
   Evidence (mentions purpose, message 1): "Write up my Q3 pricing analysis for the board."
@@ -162,9 +162,9 @@ Improvements
    Technique: State the order of steps once and feed each output into the next (W3a, W3b).
    Try this next time: "Step 1: confirm the Q2 and Q3 figures. Step 2: compute growth per tier. Step 3: draft the recommendations from step 2."
 
-2. Delegation (Level 2 of 5 now)
-   Technique: Hand over a scoped task and keep the decision (D3a, D3b).
-   Try this next time: "Draft three pricing options for the board with the revenue effect of each, and I will choose one."
+2. Strategic Thinking (Level 2 of 5 now)
+   Technique: Tie the task to the decision the board must make and use it to prioritise (S3a).
+   Try this next time: "The board has to decide whether to change prices next quarter. Draft three pricing options with the revenue effect of each, and I will choose one."
 
 Do you want these turned into one reusable skill you can keep? Nothing is saved unless you choose to save it.
 

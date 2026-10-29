@@ -138,6 +138,7 @@ are about handing off **and checking**, not about handing off more.
 | Id | Tier | Behaviour | What the message shows | Source |
 |---|---|---|---|---|
 | D1 | 1 | Vague handoff | Hands over a whole job vaguely ("do my report", "whatever you think is best") with no scope, role or output, or moves on without looking at what came back. | |
+| D1u | 1 | Unchecked handoff | A D1 handoff whose result no later message reviews, corrects or checks. Code it instead of D1 for that message. | |
 | D2a | 2 | Minimal brief | Hands over a task with a minimal brief (a topic, perhaps a length) and no review point. | |
 | D3a | 3 | Scoped handoff | Hands over a task with its scope and output format. | |
 | D3b | 3 | Keeps a decision | Keeps a decision or sets how Claude should work ("give me three options, I'll choose", "ask me questions first"). | Sets interaction mode, 30% |
@@ -187,7 +188,9 @@ For each capability, using the behaviours seen in one run:
    fact-checking) and the one that best predicts who gains from using AI.
    **Delegation is hand off and check**: its level 4 or 5 also needs at least
    one checking behaviour (D4a, D4b or D5b) among those seen; without one the
-   level is at most 3.
+   level is at most 3. Any unchecked handoff (D1u) also caps Delegation at 3,
+   however well other handoffs were checked: you can delegate the work, but
+   not the accountability.
 5. **Mostly the opposite.** When at least one positive behaviour was seen,
    count the moments with a positive behaviour of the capability (P) and the
    moments with its tier 1 behaviour (C). If C is at least P, the level is at most 2 and confidence is low. If C is above 0 but
@@ -212,6 +215,7 @@ For each capability, using the behaviours seen in one run:
 | 2: V5a; 4: V3b | 6 | 5 | medium | Verification: a tier 3 check backs level 5 |
 | 1: V1; 3: V1; 5: V1 | 7 | 1 | high | only tier 1, seen in 3 moments; rule 5 does not apply |
 | 2: D5a; 4: D3a | 6 | 3 | medium | backed at 4, but Delegation needs a check (D4a, D4b or D5b) |
+| 4: D1; 5: D4b; 6: D4a; 7: D5b, D1u | 7 | 3 | medium | level 5, but the handoff in message 7 was never checked (D1u), so at most 3; C = 2 is below P = 3 |
 | 2: D4a; 4: D4b | 6 | 4 | medium | handed off with a review point, then reviewed what came back |
 | 1: P5b; 4: P3a | 6 | 4 | medium | tier 5 needs a tier 4 moment; the tier 3 moment backs level 4 |
 | 2: V3b, V4b; 3: V4a; 6: V5a | 7 | 5 | high | tier 5 backed by tier 3 or above (Verification); 3 moments in 7 messages |

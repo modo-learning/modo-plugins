@@ -3,7 +3,7 @@ type: llm
 weight: 3
 ---
 
-Ground truth for the chat (the judge cannot see it). The assessment already given scored: Problem Solving level 4 medium; Verification level 5 high; Workflow Design level 2 medium; Delegation level 2 low; Strategic Thinking level 2 low. The export plan Claude proposed had these five quotes, numbered:
+Ground truth for the chat (the judge cannot see it). The assessment already given scored: Problem Solving level 4 medium; Verification level 5 high; Workflow Design level 2 medium; Delegation level 3 medium; Strategic Thinking level 2 low. The export plan Claude proposed had these five quotes, numbered:
 1. Problem Solving: "Show your calculation for every percentage and fix the table."
 2. Verification: "Before I use any of this I recomputed the tier growth myself. Team is 310 against 280, which is 10.7%, not 14.3%."
 3. Workflow Design: "Same board pricing analysis as before, Starter $120k, Team $310k, Enterprise $570k in Q3 and $110k, $280k, $450k in Q2."

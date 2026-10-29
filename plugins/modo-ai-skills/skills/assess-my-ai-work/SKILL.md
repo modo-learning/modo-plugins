@@ -134,7 +134,9 @@ Number the user's messages 1, 2, 3… in the order they were written.
    highest tier, the backing moment, P (messages with a positive behaviour
    of the capability), C (messages with its tier 1 behaviour; a message can
    be in both), and each rule that changed the level. If C is at least P, the
-   level is at most 2, however strong the best moment is. The rule sets the
+   level is at most 2, however strong the best moment is. For Delegation, code
+   a vague handoff whose result no later message checks as D1u; any D1u caps
+   Delegation at 3. The rule sets the
    level (1 to 5 or not shown) and the confidence. Don't adjust its result by
    feel.
 
