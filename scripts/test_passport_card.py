@@ -166,6 +166,14 @@ class Render(unittest.TestCase):
         text = text_of(body_text(self.dom)).replace(LABEL, "")
         self.assertNotRegex(text.lower(), r"verified|badge|benchmark|rank")
 
+    def test_runs_disagreed_is_not_missing_coverage(self):
+        data = json.loads(json.dumps(SAMPLE))
+        data["capabilities"][3] = {"name": "Delegation", "level": "not_shown", "agreement": "runs disagreed"}
+        text = text_of(body_text(render(data)))
+        self.assertIn("could show Strategic Thinking", text)
+        self.assertNotIn("could show Delegation", text)
+        self.assertIn("runs disagreed", text)
+
     def test_all_not_shown(self):
         data = json.loads(json.dumps(SAMPLE))
         for c in data["capabilities"]:

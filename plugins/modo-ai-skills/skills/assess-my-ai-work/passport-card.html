@@ -141,10 +141,12 @@ blockquote footer { color: var(--muted); font-size: .85rem; margin-top: 2px; }
     document.getElementById("chat").textContent = "Assessment of " + data.chat +
       ". Based on " + sessions + (sessions === 1 ? " chat" : " chats") + ", against Modo rubric v1.1.";
   }
-  if (ordered.length === 5 && nShown < 5) {
-    var missing = ordered.filter(function (c) { return !shown(c); });
+  if (ordered.length === 5) {
+    /* A capability withheld because the runs disagreed was shown; it is not missing. */
+    var missing = ordered.filter(function (c) { return !shown(c) && c.agreement !== "runs disagreed"; });
+    nShown = ordered.length - missing.length;
     var cov = document.getElementById("coverage");
-    cov.hidden = false;
+    cov.hidden = nShown === 5;
     cov.textContent = nShown === 4
       ? "This chat shows 4 of 5 capabilities. One more chat with different work could show " + missing[0].name + "."
       : "This chat shows only " + nShown + " of 5 capabilities, so this is a partial picture. Assess 2–3 more chats with different kinds of work to see the rest.";

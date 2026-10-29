@@ -251,7 +251,9 @@ How many of the five capabilities a chat shows is reported with every result:
   picture. Assess 2–3 more chats with different kinds of work to see the
   rest."
 
-A result always states how many chats it is based on. Each assessment covers
+A capability given "not shown" only because the runs disagreed was shown,
+so it counts as shown here. A result always states how many chats it is
+based on. Each assessment covers
 one chat.
 
 ---

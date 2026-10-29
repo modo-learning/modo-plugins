@@ -74,7 +74,7 @@ class Combine(unittest.TestCase):
 
     def test_spread_three_abstains(self):
         self.assertEqual(combine([(1, "low"), (4, "medium"), (4, "medium"), (2, "low"), (3, "low")]),
-                         {"level": "not shown", "confidence": None, "agreement": "runs disagreed"})
+                         {"level": "runs disagreed", "confidence": None, "agreement": "runs disagreed"})
 
     def test_majority_not_shown(self):
         self.assertEqual(combine([("not shown", None), ("not shown", None), (2, "low")]),
@@ -97,6 +97,9 @@ class Coverage(unittest.TestCase):
         self.assertEqual(coverage(self.levels(3, 4, 2, 2, "not shown")),
                          "This chat shows 4 of 5 capabilities. One more chat with different "
                          "work could show Strategic Thinking.")
+
+    def test_runs_disagreed_counts_as_shown(self):
+        self.assertIsNone(coverage(self.levels(3, 4, 2, "runs disagreed", 3)))
 
     def test_three_or_fewer_is_partial(self):
         self.assertEqual(coverage(self.levels(3, "not shown", 2, "not shown", "not shown")),

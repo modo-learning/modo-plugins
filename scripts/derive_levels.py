@@ -12,6 +12,7 @@ table here matches the rubric's.
 """
 
 NOT_SHOWN = "not shown"
+DISAGREED = "runs disagreed"  # shown as not shown, but counted as shown for coverage
 CONFIDENCE = ("low", "medium", "high")
 
 # Behaviour id -> tier, as in the rubric's behaviour tables.
@@ -83,7 +84,7 @@ def combine(runs):
     levels = sorted(lvl for lvl, _ in scored)
     spread = levels[-1] - levels[0]
     if spread >= 3:
-        return {"level": NOT_SHOWN, "confidence": None, "agreement": "runs disagreed"}
+        return {"level": DISAGREED, "confidence": None, "agreement": DISAGREED}
     level = levels[(len(levels) - 1) // 2]
     confidence = min((c for lvl, c in scored if lvl == level), key=CONFIDENCE.index)
     if spread >= 2 or len(scored) < n:

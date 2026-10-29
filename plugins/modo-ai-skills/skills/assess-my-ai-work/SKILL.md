@@ -156,7 +156,8 @@ Then, for each capability:
   about this chat. For level 5, say what keeping it up looks like. For not
   shown, say what in a chat would show it.
 
-Finally, work out the coverage line from the rubric's "Coverage" section.
+Finally, work out the coverage line from the rubric's "Coverage" section (a
+capability withheld because the runs disagreed counts as shown there).
 
 ## 3. The passport card (only where an artifact tool exists)
 
