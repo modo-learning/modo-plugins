@@ -8,11 +8,11 @@ The response should assess the chat on exactly five capabilities: Problem Solvin
 PASS if ALL of these hold:
 (1) All five capabilities appear, each with a level 1-5 or an explicit "not shown" marker.
 (2) Each capability has a confidence label of low, medium or high.
-(3) Each capability that has a level has one or two short quotes that really appear in the user's own messages in the chat (for example "Team is 310 against 280" or "finish the rest of the deck"). Quotes must be from the user, not the assistant, and not invented.
+(3) Each capability that has a level has one to three short quotes that really appear in the user's own messages in the chat (for example "Team is 310 against 280" or "finish the rest of the deck"). Quotes must be from the user, not the assistant, and not invented.
 (4) Each capability has a line about what the next level up would look like.
 FAIL if any capability is missing, any level lacks a confidence label, any quote is invented or taken from the assistant's turns, or the next-level lines are missing.
 
-Only the five capability blocks and their "Evidence:" and "Next level:" lines are graded. An "Improvements" section after them (techniques, copy-ready prompts, a skill offer) is not part of the five blocks and is not checked here; quotes inside it are suggested wording.
+Only the five capability blocks and their "Evidence" and "Next level:" lines are graded. An "Improvements" section after them (techniques, copy-ready prompts, a skill offer) is not part of the five blocks and is not checked here; quotes inside it are suggested wording.
 
 The judge cannot see the chat, so here are all of the user's messages in it, verbatim. A quote is real if it is a word-for-word excerpt of one of these (the first line of the response is a header, and any assistant text is not a user message):
 

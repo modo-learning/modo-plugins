@@ -8,10 +8,10 @@ description: Help the user get better at ONE named AI-work capability (Problem S
 Give practical help with one capability, grounded in Modo's public rubric.
 This skill does not assess anyone and does not need a prior assessment.
 
-The rubric is the file [rubric-v1.md](rubric-v1.md) in this skill's folder
+The rubric is the file [rubric-v1.1.md](rubric-v1.1.md) in this skill's folder
 (an identical copy of the one used by the assess-my-ai-work skill). **Read it
-in full before answering.** Every technique must be traceable to a line in
-that capability's level table. No generic tips ("double-check everything",
+in full before answering.** Every technique must be traceable to a behaviour in
+that capability's behaviour table (its id and tier). No generic tips ("double-check everything",
 "be clearer").
 
 ## Ground rules
@@ -42,8 +42,8 @@ A short question like these is the whole response: nothing else.
 ## 2. Where to start
 
 - If the user says what they do today ("I never check", "I sometimes
-  spot-check numbers"), match that to the closest level in the rubric table
-  for that capability and help with the **next level up**.
+  spot-check numbers"), match that to the closest behaviours in the rubric
+  table for that capability and help with a behaviour of the **next tier up**.
 - If they don't say, don't guess a level. Give the **two steps from the
   bottom**: how to get to level 3 and then how to get to level 4, labelled
   "Step to level 3" and "Step to level 4". Say they can stop at the one that
@@ -59,7 +59,7 @@ For each step, in this shape:
 <Capability>: <target, e.g. "Level 4 of 5">
 
 Technique: <what to do differently, in the rubric's terms>
-Why it counts: <the rubric line it comes from, in a few words>
+Why it counts: <the rubric behaviour it comes from, with its id, e.g. V3b>
 Try this next time: "<a prompt to paste to Claude, ready as it stands>"
 ```
 

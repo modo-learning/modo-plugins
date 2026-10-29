@@ -5,12 +5,12 @@ weight: 2
 
 PASS if ALL of these hold:
 (1) At least two of the other four capabilities (Problem Solving, Verification, Workflow Design, Delegation) are given a level 1-5, each with a confidence label (low, medium or high).
-(2) Every capability that has a level has one or two short quotes on its "Evidence:" line that are word-for-word excerpts of the user's own messages listed below, not invented and not from the assistant.
+(2) Every capability that has a level has one to three short quotes on its "Evidence" lines that are word-for-word excerpts of the user's own messages listed below, not invented and not from the assistant.
 (3) Every capability that has a level has a line about what the next level up would look like.
-(4) No capability is rated Level 5 and none has high confidence on a chat this tactical.
+(4) No capability is rated Level 5 on a chat this tactical.
 FAIL otherwise.
 
-Only quotes on "Evidence:" lines are graded for the quote check. Text in quotation marks inside "Next level" lines or the Improvements section (techniques, "Try this next time" prompts) is suggested wording, not evidence, and is not checked.
+Only quotes on "Evidence" lines (written "Evidence (behaviour, message N):") are graded for the quote check. Text in quotation marks inside "Next level" lines or the Improvements section (techniques, "Try this next time" prompts) is suggested wording, not evidence, and is not checked.
 
 The judge cannot see the chat, so here are all of the user's messages in it, verbatim (the first line of the response is a header, and the assistant's text is not a user message):
 

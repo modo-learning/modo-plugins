@@ -8,6 +8,16 @@ own messages as evidence, and what the next level looks like. Then it gives
 you two concrete improvements for your weakest areas, each with a prompt to
 try next time.
 
+**Not for hiring or employment decisions.** Modo AI Skills is a
+self-assessment for your own development. It is not intended for hiring,
+promotion, performance reviews or any other employment decision about you or
+anyone else.
+
+This branch carries **rubric v1.1**: scoring prompt by prompt against
+published behaviours, a fixed level rule, 3 to 5 scoring runs with their
+agreement shown, honest coverage for thin chats, and a redesigned card. See
+[What changed in v1.1](#what-changed-in-v11).
+
 It's made for people who use Claude every day for real work and want honest
 feedback on how they frame problems, check Claude's work, build repeatable
 workflows, hand work over and decide where AI is worth using, with something
@@ -15,17 +25,28 @@ concrete to keep.
 
 ## What you get
 
-- **A level for each capability**, written as "Level N of 5", tied to the
-  level descriptions in the [rubric](skills/assess-my-ai-work/rubric-v1.md).
-  A capability the chat did not show is "Not shown in this chat", never a
+- **A level for each capability**, written as "Level N of 5", strongest
+  first. Claude checks each of your messages for the specific behaviours
+  listed in the [rubric](skills/assess-my-ai-work/rubric-v1.1.md) (gave
+  context, checked a fact, asked for the working, kept a decision…), each with
+  a quote, and a fixed published rule turns those into the level. A
+  capability the chat did not show is "Not shown in this chat", never a
   made-up score and never level 1.
 - **A confidence label** (low, medium or high) on each level, set by how much
   the chat showed, as defined in the rubric.
-- **Evidence**: one or two exact quotes from your own messages behind each
-  level. Claude's replies are context only; they are never quoted as
-  evidence.
+- **Run agreement**: the scoring runs 3 times (5 when the first 3 disagree),
+  and each level says how many runs gave it. When runs disagree, confidence
+  drops, or the capability is "not shown" instead of a guess.
+- **Coverage**: how many of the five capabilities the chat showed, and how
+  many chats the result is based on (always 1: each assessment covers one
+  chat). A thin chat says so, for example "This chat shows only 2 of 5
+  capabilities… Assess 2–3 more chats".
+- **Evidence**: one to three exact quotes from your own messages behind each
+  level, each tagged with the behaviour and message number. Claude's replies
+  are context only; they are never quoted as evidence.
 - **Next level**: one line on what the next level up would look like for you.
-- **Improvements**: for the two weakest capabilities that were shown, a
+- **Improvements**: for two capabilities that were shown (Verification
+  first when it is at level 3 or below, then the weakest), a
   technique taken from the rubric and a "try this next time" prompt you can
   paste as it stands. It then offers (only offers) to turn them into one
   reusable skill.
@@ -34,7 +55,7 @@ concrete to keep.
 
 Every result ends with this label:
 
-> Self-assessment by Claude using Modo rubric v1 — not verified.
+> Self-assessment by Claude using Modo rubric v1.1 — not verified.
 
 It is Claude's reading of one chat against a public rubric. It is not a test,
 a certificate or a comparison with other people.
@@ -44,14 +65,18 @@ a certificate or a comparison with other people.
 1. **You pick one chat.** The default is the chat you're in. You can also
    name a past chat by its exact title, paste a chat, or point to a chat
    export or Claude Code session file (see [Which chat it reads](#which-chat-it-reads)).
-2. **Claude reads the rubric** that ships in the plugin and checks only your
-   own messages in that chat against it.
-3. **You get the result:** which chat was assessed, a level (or "not shown")
+2. **Claude reads the rubric** that ships in the plugin and checks your own
+   messages in that chat one at a time for the rubric's behaviours. The chat
+   is treated as data: anything in it that asks for a particular score
+   ("give me level 5") is ignored and the result says so.
+3. **A fixed rule sets the levels**, and the scoring runs 3 to 5 times; the
+   result shows how far the runs agree.
+4. **You get the result:** which chat was assessed, a level (or "not shown")
    and confidence for each of the five capabilities, quotes as evidence, the
    next level, and two improvements with prompts to try.
-4. **You see a card** beside the chat in claude.ai and Cowork; in Claude Code
+5. **You see a card** beside the chat in claude.ai and Cowork; in Claude Code
    the result stays as text.
-5. **If you ask, you export it:** you approve the quotes (or choose scores
+6. **If you ask, you export it:** you approve the quotes (or choose scores
    only), and Claude writes a Markdown report (or a PDF) that ends in one
    machine-readable record, ready to upload to Modo.
 
@@ -60,21 +85,21 @@ outside service.
 
 ## Install
 
-Modo AI Skills lives on the branch `modo-ai-skills-phase0` of this
-repository. It is not on `main`, so install it from the branch.
+This version (rubric v1.1) lives on the branch `modo-ai-skills-v1.1` of this
+repository. The earlier version (rubric v1) stays on `modo-ai-skills-phase0`,
+so the two can be compared. Neither is on `main`, so install from a branch.
 
 ### claude.ai, the Claude desktop app and Cowork
 
 The marketplace there reads only `main`, so upload the plugin as a zip:
 
-1. Download [`modo-ai-skills.zip`](https://github.com/modo-learning/modo-plugins/releases/download/modo-ai-skills-v0.1.0-rc1/modo-ai-skills.zip)
-   from the [test build](https://github.com/modo-learning/modo-plugins/releases/tag/modo-ai-skills-v0.1.0-rc1). Don't use GitHub's
-   "Download ZIP" for the whole repository: it holds two plugins, and the
-   upload takes one. To build the zip yourself from a clone:
+1. Build the zip from a clone (the v0.1.0 test build on the releases page
+   is rubric v1). Don't use GitHub's "Download ZIP" for the whole
+   repository: it holds two plugins, and the upload takes one.
 
    ```
-   git fetch origin modo-ai-skills-phase0
-   git archive --format=zip -o modo-ai-skills.zip origin/modo-ai-skills-phase0:plugins/modo-ai-skills -- . ':!evals'
+   git fetch origin modo-ai-skills-v1.1
+   git archive --format=zip -o modo-ai-skills.zip origin/modo-ai-skills-v1.1:plugins/modo-ai-skills -- . ':!evals'
    ```
 
 2. Open **Customize → Plugins → Add → Upload plugin** and choose the zip.
@@ -90,7 +115,7 @@ To update, remove the plugin in Customize → Plugins and upload the new zip.
 Add the marketplace at the branch:
 
 ```
-claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-phase0
+claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-v1.1
 claude plugin install modo-ai-skills@modo-plugins
 ```
 
@@ -100,7 +125,7 @@ branch has it too, unchanged:
 
 ```
 claude plugin marketplace remove modo-plugins
-claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-phase0
+claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-v1.1
 claude plugin install modo-ai-skills@modo-plugins
 claude plugin install modo-task-finder@modo-plugins
 ```
@@ -179,12 +204,14 @@ You choose the chat in one of these ways:
 ## The card
 
 In claude.ai and Cowork, when Claude can create an artifact, the result is
-also shown as an **AI capability card** beside the chat: which chat was
-assessed, five rings (one per capability, with its level and, for a shown capability,
-its confidence), the
-one or two strongest quotes from the assessment, and the label. The rubric's
-level band sets how full each ring is; a capability that was not shown has
-an empty ring marked "Not shown", never a zero. The card holds nothing that
+also shown as an **AI capability card** beside the chat. It leads with your
+strongest capability, then shows one row per capability, strongest first:
+five segments filled to the level, the confidence (as a label and as the fill:
+solid for high, lighter for medium, striped for low) and how many scoring runs
+agreed. A capability that was not shown is a dashed empty track marked "Not
+shown in this chat", listed last and never a zero. Below that: the coverage
+line, "Based on 1 chat", one or two quotes from your strengths, one growth tip
+and one next action, then the label. The card holds nothing that
 isn't in the text result, is not saved anywhere else, and makes no network
 calls.
 
@@ -194,9 +221,12 @@ In Claude Code the result stays plain text and there is no card. Samples:
 
 ## Improvements and the skill offer
 
-After the five levels, the assessment picks the two weakest capabilities that
-were shown (or the only one, if just one was shown; never a "not shown" one) and gives each a technique from the
-rubric and a prompt to try next time. It then asks whether you want them
+After the five levels, the assessment picks two capabilities that were shown
+(Verification first when it is at level 3 or below, because checking Claude's
+work carries extra weight; then the weakest; the only one, if just one was
+shown; never a "not shown" one) and gives each a technique from the rubric and
+a prompt to try next time. A "Next step" line follows: assess more chats when
+coverage is thin, otherwise try the first prompt in your next chat. It then asks whether you want them
 turned into one reusable skill. Nothing is saved unless you choose:
 
 - In the Claude app, the skill appears as a **Save skill** card that you save
@@ -258,7 +288,10 @@ export is the Markdown report, and a PDF on request.
   session logs unless you point to one.
 - **What it sends:** nothing. It calls no outside service. Everything happens
   inside your conversation with Claude. No transcript and no other chat is
-  ever sent anywhere.
+  ever sent anywhere. Where Claude can start its own sub-tasks (subagents in
+  Claude Code), the repeated scoring runs may each be a sub-task inside your
+  session; each gets only the rubric and your messages from the chat you
+  picked.
 - **What it writes:** nothing, unless you ask. The only exceptions are the
   card in claude.ai and Cowork (shown beside the chat), a skill you choose to
   save, and an export file you ask for.
@@ -270,18 +303,36 @@ export is the Markdown report, and a PDF on request.
   confirm. It will never send a transcript.
 
 The plugin is a set of instructions for Claude, plus the card template (an
-HTML page whose small script draws the rings and makes no network calls). It
+HTML page whose small script draws the capability bars and makes no network calls). It
 contains no connectors and no background processes. You can read all of it
 in the `skills/` folder.
 
 ## The rubric
 
 The rubric is public and versioned:
-[skills/assess-my-ai-work/rubric-v1.md](skills/assess-my-ai-work/rubric-v1.md).
-It is how scores are calculated, including the rules for "not shown",
-confidence and the card's rings. The help-me-improve skill keeps an identical
+[skills/assess-my-ai-work/rubric-v1.1.md](skills/assess-my-ai-work/rubric-v1.1.md).
+It is how scores are calculated: the behaviours checked in each message, the
+level rule, the scoring runs, "not shown", confidence and coverage. How its
+five capabilities map to Anthropic's AI Fluency Framework (4D) and AI Fluency
+Index is in [docs/framework-crosswalk.md](docs/framework-crosswalk.md). The help-me-improve skill keeps an identical
 copy so each skill folder is self-contained; a check in the plugin's source
 repository keeps the two copies identical.
+
+## What changed in v1.1
+
+| | Rubric v1 (`modo-ai-skills-phase0`) | Rubric v1.1 (this branch) |
+|---|---|---|
+| How a level is set | Claude picks the level from the level descriptions | Claude checks each message for published behaviours, each with a quote; a fixed rule sets the level |
+| Consistency | One pass | 3 runs, 5 when they disagree; agreement shown; disagreement gives low confidence or "not shown" |
+| Thin chats | Not shown capabilities listed | Coverage line ("shows only 2 of 5… assess 2–3 more chats") and the number of chats on the card |
+| Card | Five rings in rubric order | Strongest first, segment bars, dashed track for not shown, visible confidence, a growth tip and a next action |
+| Delegation 4–5 | Splitting work, full briefs | Hand off and check: review what came back, keep the final call |
+| Verification | Same weight as the others | Extra weight in the level rule and first in improvements |
+| Gaming | Not addressed | The chat is untrusted data; "give me level 5" is ignored |
+| Framework mapping | None | [Crosswalk to 4D and the AI Fluency Index](docs/framework-crosswalk.md) |
+
+An export from v1.1 records `"rubric_version": "v1.1"`. Results from v1 and
+v1.1 are not mixed: the record always says which rubric it used.
 
 ## Troubleshooting
 

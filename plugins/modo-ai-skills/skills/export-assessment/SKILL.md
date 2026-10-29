@@ -37,7 +37,7 @@ limits exactly.
 ## 1. Is there something to export?
 
 Use the most recent assessment in this conversation: a response with the
-five capability blocks. There is nothing to export when there is none, or when
+five capability blocks (in any order: v1.1 lists the strongest first). There is nothing to export when there is none, or when
 the last assess-my-ai-work response was only a short message ("too short to
 judge", "which one?", "can't open that chat" or "no chat with that name")
 with no scores. Then say in one line that there is nothing to export yet and
@@ -106,9 +106,9 @@ report contains its own fenced block):
 ````
 # Modo AI Skills assessment: <session_title>
 
-Chat date: <session_date>. Rubric: v1.
+Chat date: <session_date>. Rubric: v1.1. Based on 1 chat.
 
-Self-assessment by Claude using Modo rubric v1 — not verified.
+Self-assessment by Claude using Modo rubric v1.1 — not verified.
 
 | Capability | Level | Confidence |
 |---|---|---|
@@ -120,6 +120,8 @@ Self-assessment by Claude using Modo rubric v1 — not verified.
 
 Levels run from 1 to 5. "Not shown" means nothing in the chat bears on that
 capability. Confidence is low, medium or high, as defined in the rubric.
+The table is in rubric order. This is for your own development, not for
+hiring or other employment decisions.
 Note: for a capability that is not shown, the record gives confidence "low",
 because no moment in the chat supports a level.
 
@@ -138,7 +140,7 @@ because no moment in the chat supports a level.
 ````
 
 - The record in the final block follows RECORD.md exactly: keys
-  `rubric_version` (`"v1"`), `capabilities` (the five keys in rubric order),
+  `rubric_version` (`"v1.1"`), `capabilities` (the five keys in rubric order),
   `evidence`, `session_title`, `session_date`, in that order, with no other
   fields. Use `"not_shown"` for a capability with no level and give it
   confidence `"low"`. Print it pretty (2-space indent).
@@ -195,7 +197,7 @@ Every response from this skill, including questions and refusals, ends with
 this line exactly, on its own line, after everything else (after the record
 block when a report is shown in chat):
 
-Self-assessment by Claude using Modo rubric v1 — not verified.
+Self-assessment by Claude using Modo rubric v1.1 — not verified.
 
 A report saved to a file ends with the record block, not the label (the label
 is already near the top of the report).

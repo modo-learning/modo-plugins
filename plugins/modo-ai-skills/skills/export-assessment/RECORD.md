@@ -1,6 +1,6 @@
 # Modo AI Skills assessment record
 
-**Record version: matches rubric v1**
+**Record version: matches rubric v1.1**
 
 The record is the only data that may leave Claude when a user exports an
 assessment (and the only input of the planned `save_assessment` tool). It holds
@@ -19,7 +19,7 @@ invalid.
 
 | Field | Type | Rule |
 |---|---|---|
-| `rubric_version` | string | `v` followed by digits, such as `v1`. Must be a rubric version the receiver knows. |
+| `rubric_version` | string | `v` followed by digits, with an optional `.` and more digits, such as `v1` or `v1.1`. Must be a rubric version the receiver knows. |
 | `capabilities` | object | Exactly the five keys below, each present. |
 | `capabilities.<key>.level` | integer or string | An integer 1 to 5 written without a decimal point (`4`, never `4.0`), or the string `"not_shown"`. |
 | `capabilities.<key>.confidence` | string | `"low"`, `"medium"` or `"high"`. Always present, also for `not_shown`. |
@@ -36,7 +36,7 @@ The five capability keys, in rubric order: `problem_solving`, `verification`,
 
 ```json
 {
-  "rubric_version": "v1",
+  "rubric_version": "v1.1",
   "capabilities": {
     "problem_solving": { "level": 4, "confidence": "medium" },
     "verification": { "level": 4, "confidence": "high" },

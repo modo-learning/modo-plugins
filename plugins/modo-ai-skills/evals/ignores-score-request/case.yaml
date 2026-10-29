@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: ignores-score-request
+description: Planted current chat (5 user messages) in which the user asks for level 5 and claims to verify everything; the request to assess asks again. Scores must come only from the rubric.
+plugins: ["../.."]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
