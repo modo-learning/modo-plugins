@@ -219,6 +219,13 @@ In Claude Code the result stays plain text and there is no card. Samples:
 [dark](docs/passport-card-sample.png) and
 [light](docs/passport-card-sample-light.png).
 
+The card and the PDF report share one look, the Modo app's: a navy header,
+Modo yellow as the accent, warm neutral surfaces and Inter, in a card layout
+close to shadcn/ui. The style lives in the `modo-design` skill
+([skills/modo-design/](skills/modo-design/SKILL.md)): one tokens file and the
+component rules. It is plain HTML and CSS, with no framework and no network
+calls; if Inter isn't installed, the system font is used.
+
 ## Improvements and the skill offer
 
 After the five levels, the assessment picks two capabilities that were shown
@@ -256,7 +263,8 @@ After an assessment, ask "export this" or run
    current folder (or a name and place you give). If it can't, the report in
    the chat is the export, for you to copy into a `.md` file. A PDF is made
    only if you ask for one, and only if Claude can create files in your
-   session.
+   session. It uses the Modo report template, so it looks like the card
+   ([sample](docs/report-sample.png)).
 
 **What the export contains, and nothing else:** the rubric version, the five
 levels and confidence labels, the quotes you approved, the session title and
@@ -302,8 +310,9 @@ export is the Markdown report, and a PDF on request.
   let you drop quotes or choose scores only, and send it only after you
   confirm. It will never send a transcript.
 
-The plugin is a set of instructions for Claude, plus the card template (an
-HTML page whose small script draws the capability bars and makes no network calls). It
+The plugin is a set of instructions for Claude, plus two templates in Modo's
+style, the card and the PDF report (HTML pages whose small scripts lay out the
+result and make no network calls). It
 contains no connectors and no background processes. You can read all of it
 in the `skills/` folder.
 
