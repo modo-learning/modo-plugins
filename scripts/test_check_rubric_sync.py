@@ -9,11 +9,11 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from check_rubric_sync import check  # noqa: E402
 
 
-def make(tmp, a, b):
-    for name, text in (("assess-my-ai-work", a), ("help-me-improve", b)):
+def make(tmp, a, b, names=("rubric-v1.1.md", "rubric-v1.1.md")):
+    for name, text, file in zip(("assess-my-ai-work", "help-me-improve"), (a, b), names):
         d = pathlib.Path(tmp) / "skills" / name
         d.mkdir(parents=True)
-        (d / "rubric-v1.md").write_text(text)
+        (d / file).write_text(text)
     return pathlib.Path(tmp)
 
 
@@ -25,6 +25,10 @@ class RubricSync(unittest.TestCase):
     def test_diverged_copies_fail(self):
         with tempfile.TemporaryDirectory() as t:
             self.assertEqual(len(check(make(t, "x", "y"))), 1)
+
+    def test_copies_of_different_versions_fail(self):
+        with tempfile.TemporaryDirectory() as t:
+            self.assertTrue(check(make(t, "x", "x", ("rubric-v1.1.md", "rubric-v1.md"))))
 
     def test_missing_copy_fails(self):
         with tempfile.TemporaryDirectory() as t:

@@ -22,7 +22,7 @@ import pathlib
 import re
 import sys
 
-LABEL = "Self-assessment by Claude using Modo rubric v1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
 
 CAPABILITIES = ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")
 CONFIDENCE = ("low", "medium", "high")
@@ -31,7 +31,7 @@ MAX_QUOTE = 240
 MAX_TITLE = 120
 TOP_FIELDS = {"rubric_version", "capabilities", "evidence", "session_title", "session_date"}
 
-VERSION = re.compile(r"^v[0-9]+$")
+VERSION = re.compile(r"^v[0-9]+(\.[0-9]+)?$")
 DATE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
 FENCE = re.compile(r"^```json[ \t]*\n(.*?)\n```[ \t]*$", re.M | re.S)
 
@@ -58,7 +58,7 @@ def validate(record, convention=True):
 
     v = record.get("rubric_version")
     if "rubric_version" in record and not (_is_str(v) and VERSION.match(v)):
-        errors.append("rubric_version: must be a string like 'v1'")
+        errors.append("rubric_version: must be a string like 'v1' or 'v1.1'")
 
     caps = record.get("capabilities")
     shown = {}

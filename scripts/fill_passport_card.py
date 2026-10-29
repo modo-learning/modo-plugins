@@ -16,19 +16,23 @@ TEMPLATE = (pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-a
 # quotes are verbatim user messages from that chat's history.jsonl.
 SAMPLE = {
     "chat": "this chat",
+    "sessions": 1,
     "capabilities": [
-        {"name": "Problem Solving", "level": 4, "confidence": "medium"},
-        {"name": "Verification", "level": 5, "confidence": "high"},
-        {"name": "Workflow Design", "level": 2, "confidence": "low"},
-        {"name": "Delegation", "level": 2, "confidence": "medium"},
-        {"name": "Strategic Thinking", "level": "not_shown"},
+        {"name": "Problem Solving", "level": 4, "confidence": "medium", "agreement": "3 of 3 runs"},
+        {"name": "Verification", "level": 5, "confidence": "high", "agreement": "3 of 3 runs"},
+        {"name": "Workflow Design", "level": 2, "confidence": "low", "agreement": "2 of 3 runs"},
+        {"name": "Delegation", "level": 2, "confidence": "medium", "agreement": "3 of 3 runs"},
+        {"name": "Strategic Thinking", "level": "not_shown", "agreement": "3 of 3 runs"},
     ],
     "evidence": [
         {"capability": "Verification",
          "quote": "You also said enterprise tiers typically grow 20-25% quarter on quarter. What is that based on? Give me a source I can open, or tell me it's a guess so I can cut it."},
-        {"capability": "Delegation",
-         "quote": "ok. Now just write the recommendations section, whatever pricing changes you think are best, I don't have time to think about it."},
+        {"capability": "Problem Solving",
+         "quote": "Rerun it three ways: no change in churn, 5% extra churn, 10% extra churn."},
     ],
+    "growth": {"capability": "Delegation",
+               "tip": "When you hand over the deck, say what each slide must contain and ask to see the outline before Claude writes the rest."},
+    "next_action": "Assess one more chat with different work to see Strategic Thinking.",
 }
 
 START = "<!-- MODO-DATA-START -->"

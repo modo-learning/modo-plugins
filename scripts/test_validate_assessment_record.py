@@ -13,10 +13,10 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from validate_assessment_record import extract_block, validate  # noqa: E402
 
-LABEL = "Self-assessment by Claude using Modo rubric v1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
 
 GOOD = {
-    "rubric_version": "v1",
+    "rubric_version": "v1.1",
     "capabilities": {
         "problem_solving": {"level": 4, "confidence": "medium"},
         "verification": {"level": 5, "confidence": "high"},
@@ -91,6 +91,11 @@ class Validate(unittest.TestCase):
         self.assertTrue(validate(variant(rubric_version="1")))
         self.assertTrue(validate(variant(rubric_version="")))
         self.assertEqual(validate(variant(rubric_version="v2")), [])
+
+    def test_minor_rubric_version_accepted(self):
+        self.assertEqual(validate(variant(rubric_version="v1.1")), [])
+        for bad in ("v1.", "v1.1.1", "v.1", "1.1"):
+            self.assertTrue(validate(variant(rubric_version=bad)), bad)
 
     def test_evidence_count_limit(self):
         item = {"capability": "verification", "quote": "q"}

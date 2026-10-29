@@ -18,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / "plugins" / "modo-ai-skills"
 TEMPLATE = PLUGIN / "skills" / "assess-my-ai-work" / "passport-card.html"
 HISTORY = PLUGIN / "evals" / "strong-verify-weak-delegate" / "history.jsonl"
-LABEL = "Self-assessment by Claude using Modo rubric v1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from fill_passport_card import fill, SAMPLE  # noqa: E402
@@ -86,6 +86,15 @@ class Template(unittest.TestCase):
             self.assertTrue(any(e["quote"] in u for u in users), e["quote"])
 
 
+def text_of(html):
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html)).strip()
+
+
+def body_text(dom):
+    body = dom.split("<body", 1)[1]
+    return re.sub(r"<script.*?</script>", "", body, flags=re.S)
+
+
 @unittest.skipUnless(CHROME, "no headless Chrome found")
 class Render(unittest.TestCase):
     @classmethod
@@ -93,44 +102,56 @@ class Render(unittest.TestCase):
         cls.dom = render(SAMPLE)
         cls.items = items(cls.dom)
 
-    def test_five_capabilities_in_rubric_order(self):
+    def test_strengths_first_then_not_shown_last(self):
+        # Sample levels: PS 4 medium, V 5 high, WD 2 low, D 2 medium, ST not shown.
+        # Highest level first; a tie goes to the higher confidence.
         self.assertEqual(
             [name_of(i) for i in self.items],
-            ["Problem Solving", "Verification", "Workflow Design",
-             "Delegation", "Strategic Thinking"],
+            ["Verification", "Problem Solving", "Delegation", "Workflow Design",
+             "Strategic Thinking"],
         )
 
-    def test_ring_values_are_band_midpoints(self):
-        got = {}
-        for i in self.items:
-            v = re.search(r'data-value="(\d+)"', i)
-            got[name_of(i)] = int(v.group(1)) if v else None
-        self.assertEqual(got["Problem Solving"], 70)
-        self.assertEqual(got["Verification"], 90)
-        self.assertEqual(got["Workflow Design"], 30)
-        self.assertEqual(got["Delegation"], 30)
-        self.assertIsNone(got["Strategic Thinking"])
+    def test_headline_names_the_strongest(self):
+        self.assertIn("Strongest in this chat: Verification", text_of(body_text(self.dom)))
 
-    def test_level_and_confidence_text(self):
-        v = next(i for i in self.items if name_of(i) == "Verification")
-        text = re.sub(r"<[^>]+>", " ", v)
-        self.assertIn("Level 5 of 5", text)
-        self.assertIn("high confidence", text.lower())
+    def test_segments_filled_to_the_level(self):
+        got = {name_of(i): (i.count('class="seg on'), i.count('class="seg')) for i in self.items}
+        self.assertEqual(got["Verification"], (5, 5))
+        self.assertEqual(got["Problem Solving"], (4, 5))
+        self.assertEqual(got["Workflow Design"], (2, 5))
 
-    def test_not_shown_is_not_a_zero(self):
+    def test_confidence_and_agreement_visible(self):
+        v = text_of(next(i for i in self.items if name_of(i) == "Verification"))
+        self.assertIn("Level 5 of 5", v)
+        self.assertIn("High confidence", v)
+        self.assertIn("3 of 3 runs", v)
+        w = next(i for i in self.items if name_of(i) == "Workflow Design")
+        self.assertIn("Low confidence", text_of(w))
+        self.assertIn('data-confidence="low"', w)
+
+    def test_not_shown_is_a_dashed_empty_track(self):
         n = next(i for i in self.items if name_of(i) == "Strategic Thinking")
-        text = re.sub(r"<[^>]+>", " ", n)
-        self.assertIn("Not shown", text)
-        self.assertIn("ring-empty", n)
-        self.assertNotIn("data-value", n)
-        self.assertNotIn("stroke-dashoffset", n)
+        text = text_of(n)
+        self.assertIn("Not shown in this chat", text)
+        self.assertIn("track-empty", n)
+        self.assertNotIn('class="seg', n)
+        self.assertNotIn("data-level", n)
         self.assertNotRegex(text, r"\b0\b")
         self.assertNotIn("Level", text)
 
+    def test_session_count_and_coverage(self):
+        text = text_of(body_text(self.dom))
+        self.assertIn("Based on 1 chat", text)
+        self.assertIn("This chat shows 4 of 5 capabilities. One more chat with different "
+                      "work could show Strategic Thinking.", text)
+
+    def test_growth_tip_and_next_action(self):
+        text = text_of(body_text(self.dom))
+        self.assertIn(SAMPLE["growth"]["tip"], text)
+        self.assertIn(SAMPLE["next_action"], text)
+
     def test_label_verbatim_and_last(self):
-        body = self.dom.split("<body", 1)[1]
-        body = re.sub(r"<script.*?</script>", "", body, flags=re.S)
-        lines = [l.strip() for l in re.sub(r"<[^>]+>", "\n", body).splitlines() if l.strip()]
+        lines = [l.strip() for l in re.sub(r"<[^>]+>", "\n", body_text(self.dom)).splitlines() if l.strip()]
         self.assertEqual(lines[-1], LABEL)
 
     def test_evidence_shown_and_escaped(self):
@@ -142,9 +163,7 @@ class Render(unittest.TestCase):
         self.assertNotIn("<b>this</b>", dom)
 
     def test_no_verified_wording_outside_label(self):
-        body = self.dom.split("<body", 1)[1]
-        body = re.sub(r"<script.*?</script>", "", body, flags=re.S)
-        text = re.sub(r"<[^>]+>", " ", body).replace(LABEL, "")
+        text = text_of(body_text(self.dom)).replace(LABEL, "")
         self.assertNotRegex(text.lower(), r"verified|badge|benchmark|rank")
 
     def test_all_not_shown(self):
@@ -153,9 +172,13 @@ class Render(unittest.TestCase):
             c["level"] = "not_shown"
             c.pop("confidence", None)
         data["evidence"] = []
-        its = items(render(data))
+        dom = render(data)
+        its = items(dom)
         self.assertEqual(len(its), 5)
-        self.assertTrue(all("ring-empty" in i and "data-value" not in i for i in its))
+        self.assertTrue(all("track-empty" in i and "data-level" not in i for i in its))
+        text = text_of(body_text(dom))
+        self.assertNotIn("Strongest", text)
+        self.assertIn("This chat shows only 0 of 5 capabilities", text)
 
 
 if __name__ == "__main__":

@@ -2,26 +2,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: one narrow card; five rings in a wrapping grid, evidence below, label last. */
+/* Layout: one narrow card. Strongest capability as the headline, then one row per
+   capability (five segments, strongest first, not shown last), strengths' evidence,
+   one growth tip, the next action, the label last. */
 :root {
   --bg: #f4f5f3;
   --card: #ffffff;
   --fg: #1d2421;
   --muted: #5b6661;
   --line: #d9dedb;
-  --ring: #1f6f5c;
+  --fill: #1f6f5c;
   --track: #e3e8e5;
+  --tip: #f1f6f4;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #121715; --card: #1b2220; --fg: #e8eeeb; --muted: #a2aea9;
-    --line: #323c38; --ring: #5fc4a8; --track: #2c3532; color-scheme: dark;
+    --line: #323c38; --fill: #5fc4a8; --track: #2c3532; --tip: #212a27; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #121715; --card: #1b2220; --fg: #e8eeeb; --muted: #a2aea9;
-  --line: #323c38; --ring: #5fc4a8; --track: #2c3532; color-scheme: dark;
+  --line: #323c38; --fill: #5fc4a8; --track: #2c3532; --tip: #212a27; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
@@ -35,64 +38,78 @@ body {
   max-width: 640px; margin: 0 auto; background: var(--card);
   border: 1px solid var(--line); border-radius: 12px; padding: 24px;
 }
-h1 { font-size: 1.35rem; margin: 0 0 4px; text-wrap: balance; }
-.sub { color: var(--muted); margin: 0 0 20px; overflow-wrap: anywhere; }
+.kicker { color: var(--muted); font-size: .8rem; margin: 0 0 4px; letter-spacing: .04em; }
+h1 { font-size: 1.4rem; margin: 0 0 4px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; overflow-wrap: anywhere; }
+.coverage { margin: 12px 0 0; font-size: .9rem; }
 h2 {
   font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
   color: var(--muted); margin: 24px 0 8px; font-weight: 600;
 }
-ul.rings {
-  list-style: none; margin: 0; padding: 0; display: grid; gap: 16px 12px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+ul.caps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+ul.caps li {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center;
 }
-ul.rings li { display: flex; align-items: center; gap: 12px; min-width: 0; }
-svg.ring { width: 64px; height: 64px; flex: none; }
-.track, .arc, .dash { fill: none; stroke-width: 7; }
-.track { stroke: var(--track); }
-.arc { stroke: var(--ring); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 40px 40px; }
-.dash { stroke: var(--muted); stroke-dasharray: 3 7; opacity: .7; }
-.num { fill: var(--fg); font-size: 24px; font-weight: 600; text-anchor: middle; dominant-baseline: central; font-family: var(--font); }
-.num.none { fill: var(--muted); }
-.meta { min-width: 0; }
 .name { font-weight: 600; overflow-wrap: anywhere; }
-.detail { color: var(--muted); font-size: .85rem; }
-blockquote { margin: 0 0 12px; padding: 0 0 0 12px; border-left: 3px solid var(--line); overflow-wrap: anywhere; }
+.level { color: var(--muted); font-size: .85rem; text-align: right; white-space: nowrap; }
+.bar { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; height: 10px; }
+.seg { border-radius: 3px; background: var(--track); }
+.seg.on { background: var(--fill); }
+li[data-confidence="medium"] .seg.on { background: color-mix(in srgb, var(--fill) 70%, var(--track)); }
+li[data-confidence="low"] .seg.on {
+  background: repeating-linear-gradient(135deg, var(--fill) 0 3px, var(--track) 3px 6px);
+}
+.track-empty {
+  grid-column: 1 / -1; height: 10px; border-radius: 3px;
+  border: 1.5px dashed var(--muted); opacity: .6;
+}
+.meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; font-size: .8rem; color: var(--muted); }
+.pill { border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; }
+blockquote { margin: 0 0 12px; padding: 0 0 0 12px; border-left: 3px solid var(--fill); overflow-wrap: anywhere; }
 blockquote p { margin: 0; }
 blockquote footer { color: var(--muted); font-size: .85rem; margin-top: 2px; }
+.tip { background: var(--tip); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.tip p { margin: 0; }
+.tip .for { color: var(--muted); font-size: .85rem; margin-bottom: 2px; }
 .label {
   margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line);
   color: var(--muted); font-size: .85rem;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .arc { transition: stroke-dashoffset .6s ease; }
 }
 </style>
 
 <!-- Skill: replace ONLY the JSON between the two MODO-DATA markers. Do not edit anything else. -->
 <main class="card" aria-labelledby="t">
-  <h1 id="t">AI capability card</h1>
+  <p class="kicker">AI capability card</p>
+  <h1 id="t">Your AI capabilities in this chat</h1>
   <p class="sub" id="chat"></p>
+  <p class="coverage" id="coverage" hidden></p>
   <h2>Capabilities</h2>
-  <ul class="rings" id="rings"></ul>
+  <ul class="caps" id="caps"></ul>
   <div id="ev-wrap" hidden>
-    <h2>Top evidence</h2>
+    <h2>Your strengths, in your words</h2>
     <div id="evidence"></div>
   </div>
-  <p class="label">Self-assessment by Claude using Modo rubric v1 — not verified.</p>
+  <div id="growth-wrap" hidden>
+    <h2>One thing to try</h2>
+    <div class="tip"><p class="for" id="growth-for"></p><p id="growth"></p></div>
+  </div>
+  <div id="next-wrap" hidden>
+    <h2>Next</h2>
+    <p id="next" style="margin:0"></p>
+  </div>
+  <p class="label">Self-assessment by Claude using Modo rubric v1.1 — not verified.</p>
 </main>
 
 <!-- MODO-DATA-START -->
 <script type="application/json" id="passport-data">
-{"chat": "", "capabilities": [], "evidence": []}
+{"chat": "", "sessions": 1, "capabilities": [], "evidence": [], "growth": null, "next_action": ""}
 </script>
 <!-- MODO-DATA-END -->
 
 <script>
 (function () {
-  var BAND = { 1: 10, 2: 30, 3: 50, 4: 70, 5: 90 }; /* rubric-v1: level to band midpoint */
-  var NS = "http://www.w3.org/2000/svg";
+  var CONF = { low: 0, medium: 1, high: 2 };
   var data = JSON.parse(document.getElementById("passport-data").textContent);
-  var R = 33, C = 2 * Math.PI * R;
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -100,43 +117,62 @@ blockquote footer { color: var(--muted); font-size: .85rem; margin-top: 2px; }
     if (text != null) e.textContent = text;
     return e;
   }
-  function svg(tag, attrs) {
-    var e = document.createElementNS(NS, tag);
-    for (var k in attrs) e.setAttribute(k, attrs[k]);
-    return e;
+  function shown(c) { return [1, 2, 3, 4, 5].indexOf(c.level) >= 0; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  var caps = (data.capabilities || []).map(function (c, i) { return { c: c, i: i }; });
+  /* Strengths first: highest level, then higher confidence, then rubric order; not shown last. */
+  caps.sort(function (a, b) {
+    var sa = shown(a.c), sb = shown(b.c);
+    if (sa !== sb) return sa ? -1 : 1;
+    if (sa && a.c.level !== b.c.level) return b.c.level - a.c.level;
+    if (sa && a.c.confidence !== b.c.confidence) return CONF[b.c.confidence] - CONF[a.c.confidence];
+    return a.i - b.i;
+  });
+  var ordered = caps.map(function (x) { return x.c; });
+  var nShown = ordered.filter(shown).length;
+
+  if (nShown) {
+    var top = ordered[0];
+    document.getElementById("t").textContent = "Strongest in this chat: " + top.name;
+  }
+  var sessions = data.sessions || 1;
+  if (data.chat) {
+    document.getElementById("chat").textContent = "Assessment of " + data.chat +
+      ". Based on " + sessions + (sessions === 1 ? " chat" : " chats") + ", against Modo rubric v1.1.";
+  }
+  if (ordered.length === 5 && nShown < 5) {
+    var missing = ordered.filter(function (c) { return !shown(c); });
+    var cov = document.getElementById("coverage");
+    cov.hidden = false;
+    cov.textContent = nShown === 4
+      ? "This chat shows 4 of 5 capabilities. One more chat with different work could show " + missing[0].name + "."
+      : "This chat shows only " + nShown + " of 5 capabilities, so this is a partial picture. Assess 2–3 more chats with different kinds of work to see the rest.";
   }
 
-  if (data.chat) document.getElementById("chat").textContent = "Assessment of " + data.chat + ", against Modo rubric v1.";
-
-  var list = document.getElementById("rings");
-  (data.capabilities || []).forEach(function (c) {
-    var shown = BAND.hasOwnProperty(c.level);
+  var list = document.getElementById("caps");
+  ordered.forEach(function (c) {
     var li = el("li");
     li.setAttribute("data-capability", c.name);
-    var s = svg("svg", { "class": "ring", viewBox: "0 0 80 80", "aria-hidden": "true" });
+    li.appendChild(el("div", "name", c.name));
     var meta = el("div", "meta");
-    meta.appendChild(el("div", "name", c.name));
-    if (shown) {
-      var v = BAND[c.level];
-      li.setAttribute("data-value", v);
-      s.appendChild(svg("circle", { "class": "track", cx: 40, cy: 40, r: R }));
-      s.appendChild(svg("circle", { "class": "arc", cx: 40, cy: 40, r: R,
-        "stroke-dasharray": C.toFixed(2), "stroke-dashoffset": (C * (1 - v / 100)).toFixed(2) }));
-      var n = svg("text", { "class": "num", x: 40, y: 41 });
-      n.textContent = c.level;
-      s.appendChild(n);
-      meta.appendChild(el("div", "detail", "Level " + c.level + " of 5"));
-      meta.appendChild(el("div", "detail", c.confidence.charAt(0).toUpperCase() + c.confidence.slice(1) + " confidence"));
+    if (shown(c)) {
+      li.setAttribute("data-level", c.level);
+      li.setAttribute("data-confidence", c.confidence);
+      li.appendChild(el("div", "level", "Level " + c.level + " of 5"));
+      var bar = el("div", "bar");
+      bar.setAttribute("role", "img");
+      bar.setAttribute("aria-label", "Level " + c.level + " of 5");
+      for (var k = 1; k <= 5; k++) bar.appendChild(el("span", k <= c.level ? "seg on" : "seg"));
+      li.appendChild(bar);
+      meta.appendChild(el("span", "pill", cap(c.confidence) + " confidence"));
     } else {
-      s.setAttribute("class", "ring ring-empty");
-      s.appendChild(svg("circle", { "class": "dash", cx: 40, cy: 40, r: R }));
-      var d = svg("text", { "class": "num none", x: 40, y: 41 });
-      d.textContent = "–";
-      s.appendChild(d);
-      meta.appendChild(el("div", "detail", "Not shown"));
-      meta.appendChild(el("div", "detail", "in this chat"));
+      li.appendChild(el("div", "level", "Not shown in this chat"));
+      var empty = el("div", "track-empty");
+      empty.setAttribute("aria-hidden", "true");
+      li.appendChild(empty);
     }
-    li.appendChild(s);
+    if (c.agreement) meta.appendChild(el("span", null, c.agreement));
     li.appendChild(meta);
     list.appendChild(li);
   });
@@ -151,6 +187,15 @@ blockquote footer { color: var(--muted); font-size: .85rem; margin-top: 2px; }
       b.appendChild(el("footer", null, e.capability));
       box.appendChild(b);
     });
+  }
+  if (data.growth && data.growth.tip) {
+    document.getElementById("growth-wrap").hidden = false;
+    document.getElementById("growth-for").textContent = data.growth.capability;
+    document.getElementById("growth").textContent = data.growth.tip;
+  }
+  if (data.next_action) {
+    document.getElementById("next-wrap").hidden = false;
+    document.getElementById("next").textContent = data.next_action;
   }
 })();
 </script>
