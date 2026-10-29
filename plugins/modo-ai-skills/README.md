@@ -28,7 +28,7 @@ concrete to keep.
 - **A level for each capability**, written as "Level N of 5", strongest
   first. Claude checks each of your messages for the specific behaviours
   listed in the [rubric](skills/assess-my-ai-work/rubric-v1.1.md) (gave
-  context, checked a fact, asked for the working, kept a decision…), each with
+  context, checked a fact, asked for an alternative, kept a decision…), each with
   a quote, and a fixed published rule turns those into the level. A
   capability the chat did not show is "Not shown in this chat", never a
   made-up score and never level 1.

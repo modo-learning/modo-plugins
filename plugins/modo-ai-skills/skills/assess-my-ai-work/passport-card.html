@@ -126,7 +126,7 @@ blockquote footer { color: var(--muted); font-size: .85rem; margin-top: 2px; }
     var sa = shown(a.c), sb = shown(b.c);
     if (sa !== sb) return sa ? -1 : 1;
     if (sa && a.c.level !== b.c.level) return b.c.level - a.c.level;
-    if (sa && a.c.confidence !== b.c.confidence) return CONF[b.c.confidence] - CONF[a.c.confidence];
+    if (sa && a.c.confidence !== b.c.confidence) return (CONF[b.c.confidence] || 0) - (CONF[a.c.confidence] || 0);
     return a.i - b.i;
   });
   var ordered = caps.map(function (x) { return x.c; });

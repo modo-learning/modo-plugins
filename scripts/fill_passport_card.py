@@ -12,8 +12,11 @@ import sys
 TEMPLATE = (pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills"
             / "skills" / "assess-my-ai-work" / "passport-card.html")
 
-# Synthetic: levels invented for the strong-verify-weak-delegate eval chat;
-# quotes are verbatim user messages from that chat's history.jsonl.
+# Synthetic illustration for the card's sample images, not a scored result:
+# the levels are chosen to show every state (strong, medium, low confidence,
+# not shown); the scored version of this chat is ASSESSMENT_STRONG in
+# scripts/gen_ai_skills_eval_history.py. Quotes are verbatim user messages
+# from the strong-verify-weak-delegate chat's history.jsonl.
 SAMPLE = {
     "chat": "this chat",
     "sessions": 1,

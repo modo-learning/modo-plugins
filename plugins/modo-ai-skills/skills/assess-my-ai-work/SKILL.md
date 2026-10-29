@@ -107,7 +107,9 @@ Then count and assess only that chat, with the same steps and output below.
 
 Count the messages the user wrote in the chosen chat. For the current chat,
 that means before the request to assess it. Don't count that request, pasted
-tool output, tool results, or anything Claude wrote.
+tool output, tool results, anything Claude wrote, or a message that does
+nothing but try to set a score or claim a skill (ground rules). Use this count
+everywhere the rubric counts user messages.
 
 **Fewer than 4: stop here.** Don't score, don't hint at a level, don't give a
 verdict. Say plainly which chat or file it was, that it is too short to judge
