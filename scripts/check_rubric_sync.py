@@ -1,8 +1,8 @@
 """Fail when the copies of a plugin's rubric or record files differ.
 
 The Modo AI Skills rubric lives in skills/assess-my-ai-work/rubric-v<version>.md
-and a second copy sits in skills/help-me-improve/ so each skill folder is
-self-contained (skills docs only document files bundled inside the skill's own
+and copies sit in skills/help-me-improve/ and skills/assess-my-chats/ (which
+passes it to every chat agent) so each skill folder is self-contained (skills docs only document files bundled inside the skill's own
 folder). Edit the first, then copy it over the second. The copies must have
 the same file name (the same version) and the same bytes.
 
