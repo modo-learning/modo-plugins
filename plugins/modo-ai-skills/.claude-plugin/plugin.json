@@ -1,7 +1,7 @@
 {
   "name": "modo-ai-skills",
   "displayName": "Modo AI Skills",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Assess how well you work with AI against Modo's public rubric: scored prompt by prompt with a published rule, a level, confidence, run agreement and quoted evidence for five capabilities, from one chat you choose. For your own development, not for hiring decisions.",
   "author": {
     "name": "Modo",
