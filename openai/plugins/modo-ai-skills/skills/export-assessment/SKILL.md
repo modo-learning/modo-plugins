@@ -188,7 +188,9 @@ Make a PDF only if the user asks for one. Show the same Markdown report first
 (step 4), with the same content in the same order and the record block last.
 Then create the PDF with whatever file creation you have in this session (in
 ChatGPT, usually its code tool) and the user's approval. Give the download link
-or say where it is.
+or say where it is. The template belongs to this skill, so a code tool won't
+find it on disk: write it out from the text you read, unchanged except the data
+block, and convert that page. A page written that way is the template.
 
 Build the PDF from [report-template.html](report-template.html) so it has
 Modo's look (the modo-design skill): read the template, replace only the JSON
@@ -197,6 +199,11 @@ between the `MODO-DATA-START` and `MODO-DATA-END` markers with the record
 `<`), change nothing else, and print that page to PDF. The template lays
 out the same content in the same order, record last. If you can't render HTML
 to PDF here, make the PDF your usual way with the same content and order.
+
+Either way, the PDF holds the report exactly: the header line as written in
+step 4 with nothing added to it, and the record block printed as in the report,
+the same JSON with its 2-space indentation and line breaks, in a monospaced
+font.
 
 If you have no way to create a PDF in this session, say so in one line *before*
 the report (so the record block stays last), don't claim that a PDF exists,

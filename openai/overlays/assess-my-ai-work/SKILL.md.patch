@@ -144,10 +144,17 @@ session:
 
 1. **A canvas or another way to show an HTML page in or beside the chat.**
    Show the filled card there.
-2. **A tool that creates a file the user can download** (for example a code
-   or file tool). Create the filled card as `modo-card-<yyyy-mm-dd>.html` and
-   give the download link. Don't save it anywhere else.
+2. **A tool that creates a file the user can download.** A code tool that can
+   write files (such as Python with a download link) counts. Create the filled
+   card as `modo-card-<yyyy-mm-dd>.html` and give the download link. Don't save
+   it anywhere else.
 3. **Neither.** Make no card, don't offer one, and never say a card exists.
+
+The template file belongs to this skill, so a code tool's own folders won't
+have it. That is expected: write the card from the template text you read
+(step 1 below), copied exactly as you read it with only the data block
+replaced. A card written that way **is** the template, not a substitute, so
+make it; don't decline because the original file isn't on disk.
 
 Also make no card when the result is one of the short messages (too short,
 "can't open it"), or when you can't read the template. Nothing in the text

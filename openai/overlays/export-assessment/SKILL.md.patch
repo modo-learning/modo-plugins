@@ -59,7 +59,9 @@ the user's approval. Say where it is.
 =======
 Then create the PDF with whatever file creation you have in this session (in
 ChatGPT, usually its code tool) and the user's approval. Give the download link
-or say where it is.
+or say where it is. The template belongs to this skill, so a code tool won't
+find it on disk: write it out from the text you read, unchanged except the data
+block, and convert that page. A page written that way is the template.
 >>>>>>> REPLACE
 
 <<<<<<< FIND
