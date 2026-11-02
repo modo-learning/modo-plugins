@@ -45,19 +45,16 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from derive_levels import BEHAVIOURS  # noqa: E402
+from rubric_common import CAPABILITIES, CONFIDENCE, LEVEL_NOT_SHOWN, MAX_QUOTE, is_date, is_int, is_level  # noqa: E402
 
-CAPABILITIES = ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")
 PREFIX = {"problem_solving": "P", "verification": "V", "workflow_design": "W",
           "delegation": "D", "strategic_thinking": "S"}
-CONFIDENCE = ("low", "medium", "high")
 RUN_KINDS = ("subagents", "one_response", "none")
-MAX_QUOTE = 240
 MIN_USER_MESSAGES = 4
 TOP = {"chat_id", "title", "updated_at", "turns_total", "user_messages", "unreadable_turns",
        "attachments_seen", "truncated_turns", "too_short", "runs", "run_kind", "capabilities"}
 CAP_FIELDS = {"level", "confidence", "agreement", "behaviours", "quotes"}
 AGREEMENT = re.compile(r"^([1-5]) of ([35]) runs$|^runs disagreed$")
-DATE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 # The past-chat tools put this before typed user messages (verified 2026-11-01).
 REMINDER = re.compile(r"^\s*<system-reminder>.*?</system-reminder>\s*", re.S)
 
@@ -65,10 +62,6 @@ REMINDER = re.compile(r"^\s*<system-reminder>.*?</system-reminder>\s*", re.S)
 def clean_user_message(text: str) -> str:
     """A user message as the user typed it: the leading system-reminder removed."""
     return REMINDER.sub("", text, count=1)
-
-
-def _int(v, low=0):
-    return isinstance(v, int) and not isinstance(v, bool) and v >= low
 
 
 def validate(result, messages=None):
@@ -85,28 +78,27 @@ def validate(result, messages=None):
     if missing:
         errors.append(f"result: missing field(s) {missing}")
 
-    for key in ("chat_id",):
-        if key in result and not (isinstance(result[key], str) and result[key].strip()):
-            errors.append(f"{key}: must be a non-empty string")
+    if "chat_id" in result and not (isinstance(result["chat_id"], str) and result["chat_id"].strip()):
+        errors.append("chat_id: must be a non-empty string")
     if "title" in result and not isinstance(result["title"], str):
         errors.append("title: must be a string")
-    if "updated_at" in result and not (isinstance(result["updated_at"], str) and DATE.match(result["updated_at"])):
+    if "updated_at" in result and not (isinstance(result["updated_at"], str) and is_date(result["updated_at"][:10])):
         errors.append("updated_at: must start with a yyyy-mm-dd date")
     for key in ("turns_total", "user_messages", "unreadable_turns"):
-        if key in result and not _int(result[key]):
+        if key in result and not is_int(result[key], 0):
             errors.append(f"{key}: must be an integer of 0 or more")
     for key in ("attachments_seen", "too_short"):
         if key in result and not isinstance(result[key], bool):
             errors.append(f"{key}: must be true or false")
     turns = result.get("truncated_turns")
-    if "truncated_turns" in result and not (isinstance(turns, list) and all(_int(t) for t in turns)):
+    if "truncated_turns" in result and not (isinstance(turns, list) and all(is_int(t, 0) for t in turns)):
         errors.append("truncated_turns: must be a list of turn numbers")
     if "run_kind" in result and result["run_kind"] not in RUN_KINDS:
         errors.append(f"run_kind: must be one of {list(RUN_KINDS)}")
 
     too_short = result.get("too_short")
     users = result.get("user_messages")
-    if isinstance(too_short, bool) and _int(users):
+    if isinstance(too_short, bool) and is_int(users, 0):
         if too_short != (users < MIN_USER_MESSAGES):
             errors.append(f"too_short: must be true exactly when user_messages is under {MIN_USER_MESSAGES}")
     runs = result.get("runs")
@@ -144,21 +136,21 @@ def _capability(cap, c, too_short, runs, users, messages):
     if missing:
         errors.append(f"{where}: missing field(s) {missing}")
     level = c.get("level")
-    shown = level != "not_shown"
-    if not (level == "not_shown" or (_int(level, 1) and level <= 5)):
+    shown = level != LEVEL_NOT_SHOWN
+    if not is_level(level):
         errors.append(f'{where}.level: must be an integer from 1 to 5 or "not_shown"')
     if c.get("confidence") not in CONFIDENCE:
         errors.append(f"{where}.confidence: must be one of {list(CONFIDENCE)}")
     agreement = c.get("agreement")
     m = AGREEMENT.match(agreement) if isinstance(agreement, str) else None
     if too_short is True:
-        if level != "not_shown":
+        if level != LEVEL_NOT_SHOWN:
             errors.append(f'{where}.level: must be "not_shown" for a chat that is too short')
         if agreement != "":
             errors.append(f'{where}.agreement: must be "" for a chat that is too short')
     elif not m:
         errors.append(f'{where}.agreement: must be "k of n runs" (n = 3 or 5) or "runs disagreed"')
-    elif m.group(2) and _int(runs) and int(m.group(2)) != runs:
+    elif m.group(2) and is_int(runs, 0) and int(m.group(2)) != runs:
         errors.append(f"{where}.agreement: says {m.group(2)} runs but runs is {runs}")
     elif m.group(1) and int(m.group(1)) > int(m.group(2)):
         errors.append(f"{where}.agreement: k is more than n")
@@ -191,7 +183,7 @@ def _capability(cap, c, too_short, runs, users, messages):
         if not (isinstance(text, str) and text.strip() and len(text) <= MAX_QUOTE):
             errors.append(f"{qw}.text: must be 1 to {MAX_QUOTE} characters and not blank")
             continue
-        if not (_int(n, 1) and (not _int(users) or n <= users)):
+        if not (is_int(n, 1) and (not is_int(users, 0) or n <= users)):
             errors.append(f"{qw}.message: must be a user message number from 1 to user_messages")
             continue
         if messages is not None:

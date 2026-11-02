@@ -36,7 +36,8 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from validate_chat_result import CAPABILITIES, validate  # noqa: E402
+from rubric_common import CAPABILITIES, LEVEL_NOT_SHOWN  # noqa: E402
+from validate_chat_result import validate  # noqa: E402
 
 
 def lower_median(values):
@@ -72,10 +73,10 @@ def aggregate(results):
     capabilities = {}
     for cap in CAPABILITIES:
         dated = [(r["updated_at"], r["capabilities"][cap]["level"]) for r in scored
-                 if r["capabilities"][cap]["level"] != "not_shown"]
+                 if r["capabilities"][cap]["level"] != LEVEL_NOT_SHOWN]
         levels = [lvl for _, lvl in dated]
         if not levels:
-            capabilities[cap] = {"level": "not_shown", "confidence": "low", "best_shown": None,
+            capabilities[cap] = {"level": LEVEL_NOT_SHOWN, "confidence": "low", "best_shown": None,
                                  "trend": None, "chats_shown": 0}
             continue
         capabilities[cap] = {"level": lower_median(levels), "confidence": combined_confidence(levels),
@@ -87,7 +88,7 @@ def aggregate(results):
         "chats_scored": len(scored),
         "chats_too_short": len(results) - len(scored),
         "date_range": [dates[0], dates[-1]] if dates else None,
-        "coverage": sum(1 for c in capabilities.values() if c["level"] != "not_shown"),
+        "coverage": sum(1 for c in capabilities.values() if c["level"] != LEVEL_NOT_SHOWN),
         "capabilities": capabilities,
     }
 

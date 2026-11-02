@@ -16,7 +16,6 @@ conventions in RECORD.md are also enforced: a not_shown capability records
 confidence "low", and no quote is attached to a not_shown capability.
 """
 
-import datetime
 import json
 import pathlib
 import re
@@ -24,13 +23,12 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from aggregate_chats import best_shown, combined_confidence, lower_median, trend  # noqa: E402
+from rubric_common import (CAPABILITIES, CONFIDENCE, LEVEL_NOT_SHOWN, MAX_QUOTE,  # noqa: E402
+                           is_date as _is_date, is_int as _is_int, is_level as _is_level)
 
 LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
 
-CAPABILITIES = ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")
-CONFIDENCE = ("low", "medium", "high")
 MAX_EVIDENCE = 5
-MAX_QUOTE = 240
 MAX_TITLE = 120
 TOP_FIELDS = {"rubric_version", "capabilities", "evidence", "session_title", "session_date"}
 MULTI_CHAT = "multi_chat"
@@ -43,7 +41,6 @@ TRENDS = ("up", "flat", "down", None)
 MAX_CHATS = 25
 
 VERSION = re.compile(r"^v[0-9]+(\.[0-9]+)?$")
-DATE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
 FENCE = re.compile(r"^```json[ \t]*\n(.*?)\n```[ \t]*$", re.M | re.S)
 
 
@@ -58,24 +55,6 @@ def _fields(obj, allowed, where, errors, required=True):
     missing = sorted(set(allowed) - set(obj)) if required else []
     if missing:
         errors.append(f"{where}: missing field(s) {missing}")
-
-
-def _is_int(v):
-    return isinstance(v, int) and not isinstance(v, bool)
-
-
-def _is_level(v):
-    return v == "not_shown" or (_is_int(v) and 1 <= v <= 5)
-
-
-def _is_date(d):
-    if not (_is_str(d) and DATE.match(d)):
-        return False
-    try:
-        datetime.date.fromisoformat(d)
-        return True
-    except ValueError:
-        return False
 
 
 def _title(t, where, errors):
@@ -121,8 +100,8 @@ def validate(record, convention=True):
                     errors.append(f"{where}.level: must be an integer 1-5 or 'not_shown'")
                 if "confidence" in entry and conf not in CONFIDENCE:
                     errors.append(f"{where}.confidence: must be one of {list(CONFIDENCE)}")
-                shown[name] = level != "not_shown"
-                if convention and level == "not_shown" and conf != "low":
+                shown[name] = level != LEVEL_NOT_SHOWN
+                if convention and level == LEVEL_NOT_SHOWN and conf != "low":
                     errors.append(f"{where}.confidence: convention: a not_shown capability records 'low'")
 
     ev = record.get("evidence")
@@ -245,7 +224,7 @@ def _validate_multi(record, convention, errors):
             errors.append(f"{where}.trend: must be 'up', 'flat', 'down' or null")
         if not (_is_int(entry["chats_shown"]) and entry["chats_shown"] >= 0):
             errors.append(f"{where}.chats_shown: must be a whole number, 0 or more")
-        dated = [(i, c["levels"][name]) for i, c in enumerate(oldest_first) if c["levels"][name] != "not_shown"]
+        dated = [(i, c["levels"][name]) for i, c in enumerate(oldest_first) if c["levels"][name] != LEVEL_NOT_SHOWN]
         levels = [lvl for _, lvl in dated]
         if levels:
             shown_count += 1
@@ -267,7 +246,7 @@ def _validate_multi(record, convention, errors):
             errors.append(f"{where}: must be a chat number from 1 to {len(chats)}")
             continue
         chat = chats[n - 1]
-        if chat["result"] != "scored" or chat["levels"][item["capability"]] == "not_shown":
+        if chat["result"] != "scored" or chat["levels"][item["capability"]] == LEVEL_NOT_SHOWN:
             errors.append(f"{where}: chat {n} must be scored and show {item['capability']}")
         elif convention and chat["levels"][item["capability"]] != record["capabilities"][item["capability"]]["level"]:
             errors.append(f"{where}: convention: quote from a chat whose level equals the combined level")
