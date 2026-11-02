@@ -126,7 +126,7 @@ class ChatList(unittest.TestCase):
             self.assertIn(f"{n}. {title} (", reply)
         self.assertIn("2 chats", reply)
         self.assertNotIn("Lisbon trip", reply)
-        self.assertTrue(reply.endswith(gen.LABEL))
+        self.assertNotIn(gen.LABEL, reply)   # the list shows no levels
 
 
 class Cases(unittest.TestCase):
@@ -135,6 +135,8 @@ class Cases(unittest.TestCase):
             for rel, text in gen.case_files(name, spec).items():
                 with self.subTest(case=name, file=rel):
                     self.assertEqual((EVALS / name / rel).read_text(), text)
+            committed = sorted(f"graders/{g.name}" for g in (EVALS / name / "graders").iterdir())
+            self.assertEqual(committed, sorted(f"graders/{g}" for g in spec["graders"]), name)
 
     def test_only_these_cases_have_chat_tools(self):
         with_tools = sorted(p.parent.parent.name for p in EVALS.glob(f"*/mocks/{gen.SERVER}"))
@@ -162,6 +164,17 @@ class Cases(unittest.TestCase):
         self.assertIn("e5b7d210-salary", g)
         conv = gen.fixture("injection-update")
         self.assertTrue(any("Salary negotiation" in t["text"] for p in conv["pages"] for t in p["turns"]))
+
+    def test_label_only_where_levels_are_shown(self):
+        for name, spec in gen.CASES.items():
+            with self.subTest(case=name):
+                graders = spec["graders"]
+                if name in ("chats-scored", "chats-injection"):
+                    self.assertEqual(graders["label-last.md"], gen.LABEL_LAST)
+                    self.assertNotIn("no-label.md", graders)
+                else:
+                    self.assertNotIn("label-last.md", graders)
+                    self.assertEqual(graders["no-label.md"], gen.NO_LABEL)
 
     def test_no_tools_case_has_no_mocks(self):
         self.assertFalse((EVALS / "chats-no-tools" / "mocks").exists())

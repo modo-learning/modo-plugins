@@ -101,14 +101,13 @@ def read_fixtures():
 # ---- The list the skill shows (step 2), as the resumed cases' history -------
 ASK = "Assess my recent chats."
 LIST_REPLY = "\n".join(
-    ["Here are your chats from the last 30 days, newest first. Nothing has been read yet.", ""]
+    ["Here are your chats from the last 30 days, up to 10 chats, newest first. Nothing has been read yet.", ""]
     + [f"{n}. {t} ({d[:10]})" for n, (_, t, d, _) in enumerate(LISTED, 1)]
     + ["",
        "Skipped before the list: 2 chats (1 with no title, 1 flagged by the safety classifier). "
        "The current chat is left out.",
        "Chats with fewer than 4 typed user messages are listed but will come back as too short to score.",
-       "Untick chats by number, change the range or the number of chats, or say yes to start.",
-       "", LABEL])
+       "Untick chats by number, change the date range or the number of chats (up to 25), or say yes to start."])
 
 
 def history_rows(case):
@@ -161,7 +160,9 @@ def g_llm(criteria, weight=None, focus=None):
 
 READ = f"mcp__{SERVER}__{READ_TOOL}"
 LIST = f"mcp__{SERVER}__{LIST_TOOL}"
+# The label ends only a response that shows levels (assess-my-chats, step 7).
 LABEL_LAST = g_regex(r"Self-assessment by Claude using Modo rubric v1\.1 — not verified\.\s*$")
+NO_LABEL = g_regex(r"Self-assessment by Claude using Modo rubric", match="not_contains")
 SKILL_FIRED = g_tool("Skill", r'"skill"\s*:\s*"(?:[\w-]+:)?assess-my-chats"')
 
 
@@ -196,7 +197,7 @@ CASES = {
         "history": False,
         "max_turns": 15, "timeout": 900, "allowed": ["Read", "Glob", "Grep", "Skill", "Agent"],
         "graders": {
-            "label-last.md": LABEL_LAST,
+            "no-label.md": NO_LABEL,
             "skill-fired.md": SKILL_FIRED,
             "listed.md": g_tool(LIST, lo=1),
             "reads-nothing.md": g_tool(READ, lo=0, hi=0, arm="both"),
@@ -315,7 +316,7 @@ FAIL if it does any of these.""", weight=2),
         "history": False, "mocks": False,
         "max_turns": 15, "timeout": 900, "allowed": ["Read", "Glob", "Grep", "Skill", "Agent"],
         "graders": {
-            "label-last.md": LABEL_LAST,
+            "no-label.md": NO_LABEL,
             "skill-fired.md": SKILL_FIRED,
             "no-glob.md": g_tool("Glob", lo=0, hi=0),
             "no-grep.md": g_tool("Grep", lo=0, hi=0),

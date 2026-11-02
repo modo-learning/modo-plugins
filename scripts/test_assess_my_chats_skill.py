@@ -238,6 +238,55 @@ def folded(path):
     return re.sub(r"[ \t]*\n[ \t]*(?=\S)(?![-#|`]|\d+\. )", " ", path.read_text())
 
 
+def section(body, start, end):
+    return body[body.index(start):body.index(end)]
+
+
+LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+
+
+class Answer(unittest.TestCase):
+    AGENTS_LINE = "Each chat was read and scored by its own agent, 3 or 5 times in one response."
+    FALLBACK_LINE = ("Each chat was read and scored here in the main chat, one at a time, 3 or 5 times "
+                     "(agents could not be started, so at most 3 chats).")
+
+    def test_line_two_has_a_fallback_variant(self):
+        step5 = section(text(), "## 5. Write the answer", "## 6. The card")
+        self.assertIn(self.AGENTS_LINE, step5)
+        self.assertIn(self.FALLBACK_LINE, step5)
+
+    def test_fallback_says_so_in_the_result(self):
+        step3 = section(text(), "## 3. Read and score", "## 4. Combine")
+        self.assertIn("at most 3 chats", step3)
+        self.assertIn("use the fallback line 2 in step 5", step3)
+
+
+class Label(unittest.TestCase):
+    """Live defect 1 (2026-11-02): the label only under responses that show levels."""
+
+    def test_label_ends_only_responses_that_show_levels(self):
+        step7 = section(text(), "## 7. The label", LABEL)
+        self.assertIn("only a response that shows levels or scores", step7)
+        for not_here in ("the list", "the question in step 2", "progress updates"):
+            self.assertIn(not_here, step7)
+        self.assertNotIn("Every response from this skill", step7)
+
+    def test_messages_without_levels_do_not_end_with_the_label(self):
+        body = text()
+        self.assertNotIn("End a message that stops here with the label", body)
+        self.assertNotIn("offer a wider range. End with the label", body)
+
+
+class Scope(unittest.TestCase):
+    """Live defect 2: scope is offered inside the list message, not asked first."""
+
+    def test_list_message_offers_range_and_count(self):
+        step2 = section(text(), "## 2. Show the list and ask", "## 3. Read and score")
+        self.assertIn("The list message is where the user sets the scope", step2)
+        self.assertIn("the date range and the number of chats used", step2)
+        self.assertIn("Don't ask about scope before the list", step2)
+
+
 class ExportAndSave(unittest.TestCase):
     """Ticket 17: a multi-chat result can be exported and (once modo-mcp accepts it) saved."""
 

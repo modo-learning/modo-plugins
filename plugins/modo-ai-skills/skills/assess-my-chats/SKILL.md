@@ -34,6 +34,11 @@ Decided 2026-11-02, flag for review:
 8. The card is a copy of assess-my-ai-work/passport-card.html, kept
    identical by check_rubric_sync.py; its multi-chat look is a proposal for
    Angelina.
+9. Scope is offered inside the list message (step 2), not asked before it.
+10. The label ends only responses that show levels (step 7), not the list,
+    the question or progress updates (live test 2026-11-02, defect 1).
+11. The fallback (no agents) says so in line 2 of the answer; confirmed
+    chats beyond the 3 it reads count as could not be read.
 -->
 
 # Assess my chats
@@ -93,8 +98,6 @@ Then, in either case:
 - Otherwise, say that /assess-my-ai-work can assess this chat once it has
   some work in it. Stop.
 
-End a message that stops here with the label (step 7).
-
 ## 1. Scope and list
 
 **Scope.** Unless the user said otherwise, use the last 30 days and at most
@@ -116,18 +119,24 @@ Keep the newest chats up to the limit. Note each one's `chat_id`, title and
 the date the list gives.
 
 **No chats left**: say that no chats in that range can be assessed, how many
-were skipped and why, and offer a wider range. End with the label.
+were skipped and why, and offer a wider range.
 
 ## 2. Show the list and ask
 
-Show one numbered list, newest first: `<n>. <title> (<date>)`. Below it say:
+The list message is where the user sets the scope. Don't ask about scope
+before the list: list with the defaults (or what the user asked for) and
+offer the change here.
+
+Show one numbered list, newest first: `<n>. <title> (<date>)`. Above it say
+the date range and the number of chats used (for example "the last 30 days,
+up to 10 chats"). Below it say:
 
 - how many chats were skipped and why (current chat, untitled, flagged), if
   any;
 - that chats with fewer than 4 typed user messages are listed but will come
   back as too short to score;
-- that the user can untick chats by number, change the range or the number
-  of chats, or say yes to start.
+- that the user can untick chats by number, change the date range or the
+  number of chats (up to 25), or say yes to start.
 
 Then wait. A change to the range or the number means a new list (step 1) and
 a new question. Read nothing until the user says yes to a list.
@@ -179,7 +188,9 @@ approves every quote again before any export. Say neither more nor less.
 fails twice): do it here, one chat at a time, at most 3 chats (the newest 3
 of the confirmed list). Say so before you start. For each chat, follow the
 brief yourself, end with its ChatResult, then keep only that result and drop
-the chat's text from your notes before the next chat.
+the chat's text from your notes before the next chat. In the answer, use the
+fallback line 2 in step 5, and count the confirmed chats you did not read as
+could not be read ("not read: no agents").
 
 ## 4. Combine
 
@@ -209,7 +220,11 @@ scored chat.
 ## 5. Write the answer
 
 Keep to this shape. Write the first three lines word for word, filling in
-only the `<…>` parts (use 0 for none), with no heading before them:
+only the `<…>` parts (use 0 for none), with no heading before them. Line 2
+is the one for how the chats were read: with agents (step 3), the line
+below; in the fallback (one chat at a time in the main chat, at most 3),
+instead:
+"Each chat was read and scored here in the main chat, one at a time, 3 or 5 times (agents could not be started, so at most 3 chats)."
 
 ```
 Assessment across <s> of your chats (<first date> to <last date>), against Modo rubric v1.1.
@@ -295,7 +310,11 @@ never say a card exists.
 
 ## 7. The label
 
-Every response from this skill, including the list, the question in step 2
-and the short messages, ends with this line exactly, on its own line:
+End only a response that shows levels or scores with this line exactly, on
+its own line: the result (step 5), and any later message that restates or
+explains levels from it. Don't add it to the list, the question in step 2,
+progress updates, the work estimate, or a message that stops without a
+result (step 0, no chats left). When step 0 hands over to assess-my-ai-work,
+that skill's answer carries its own label.
 
 Self-assessment by Claude using Modo rubric v1.1 — not verified.
