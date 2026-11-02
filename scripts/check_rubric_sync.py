@@ -11,6 +11,11 @@ assessment-record.schema.json live in skills/export-assessment/ and are copied
 into every other skill that builds a record (skills/save-to-passport/). Every
 skill folder holding RECORD.md must hold both files, identical to the others.
 
+The passport card works the same way: passport-card.html lives in
+skills/assess-my-ai-work/ (the source: edit there) and is copied into
+skills/assess-my-chats/, which renders a multi-chat result with it. Every copy
+must be identical.
+
 Usage: python3 scripts/check_rubric_sync.py plugins/modo-ai-skills
 """
 
@@ -19,6 +24,7 @@ import sys
 
 PATTERN = "rubric-v*.md"
 RECORD_FILES = ("RECORD.md", "assessment-record.schema.json")
+CARD = "passport-card.html"
 
 
 def _same(copies: list) -> list:
@@ -44,7 +50,8 @@ def check(plugin: pathlib.Path) -> list:
         return [f"expected at least 2 copies of {PATTERN} under {plugin}/skills, found {len(copies)}"]
     first = copies[0]
     names = [f"{c} differs from {first}" for c in copies[1:] if c.name != first.name]
-    return names + _same(copies) + check_record(plugin)
+    cards = sorted((plugin / "skills").glob(f"*/{CARD}"))
+    return names + _same(copies) + check_record(plugin) + (_same(cards) if len(cards) > 1 else [])
 
 
 if __name__ == "__main__":
@@ -53,4 +60,4 @@ if __name__ == "__main__":
         print("FAIL:", p)
     if problems:
         sys.exit(1)
-    print("rubric and record copies identical")
+    print("rubric, record and card copies identical")

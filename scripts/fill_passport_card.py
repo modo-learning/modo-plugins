@@ -38,6 +38,29 @@ SAMPLE = {
     "next_action": "Assess one more chat with different work to see Strategic Thinking.",
 }
 
+# A result across several chats (assess-my-chats), as the card gets it. Synthetic
+# illustration: the levels are the multi-chat example in RECORD.md (combined by
+# the aggregation rules) and the quote is invented. Chats are named "Chat n"
+# because chat titles are shown only when the user approves them.
+MULTI_SAMPLE = {
+    "scope": "multi_chat",
+    "sessions": 4,
+    "date_range": ["2026-10-06", "2026-10-30"],
+    "capabilities": [
+        {"name": "Problem Solving", "level": 2, "confidence": "high", "best_shown": 3, "trend": "up", "chats_shown": 4},
+        {"name": "Verification", "level": 3, "confidence": "high", "best_shown": 4, "trend": "up", "chats_shown": 4},
+        {"name": "Workflow Design", "level": 2, "confidence": "medium", "best_shown": 2, "trend": None, "chats_shown": 3},
+        {"name": "Delegation", "level": 3, "confidence": "medium", "best_shown": None, "trend": None, "chats_shown": 3},
+        {"name": "Strategic Thinking", "level": "not_shown", "best_shown": None, "trend": None, "chats_shown": 0},
+    ],
+    "evidence": [
+        {"capability": "Verification", "source": "Chat 4, 2026-10-14",
+         "quote": "Before we use that number, show me the query you ran so I can rerun it."},
+    ],
+    "growth": None,
+    "next_action": "Run /help-me-improve for Verification.",
+}
+
 START = "<!-- MODO-DATA-START -->"
 END = "<!-- MODO-DATA-END -->"
 

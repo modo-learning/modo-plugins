@@ -21,7 +21,7 @@ HISTORY = PLUGIN / "evals" / "strong-verify-weak-delegate" / "history.jsonl"
 LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from fill_passport_card import fill, SAMPLE  # noqa: E402
+from fill_passport_card import fill, MULTI_SAMPLE, SAMPLE  # noqa: E402
 
 CHROME = next(
     filter(
@@ -187,6 +187,98 @@ class Render(unittest.TestCase):
         text = text_of(body_text(dom))
         self.assertNotIn("Strongest", text)
         self.assertIn("This chat shows only 0 of 5 capabilities", text)
+
+
+@unittest.skipUnless(CHROME, "no headless Chrome found")
+class RenderMultiChat(unittest.TestCase):
+    """A result across several chats (assess-my-chats). Proposal: card look is Angelina's."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.dom = render(MULTI_SAMPLE)
+        cls.items = items(cls.dom)
+        cls.text = text_of(body_text(cls.dom))
+
+    def item(self, name):
+        return next(i for i in self.items if name_of(i) == name)
+
+    def test_header_names_the_chat_count_and_date_range(self):
+        self.assertIn("Based on 4 chats, 2026-10-06 to 2026-10-30, against Modo rubric v1.1.", self.text)
+        self.assertIn("Strongest across these chats: Verification", self.text)
+        self.assertNotIn("this chat", self.text.lower())
+
+    def test_order_strengths_first(self):
+        # Sample: P 2 high, V 3 high, W 2 medium, D 3 medium, S not shown.
+        self.assertEqual([name_of(i) for i in self.items],
+                         ["Verification", "Delegation", "Problem Solving", "Workflow Design",
+                          "Strategic Thinking"])
+
+    def test_trend_arrow_per_capability(self):
+        v = self.item("Verification")
+        self.assertIn('data-trend="up"', v)
+        self.assertIn('aria-label="Trend: up"', v)
+        self.assertIn("\u2191", v)
+        self.assertNotIn("data-trend", self.item("Delegation"))
+
+    def test_down_and_flat_arrows(self):
+        data = json.loads(json.dumps(MULTI_SAMPLE))
+        data["capabilities"][0]["trend"] = "down"
+        data["capabilities"][1]["trend"] = "flat"
+        its = items(render(data))
+        p = next(i for i in its if name_of(i) == "Problem Solving")
+        v = next(i for i in its if name_of(i) == "Verification")
+        self.assertIn("\u2193", p)
+        self.assertIn('aria-label="Trend: down"', p)
+        self.assertIn("\u2192", v)
+        self.assertIn('aria-label="Trend: flat"', v)
+
+    def test_chats_shown_and_best_shown(self):
+        v = text_of(self.item("Verification"))
+        self.assertIn("Level 3 of 5", v)
+        self.assertIn("High confidence", v)
+        self.assertIn("Shown in 4 of 4 chats", v)
+        self.assertIn("Best shown: Level 4", v)
+        self.assertNotIn("Best shown", text_of(self.item("Delegation")))
+
+    def test_not_shown_in_these_chats(self):
+        s = self.item("Strategic Thinking")
+        self.assertIn("Not shown in these chats", text_of(s))
+        self.assertIn("track-empty", s)
+        self.assertNotIn("data-trend", s)
+
+    def test_coverage_line_for_several_chats(self):
+        self.assertIn("These chats show 4 of 5 capabilities. A chat with different work "
+                      "could show Strategic Thinking.", self.text)
+
+    def test_partial_coverage(self):
+        data = json.loads(json.dumps(MULTI_SAMPLE))
+        for c in data["capabilities"][2:]:
+            c.update(level="not_shown", trend=None, best_shown=None, chats_shown=0)
+            c.pop("confidence", None)
+        self.assertIn("These chats show only 2 of 5 capabilities, so this is a partial picture.",
+                      text_of(body_text(render(data))))
+
+    def test_evidence_names_its_chat(self):
+        self.assertIn(MULTI_SAMPLE["evidence"][0]["quote"], self.text)
+        self.assertIn("Verification · Chat 4, 2026-10-14", self.text)
+
+    def test_label_verbatim_and_last(self):
+        lines = [l.strip() for l in re.sub(r"<[^>]+>", "\n", body_text(self.dom)).splitlines() if l.strip()]
+        self.assertEqual(lines[-1], LABEL)
+        self.assertNotRegex(self.text.replace(LABEL, "").lower(), r"verified|badge|benchmark|rank")
+
+    def test_nothing_shown_across_chats(self):
+        data = json.loads(json.dumps(MULTI_SAMPLE))
+        for c in data["capabilities"]:
+            c.update(level="not_shown", trend=None, best_shown=None, chats_shown=0)
+            c.pop("confidence", None)
+        data["evidence"] = []
+        text = text_of(body_text(render(data)))
+        self.assertIn("Your AI capabilities across these chats", text)
+        self.assertNotIn("this chat", text)
+
+    def test_single_chat_card_has_no_trend(self):
+        self.assertFalse([i for i in items(render(SAMPLE)) if "data-trend" in i])
 
 
 if __name__ == "__main__":
