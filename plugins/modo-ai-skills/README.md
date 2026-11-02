@@ -1,7 +1,8 @@
 # Modo AI Skills
 
 Modo AI Skills tells you how well you work with AI, from one Claude chat you
-choose, against Modo's public rubric. For each of five capabilities (Problem
+choose or from several of your past claude.ai chats at once, against Modo's
+public rubric. For each of five capabilities (Problem
 Solving, Verification, Workflow Design, Delegation, Strategic Thinking) you
 get a level from 1 to 5, or "not shown", a confidence label, a quote from your
 own messages as evidence, and what the next level looks like. Then it gives
@@ -13,7 +14,7 @@ self-assessment for your own development. It is not intended for hiring,
 promotion, performance reviews or any other employment decision about you or
 anyone else.
 
-This branch carries **rubric v1.1**: scoring prompt by prompt against
+This version (0.3.0) carries **rubric v1.1**: scoring prompt by prompt against
 published behaviours, a fixed level rule, 3 to 5 scoring runs with their
 agreement shown, honest coverage for thin chats, and a redesigned card. See
 [What changed in v1.1](#what-changed-in-v11).
@@ -88,9 +89,9 @@ outside service.
 
 ## Install
 
-This version (rubric v1.1) lives on the branch `modo-ai-skills-v1.1` of this
-repository. The earlier version (rubric v1) stays on `modo-ai-skills-phase0`,
-so the two can be compared. Neither is on `main`, so install from a branch.
+This version (0.3.0, rubric v1.1) is on `main`. The earlier rubric v1 build
+stays on the branch `modo-ai-skills-phase0` for comparison. A ChatGPT and
+Codex build is generated from this plugin; see [openai/README.md](../../openai/README.md).
 
 ### claude.ai, the Claude desktop app and Cowork
 
@@ -101,13 +102,13 @@ The marketplace there reads only `main`, so upload the plugin as a zip:
    repository: it holds two plugins, and the upload takes one.
 
    ```
-   git fetch origin modo-ai-skills-v1.1
-   git archive --format=zip -o modo-ai-skills.zip origin/modo-ai-skills-v1.1:plugins/modo-ai-skills -- . ':!evals'
+   git fetch origin main
+   git archive --format=zip -o modo-ai-skills.zip origin/main:plugins/modo-ai-skills -- . ':!evals'
    ```
 
 2. Open **Customize → Plugins → Add → Upload plugin** and choose the zip.
-3. To assess a past chat by its title, turn on **Settings → Memory →
-   "Search and reference chats"**.
+3. To assess a past chat by its title, or several past chats at once, turn on
+   **Settings → Memory → "Search and reference chats"**.
 4. Start a new chat, work on something real for at least 4 messages, then ask
    "how good am I at using AI in this chat?", and then "export it".
 
@@ -115,23 +116,23 @@ To update, remove the plugin in Customize → Plugins and upload the new zip.
 
 ### Claude Code
 
-Add the marketplace at the branch:
-
 ```
-claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-v1.1
+claude plugin marketplace add modo-learning/modo-plugins
 claude plugin install modo-ai-skills@modo-plugins
 ```
 
-If you already added `modo-plugins` from `main` (for Task Finder), remove it
-first. Removing it also uninstalls Task Finder, so install that again; the
-branch has it too, unchanged:
+If you added `modo-plugins` from a branch before, remove it and add it again
+from `main` (this also reinstalls Task Finder):
 
 ```
 claude plugin marketplace remove modo-plugins
-claude plugin marketplace add modo-learning/modo-plugins#modo-ai-skills-v1.1
+claude plugin marketplace add modo-learning/modo-plugins
 claude plugin install modo-ai-skills@modo-plugins
 claude plugin install modo-task-finder@modo-plugins
 ```
+
+Assessing several past chats needs claude.ai's chat tools, so it works in
+claude.ai and the desktop app, not in Claude Code.
 
 To update: `claude plugin marketplace update modo-plugins`, then
 `claude plugin update modo-ai-skills@modo-plugins`.
@@ -142,6 +143,7 @@ In Claude chat or Cowork, ask in plain words, for example:
 
 - "How good am I at using AI?"
 - "Assess this chat."
+- "How good am I at working with AI across my recent chats?" (several chats)
 - 'Assess my chat called "Q3 budget review".'
 - "How do I get better at verification?"
 - "Export this assessment."
@@ -153,9 +155,36 @@ app:
 | Command | What it does |
 |---|---|
 | `/modo-ai-skills:assess-my-ai-work` | Assess one chat |
+| `/modo-ai-skills:assess-my-chats` | Assess several past claude.ai chats at once (claude.ai and desktop only) |
 | `/modo-ai-skills:help-me-improve` | Help with one capability, without an assessment |
 | `/modo-ai-skills:export-assessment` | Export the assessment you were just given |
 | `/modo-ai-skills:save-to-passport` | Save the assessment to your Modo passport, or show the passport (needs the Modo connector) |
+
+## Assess several chats at once
+
+`assess-my-chats` scores up to 25 of your past claude.ai chats (by default
+the 10 newest from the last 30 days) and combines them into one result.
+
+1. It lists the chats it would read, by title and date, and reads nothing
+   until you say yes. You can untick chats by number, change the date range
+   or the number of chats. Incognito chats are never listed; chats flagged by
+   the safety classifier and empty chats are skipped and counted.
+2. Each chat is read and scored by its own agent, 5 at a time, with the same
+   rubric and the same 3 to 5 scoring runs as a single chat. The main chat
+   only receives each chat's levels, quotes and coverage, never the
+   transcript. Chats with fewer than 4 typed messages are counted as too short.
+3. For each capability, the level is the middle of the chat levels (the lower
+   one on a tie). You also see the best level shown in at least 2 chats, how
+   many chats show it, a confidence label from how close the levels are, and
+   a trend (older against newer chats, with 4 or more chats).
+4. You get one card ("Based on N chats, date range"), a table with a row per
+   chat, and a coverage line naming what could not be read (attachments, tool
+   results, answers picked in Claude's question widgets).
+
+Export works as for one chat: you approve every quote, and chat titles are
+left out ("Chat 1…N") unless you say "with titles". Saving a multi-chat
+result to the Modo passport needs a Modo connector that accepts results
+across several chats; until then the skill says so and sends nothing.
 
 ## Which chat it reads
 
@@ -387,7 +416,7 @@ repository keeps the two copies identical.
 
 ## What changed in v1.1
 
-| | Rubric v1 (`modo-ai-skills-phase0`) | Rubric v1.1 (this branch) |
+| | Rubric v1 (`modo-ai-skills-phase0`) | Rubric v1.1 (0.2 and later) |
 |---|---|---|
 | How a level is set | Claude picks the level from the level descriptions | Claude checks each message for published behaviours, each with a quote; a fixed rule sets the level |
 | Consistency | One pass | 3 runs, 5 when they disagree; agreement shown; disagreement gives low confidence or "not shown" |

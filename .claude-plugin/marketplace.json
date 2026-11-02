@@ -19,7 +19,7 @@
       "name": "modo-ai-skills",
       "description": "Assess how well you work with AI against Modo's public rubric: a level, confidence and quoted evidence for five capabilities.",
       "source": "./plugins/modo-ai-skills",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "license": "MIT",
       "category": "productivity"
     }
