@@ -1,0 +1,50 @@
+{
+  "chat_id": "5b1d9c30-cover",
+  "title": "Cover letter",
+  "updated_at": "2026-10-21T18:40:00Z",
+  "turns_total": 8,
+  "user_messages": 3,
+  "unreadable_turns": 1,
+  "attachments_seen": false,
+  "truncated_turns": [],
+  "too_short": true,
+  "runs": 0,
+  "run_kind": "none",
+  "capabilities": {
+    "problem_solving": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "",
+      "behaviours": [],
+      "quotes": []
+    },
+    "verification": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "",
+      "behaviours": [],
+      "quotes": []
+    },
+    "workflow_design": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "",
+      "behaviours": [],
+      "quotes": []
+    },
+    "delegation": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "",
+      "behaviours": [],
+      "quotes": []
+    },
+    "strategic_thinking": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "",
+      "behaviours": [],
+      "quotes": []
+    }
+  }
+}

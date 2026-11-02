@@ -1,0 +1,71 @@
+{
+  "chat_id": "9e44b6a1-merge",
+  "title": "CSV merge drops rows",
+  "updated_at": "2026-10-30T15:12:00Z",
+  "turns_total": 10,
+  "user_messages": 4,
+  "unreadable_turns": 0,
+  "attachments_seen": false,
+  "truncated_turns": [],
+  "too_short": false,
+  "runs": 3,
+  "run_kind": "one_response",
+  "capabilities": {
+    "problem_solving": {
+      "level": 3,
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "P3a"
+      ],
+      "quotes": [
+        {
+          "message": 1,
+          "text": "My script that merges two CSV files drops rows."
+        }
+      ]
+    },
+    "verification": {
+      "level": 3,
+      "confidence": "medium",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "V4b"
+      ],
+      "quotes": [
+        {
+          "message": 4,
+          "text": "I ran it on the real files: 1,204 rows in, 1,204 out."
+        }
+      ]
+    },
+    "workflow_design": {
+      "level": 2,
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "W2a"
+      ],
+      "quotes": [
+        {
+          "message": 2,
+          "text": "Now do the same for the orders file."
+        }
+      ]
+    },
+    "delegation": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [],
+      "quotes": []
+    },
+    "strategic_thinking": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [],
+      "quotes": []
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "chat_id": "c0a7e2f4-pricing",
+  "title": "Pro plan price rise",
+  "updated_at": "2026-10-27T10:02:00Z",
+  "turns_total": 16,
+  "user_messages": 7,
+  "unreadable_turns": 1,
+  "attachments_seen": true,
+  "truncated_turns": [
+    8
+  ],
+  "too_short": false,
+  "runs": 5,
+  "run_kind": "one_response",
+  "capabilities": {
+    "problem_solving": {
+      "level": 3,
+      "confidence": "high",
+      "agreement": "5 of 5 runs",
+      "behaviours": [
+        "P3a",
+        "P3b"
+      ],
+      "quotes": [
+        {
+          "message": 1,
+          "text": "Goal: a one-page recommendation for the leadership meeting."
+        },
+        {
+          "message": 7,
+          "text": "Paragraph two says churn will not change; that contradicts the 0.7 point rise we agreed."
+        }
+      ]
+    },
+    "verification": {
+      "level": 4,
+      "confidence": "high",
+      "agreement": "5 of 5 runs",
+      "behaviours": [
+        "V4b",
+        "V3b"
+      ],
+      "quotes": [
+        {
+          "message": 5,
+          "text": "I recomputed it in my own sheet and got $38k, because you used 1,700 seats instead of 1,610."
+        },
+        {
+          "message": 3,
+          "text": "Your churn figure for the 2024 rise is wrong: the sheet shows 3.2% before and 3.9% after, so 0.7 points, not 0.4."
+        }
+      ]
+    },
+    "workflow_design": {
+      "level": 4,
+      "confidence": "medium",
+      "agreement": "5 of 5 runs",
+      "behaviours": [
+        "W4b",
+        "W3b"
+      ],
+      "quotes": [
+        {
+          "message": 2,
+          "text": "First, before you write anything, list the three options you see and the risk of each."
+        },
+        {
+          "message": 6,
+          "text": "Go with option B. Draft the one-pager"
+        }
+      ]
+    },
+    "delegation": {
+      "level": 4,
+      "confidence": "high",
+      "agreement": "5 of 5 runs",
+      "behaviours": [
+        "D4b",
+        "D3b"
+      ],
+      "quotes": [
+        {
+          "message": 7,
+          "text": "Change it and keep the rest."
+        },
+        {
+          "message": 2,
+          "text": "I'll pick one."
+        }
+      ]
+    },
+    "strategic_thinking": {
+      "level": 4,
+      "confidence": "medium",
+      "agreement": "4 of 5 runs",
+      "behaviours": [
+        "S4b",
+        "S3a"
+      ],
+      "quotes": [
+        {
+          "message": 2,
+          "text": "list the three options you see and the risk of each"
+        },
+        {
+          "message": 1,
+          "text": "I need to decide by Friday whether we raise the Pro plan price from $20 to $25."
+        }
+      ]
+    }
+  }
+}
