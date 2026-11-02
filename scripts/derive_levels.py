@@ -16,10 +16,13 @@ from this arithmetic, not from the model's reading of the rule):
 
     python3 derive_levels.py runs.json      # or the JSON on stdin
 
-runs.json: {"user_messages": 7, "runs": [RUN, RUN, RUN]} where each RUN maps
-a capability name to the behaviours noted in that run, as [message, id] pairs:
-{"Verification": [[2, "V4b"], [6, "V5a"]], "Delegation": [[7, "D1u"]], ...}.
-A capability with nothing noted may be left out or given [].
+runs.json: {"user_messages": 7, "messages": [the user's 7 messages], "runs": [RUN, RUN, RUN]}
+where each RUN maps a capability name to the behaviours noted in that run, as
+[message, id, "the user's exact words"]:
+{"Verification": [[2, "V4b", "I recomputed the tier growth myself"]], ...}.
+A capability with nothing noted may be left out or given []. Without
+"messages", [message, id] pairs are accepted and quotes are not checked.
+Optional "run_kind": "subagents" when each run was a separate sub-task.
 """
 
 import json
@@ -128,57 +131,107 @@ def coverage(levels):
 
 CAPABILITIES = {"Problem Solving": "P", "Verification": "V", "Workflow Design": "W",
                 "Delegation": "D", "Strategic Thinking": "S"}
+SCRIPT_VERSION = "rubric-v1.1-levels-2"
 
 
 class RunsError(ValueError):
     pass
 
 
+def _norm(text):
+    return " ".join(str(text).split())
+
+
 def _runs_seen(data):
-    if not isinstance(data, dict) or set(data) != {"user_messages", "runs"}:
-        raise RunsError('expected exactly {"user_messages": N, "runs": [...]}')
-    n, runs = data["user_messages"], data["runs"]
+    if not isinstance(data, dict) or not {"user_messages", "runs"} <= set(data) or \
+            set(data) - {"user_messages", "runs", "messages", "run_kind"}:
+        raise RunsError('expected {"user_messages": N, "runs": [...]} with optional "messages", "run_kind"')
+    n, runs, messages = data["user_messages"], data["runs"], data.get("messages")
     if not isinstance(n, int) or isinstance(n, bool) or n < 1:
         raise RunsError("user_messages must be a positive integer")
+    if messages is not None and not (isinstance(messages, list) and len(messages) == n
+                                     and all(isinstance(m, str) for m in messages)):
+        raise RunsError("messages must be the list of the user's N messages, in order")
     if not isinstance(runs, list) or len(runs) not in (3, 5):
         raise RunsError("runs must be a list of 3 or 5 runs")
-    out = []
+    texts = [_norm(m) for m in messages] if messages is not None else None
+    out, dropped = [], []
     for i, run in enumerate(runs, 1):
         if not isinstance(run, dict) or set(run) - set(CAPABILITIES):
             raise RunsError(f"run {i}: keys must be capability names {list(CAPABILITIES)}")
         per_cap = {}
         for cap, prefix in CAPABILITIES.items():
-            pairs = run.get(cap, [])
+            entries = run.get(cap, [])
             seen = []
-            for pair in pairs if isinstance(pairs, list) else [None]:
-                if not (isinstance(pair, list) and len(pair) == 2):
-                    raise RunsError(f"run {i}, {cap}: each behaviour is [message, id]")
-                m, b = pair
+            for entry in entries if isinstance(entries, list) else [None]:
+                if not (isinstance(entry, list) and len(entry) in (2, 3)):
+                    raise RunsError(f"run {i}, {cap}: each behaviour is [message, id, \"exact quote\"]")
+                m, b = entry[0], entry[1]
                 if not isinstance(m, int) or isinstance(m, bool) or not 1 <= m <= n:
                     raise RunsError(f"run {i}, {cap}: message {m!r} is not 1 to {n}")
                 if b not in BEHAVIOURS or not b.startswith(prefix):
                     raise RunsError(f"run {i}, {cap}: {b!r} is not a {cap} behaviour id")
+                if texts is not None:
+                    quote = _norm(entry[2]) if len(entry) == 3 else ""
+                    if not quote or quote not in texts[m - 1]:
+                        dropped.append(f"run {i}, {cap}: {b} in message {m} (no exact quote from that message)")
+                        continue
                 seen.append((m, b))
-            per_cap[cap] = sorted(seen)
+            per_cap[cap] = sorted(set(seen))
         out.append(per_cap)
-    return n, out
+    return n, out, dropped
 
 
 def assess(data):
-    """Every level of one chat from all its runs: the final result per capability."""
-    n, runs = _runs_seen(data)
+    """Every level of one chat from all its runs: the final result per capability.
+
+    With "messages", each behaviour must carry the user's exact words from the
+    message it names; a behaviour whose quote isn't found is dropped and listed
+    (the rubric: a behaviour is noted "with the exact words that show it").
+    Runs that are exact copies of each other count once, and the runs line says so.
+    """
+    n, runs, dropped = _runs_seen(data)
+    distinct = [r for k, r in enumerate(runs) if r not in runs[:k]]
+    used = runs if len(distinct) > 1 else distinct
     result, levels = {}, {}
     for cap in CAPABILITIES:
-        derived = [derive(run[cap], n) for run in runs]
+        derived = [derive(run[cap], n) for run in used]
         final = combine(derived)
         final["runs"] = [lvl for lvl, _ in derived]
         result[cap] = final
         levels[cap] = NOT_SHOWN if final["level"] == DISAGREED else final["level"]
     shown_for_coverage = {c: (lvl if result[c]["level"] != DISAGREED else 1) for c, lvl in levels.items()}
-    differ = any(len(set(result[c]["runs"])) > 1 for c in CAPABILITIES)
-    return {"capabilities": result, "coverage": coverage(shown_for_coverage),
-            "runs_agree": not differ,
-            "needs_more_runs": len(runs) == 3 and differ}
+    agree = sum(1 for c in CAPABILITIES if len(set(result[c]["runs"])) == 1)
+    where = "as separate sub-tasks" if data.get("run_kind") == "subagents" else "in this one response"
+    if len(used) == 1:
+        runs_line = (f"Scored once: the {len(runs)} runs given were identical, so how far runs "
+                     "agree was not measured.")
+    else:
+        runs_line = f"Scored {len(used)} times ({where}); the runs agreed on {agree} of 5 capabilities."
+    return {"script_version": SCRIPT_VERSION, "self_check": self_check(),
+            "capabilities": result, "coverage": coverage(shown_for_coverage),
+            "runs_used": len(used), "runs_line": runs_line,
+            "needs_more_runs": len(used) == 3 and agree < 5,
+            "dropped": dropped}
+
+
+def self_check():
+    """Known answers of the level rule; a copy of this file that changed the rule fails here."""
+    cases = [
+        (derive([(2, "V4b"), (6, "V5a")], 7), (5, "medium")),        # Verification's extra weight
+        (derive([(6, "D4a"), (7, "D1u")], 7), (2, "low")),           # unchecked handoff + rule 5
+        (derive([(1, "D4a"), (3, "D4b"), (5, "D3a")], 7), (4, "high")),
+        (derive([(2, "W4a")], 7), (3, "low")),                       # tier 4 needs backing
+        (derive([], 7), (NOT_SHOWN, None)),
+        (combine([(3, "medium"), (3, "high"), (4, "medium")]),
+         {"level": 3, "confidence": "medium", "agreement": "2 of 3 runs"}),
+        (combine([(1, "low"), (4, "high"), (2, "low")]),
+         {"level": DISAGREED, "confidence": None, "agreement": DISAGREED}),
+    ]
+    bad = [i for i, (got, want) in enumerate(cases, 1) if got != want]
+    if bad:
+        raise RunsError(f"self check failed (cases {bad}): this copy of derive_levels.py is not the published one")
+    return "passed"
 
 
 if __name__ == "__main__":

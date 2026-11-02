@@ -15,7 +15,7 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import subprocess  # noqa: E402
 import json  # noqa: E402
-from derive_levels import BEHAVIOURS, RunsError, assess, combine, coverage, derive  # noqa: E402
+from derive_levels import BEHAVIOURS, RunsError, assess, combine, coverage, derive, self_check  # noqa: E402
 
 RUBRIC = (pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills"
           / "skills" / "assess-my-ai-work" / "rubric-v1.1.md")
@@ -127,7 +127,6 @@ class Assess(unittest.TestCase):
         d = out["capabilities"]["Delegation"]
         self.assertLessEqual(d["level"], 3)
         self.assertEqual(out["capabilities"]["Verification"]["level"], 5)
-        self.assertTrue(out["runs_agree"])
         self.assertFalse(out["needs_more_runs"])
 
     def test_three_runs_that_differ_ask_for_two_more(self):
@@ -152,7 +151,7 @@ class Assess(unittest.TestCase):
             ({"user_messages": 7, "runs": [dict(RUN, Verification=[[2, "D3a"]])] * 3}, "not a Verification"),
             ({"user_messages": 7, "runs": [dict(RUN, Verification=[[9, "V3b"]])] * 3}, "not 1 to 7"),
             ({"user_messages": 7, "runs": [dict(RUN, Creativity=[])] * 3}, "capability names"),
-            ({"runs": [RUN] * 3}, "exactly"),
+            ({"runs": [RUN] * 3}, "with optional"),
         ]:
             with self.subTest(msg=msg), self.assertRaisesRegex(RunsError, msg):
                 assess(data)
@@ -166,6 +165,60 @@ class Assess(unittest.TestCase):
         bad = subprocess.run([sys.executable, "-I", str(script)], input="{}", capture_output=True, text=True)
         self.assertEqual(bad.returncode, 1)
         self.assertIn("error:", bad.stderr)
+
+
+MESSAGES = [
+    "Write up my Q3 pricing analysis for the board.",
+    "Before I use any of this I recomputed the tier growth myself. Team is 310 against 280.",
+    "What is that based on? Give me a source I can open.",
+    "Now just write the recommendations section, whatever you think is best.",
+    "Where does the $45k come from? Walk me through the arithmetic.",
+    "Rerun it three ways. I'll check the three results against my own spreadsheet before they go in the deck.",
+    "The third is off by $2k, so fix that one. Then finish the rest of the deck, all the slides.",
+]
+Q = {"V": [2, "V4b", "I recomputed the tier growth myself"],
+     "D4a": [6, "D4a", "Rerun it three ways."],
+     "D1u": [7, "D1u", "finish the rest of the deck, all the slides"]}
+
+
+class Honesty(unittest.TestCase):
+    def test_identical_runs_count_once_and_the_runs_line_says_so(self):
+        out = assess({"user_messages": 7, "runs": [RUN, RUN, RUN]})
+        self.assertEqual(out["runs_used"], 1)
+        self.assertTrue(out["runs_line"].startswith("Scored once"))
+        self.assertEqual(out["capabilities"]["Verification"]["agreement"], "1 of 1 runs")
+        self.assertFalse(out["needs_more_runs"])
+
+    def test_different_runs_report_real_agreement(self):
+        other = dict(RUN, **{"Workflow Design": [[6, "W3b"]]})
+        out = assess({"user_messages": 7, "runs": [RUN, other, RUN], "run_kind": "subagents"})
+        self.assertEqual(out["runs_used"], 3)
+        self.assertEqual(out["runs_line"], "Scored 3 times (as separate sub-tasks); the runs agreed on 4 of 5 capabilities.")
+        self.assertTrue(out["needs_more_runs"])
+
+    def test_with_messages_a_behaviour_needs_the_users_exact_words(self):
+        run = {"Verification": [Q["V"]], "Delegation": [Q["D4a"], Q["D1u"],
+                                                     [5, "D4b", "words the user never wrote"]]}
+        other = {"Verification": [Q["V"]], "Delegation": [Q["D4a"], Q["D1u"]], "Strategic Thinking": [[1, "S2a", "for the board"]]}
+        out = assess({"user_messages": 7, "messages": MESSAGES, "runs": [run, other, run]})
+        self.assertEqual(out["dropped"], ["run 1, Delegation: D4b in message 5 (no exact quote from that message)",
+                                          "run 3, Delegation: D4b in message 5 (no exact quote from that message)"])
+        self.assertLessEqual(out["capabilities"]["Delegation"]["level"], 3)
+
+    def test_a_quote_from_another_message_is_dropped(self):
+        wrong = [3, "V4b", "I recomputed the tier growth myself"]
+        out = assess({"user_messages": 7, "messages": MESSAGES, "runs": [{"Verification": [wrong]}] * 3})
+        self.assertEqual(len(out["dropped"]), 3)
+        self.assertEqual(out["capabilities"]["Verification"]["level"], "not shown")
+
+    def test_messages_must_match_the_count(self):
+        with self.assertRaisesRegex(RunsError, "messages must be"):
+            assess({"user_messages": 7, "messages": MESSAGES[:3], "runs": [RUN] * 3})
+
+    def test_self_check_passes_and_is_reported(self):
+        self.assertEqual(self_check(), "passed")
+        out = assess({"user_messages": 7, "runs": [RUN] * 3})
+        self.assertEqual((out["self_check"], out["script_version"]), ("passed", "rubric-v1.1-levels-2"))
 
 
 if __name__ == "__main__":
