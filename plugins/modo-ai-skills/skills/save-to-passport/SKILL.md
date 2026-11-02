@@ -29,7 +29,9 @@ the save tool: nothing else is ever sent.
   Nothing else: no record, no instructions for installing anything. End with
   the label (step 7).
 - Save only an assessment given earlier in this conversation by the
-  assess-my-ai-work skill. Take the levels and confidence from it as they
+  assess-my-ai-work skill, or a result across several chats given by the
+  assess-my-chats skill (then also follow [Multi-chat result](#multi-chat-result)).
+  Take the levels and confidence from it as they
   stand. Don't re-score and don't read any chat again, except to check that
   each quote is word for word what the user wrote in the assessed chat.
 - Never search for, list or open other chats or files.
@@ -160,6 +162,27 @@ Use the five capabilities in rubric order; a capability with no latest level
 is "Not shown yet". Show only what the tool returned: don't add levels, quotes
 or comparisons. An empty history means nothing has been saved yet: say so. On
 an error, say the passport couldn't be read and that they can try again later.
+
+## Multi-chat result
+
+A result from assess-my-chats is saved as a **multi-chat record**
+(`"scope": "multi_chat"`): read "Multi-chat record" in RECORD.md in full. This
+shape is a proposal (decided 2026-11-02, flag for review).
+
+- **First check the server takes it.** Look at the save tool's input fields.
+  If the tool has no `scope` field, the Modo connector can't store a result
+  across several chats yet: say so in one line, send nothing, and offer the
+  export (/export-assessment) instead. Don't reshape the result into a
+  single-chat record to get it accepted.
+- Build the record as export-assessment's "Multi-chat result" says (if an
+  export of it was approved here, start from that): quotes only from the
+  result, each with its chat number; chats named `"Chat 1"`, `"Chat 2"`, …
+  unless the user says "with titles"; title "Assessment across <s> chats";
+  date the newest scored chat's date; every number copied as it stands.
+- Don't open any chat: the agents checked the quotes; the user's yes in step
+  4 is the check here.
+- Step 3 shows the chat list too, as the record names it, then the record.
+  Steps 4 to 7 are unchanged.
 
 ## 7. The label
 

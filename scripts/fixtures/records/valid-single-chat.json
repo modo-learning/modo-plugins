@@ -1,0 +1,33 @@
+{
+  "rubric_version": "v1.1",
+  "capabilities": {
+    "problem_solving": {
+      "level": 4,
+      "confidence": "medium"
+    },
+    "verification": {
+      "level": 5,
+      "confidence": "high"
+    },
+    "workflow_design": {
+      "level": 2,
+      "confidence": "medium"
+    },
+    "delegation": {
+      "level": 1,
+      "confidence": "low"
+    },
+    "strategic_thinking": {
+      "level": "not_shown",
+      "confidence": "low"
+    }
+  },
+  "evidence": [
+    {
+      "capability": "verification",
+      "quote": "Team is 310 against 280, which is 10.7%, not 14.3%."
+    }
+  ],
+  "session_title": "Q3 pricing analysis for the board",
+  "session_date": "2026-10-20"
+}

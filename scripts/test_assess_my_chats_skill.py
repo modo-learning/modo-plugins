@@ -167,5 +167,53 @@ class Aggregation(unittest.TestCase):
         self.assertNotIn("quotes", json.dumps(aggregate(results)))
 
 
+EXPORT = PLUGIN / "skills" / "export-assessment" / "SKILL.md"
+SAVE = PLUGIN / "skills" / "save-to-passport" / "SKILL.md"
+
+
+def folded(path):
+    return re.sub(r"[ \t]*\n[ \t]*(?=\S)(?![-#|`]|\d+\. )", " ", path.read_text())
+
+
+class ExportAndSave(unittest.TestCase):
+    """Ticket 17: a multi-chat result can be exported and (once modo-mcp accepts it) saved."""
+
+    def test_no_longer_says_export_is_not_available(self):
+        self.assertNotIn("not available yet", text())
+
+    def test_hands_off_to_export_and_save(self):
+        body = text()
+        self.assertIn("/export-assessment", body)
+        self.assertIn("/save-to-passport", body)
+
+    def test_says_save_needs_the_server_to_accept_the_scope(self):
+        self.assertIn("once the Modo connector accepts results across several chats", text())
+
+    def test_card_uses_its_own_copy_with_the_multi_chat_scope(self):
+        body = text()
+        self.assertIn("[passport-card.html](passport-card.html)", body)
+        self.assertIn('"scope": "multi_chat"', body)
+        self.assertIn("date_range", body)
+        self.assertIn("I also made a card of this result.", body)
+
+    def test_export_skill_accepts_a_multi_chat_result(self):
+        body = folded(EXPORT)
+        self.assertIn("assess-my-chats", body)
+        self.assertIn('"scope": "multi_chat"', body)
+        self.assertIn("Multi-chat record", body)
+        # Chat titles are user content: only with approval, else Chat 1..N.
+        self.assertIn('"Chat 1"', body)
+        self.assertIn('"with titles"', body)
+        # Same header line as report-template.html renders.
+        self.assertIn("Chats: <from> to <to>. Rubric: v1.1. Based on <scored> chats.", body)
+
+    def test_save_skill_accepts_a_multi_chat_result_but_checks_the_server(self):
+        body = folded(SAVE)
+        self.assertIn("assess-my-chats", body)
+        self.assertIn('"scope": "multi_chat"', body)
+        self.assertIn("has no `scope` field", body)
+        self.assertIn('"Chat 1"', body)
+
+
 if __name__ == "__main__":
     unittest.main()

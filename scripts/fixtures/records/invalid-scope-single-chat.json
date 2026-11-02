@@ -1,0 +1,118 @@
+{
+  "expect": "scope: must be 'multi_chat'",
+  "record": {
+    "rubric_version": "v1.1",
+    "scope": "single_chat",
+    "capabilities": {
+      "problem_solving": {
+        "level": 2,
+        "confidence": "high",
+        "best_shown": 3,
+        "trend": "up",
+        "chats_shown": 4
+      },
+      "verification": {
+        "level": 3,
+        "confidence": "high",
+        "best_shown": 4,
+        "trend": "up",
+        "chats_shown": 4
+      },
+      "workflow_design": {
+        "level": 2,
+        "confidence": "medium",
+        "best_shown": 2,
+        "trend": null,
+        "chats_shown": 3
+      },
+      "delegation": {
+        "level": 3,
+        "confidence": "medium",
+        "best_shown": null,
+        "trend": null,
+        "chats_shown": 3
+      },
+      "strategic_thinking": {
+        "level": "not_shown",
+        "confidence": "low",
+        "best_shown": null,
+        "trend": null,
+        "chats_shown": 0
+      }
+    },
+    "evidence": [
+      {
+        "capability": "verification",
+        "chat": 4,
+        "quote": "Before we use that number, show me the query you ran so I can rerun it."
+      }
+    ],
+    "session_title": "Assessment across 4 chats",
+    "session_date": "2026-10-30",
+    "chats_assessed": {
+      "count": 5,
+      "scored": 4,
+      "too_short": 1,
+      "could_not_be_read": 0,
+      "from": "2026-10-06",
+      "to": "2026-10-30"
+    },
+    "chats": [
+      {
+        "title": "Chat 1",
+        "date": "2026-10-30",
+        "result": "scored",
+        "levels": {
+          "problem_solving": 3,
+          "verification": 4,
+          "workflow_design": 2,
+          "delegation": "not_shown",
+          "strategic_thinking": "not_shown"
+        }
+      },
+      {
+        "title": "Chat 2",
+        "date": "2026-10-27",
+        "result": "scored",
+        "levels": {
+          "problem_solving": 3,
+          "verification": 4,
+          "workflow_design": 4,
+          "delegation": 4,
+          "strategic_thinking": "not_shown"
+        }
+      },
+      {
+        "title": "Chat 3",
+        "date": "2026-10-21",
+        "result": "too_short",
+        "levels": null
+      },
+      {
+        "title": "Chat 4",
+        "date": "2026-10-14",
+        "result": "scored",
+        "levels": {
+          "problem_solving": 2,
+          "verification": 3,
+          "workflow_design": 2,
+          "delegation": 3,
+          "strategic_thinking": "not_shown"
+        }
+      },
+      {
+        "title": "Chat 5",
+        "date": "2026-10-06",
+        "result": "scored",
+        "levels": {
+          "problem_solving": 2,
+          "verification": 3,
+          "workflow_design": "not_shown",
+          "delegation": 2,
+          "strategic_thinking": "not_shown"
+        }
+      }
+    ],
+    "coverage": 4
+  }
+}

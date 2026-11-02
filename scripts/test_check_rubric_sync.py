@@ -66,6 +66,31 @@ class RubricSync(unittest.TestCase):
             (root / "skills" / "export-assessment" / "assessment-record.schema.json").write_text("{}")
             self.assertEqual(len(check(root)), 1)
 
+    def test_card_copies_identical_pass(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = make(t, "x", "x")
+            (root / "skills" / "assess-my-ai-work" / "passport-card.html").write_text("card")
+            d = root / "skills" / "assess-my-chats"
+            d.mkdir()
+            (d / "passport-card.html").write_text("card")
+            self.assertEqual(check(root), [])
+
+    def test_card_copy_diverged_fails(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = make(t, "x", "x")
+            (root / "skills" / "assess-my-ai-work" / "passport-card.html").write_text("card")
+            d = root / "skills" / "assess-my-chats"
+            d.mkdir()
+            (d / "passport-card.html").write_text("card v2")
+            problems = check(root)
+            self.assertEqual(len(problems), 1)
+            self.assertIn("passport-card.html", problems[0])
+
+    def test_real_plugin_has_two_card_copies(self):
+        root = pathlib.Path(__file__).parent.parent / "plugins" / "modo-ai-skills"
+        self.assertEqual(sorted(p.parent.name for p in root.glob("skills/*/passport-card.html")),
+                         ["assess-my-ai-work", "assess-my-chats"])
+
     def test_real_plugin_in_sync(self):
         root = pathlib.Path(__file__).parent.parent / "plugins" / "modo-ai-skills"
         self.assertEqual(check(root), [])

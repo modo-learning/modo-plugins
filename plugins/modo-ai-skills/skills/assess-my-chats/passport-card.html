@@ -1,0 +1,310 @@
+<title>AI Capability Card</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Modo AI capability card. Style: the modo-design skill (Modo tokens, shadcn/ui
+   card pattern). Navy header with the strongest capability, then one row per
+   capability (five segments, strongest first, not shown last), strengths'
+   evidence, one growth tip, the next action, the label last. A result across
+   several chats ("scope": "multi_chat") adds the chat count and date range to
+   the header and a trend arrow, chats shown and best shown per capability
+   (proposal, decided 2026-11-02, flag for review: Angelina). */
+/* MODO-TOKENS-START */
+/* Modo design tokens, taken from modo-frontend src/styles/tokens.css (Modo v2:
+   navy shell, Modo yellow accent, warm neutral surfaces, Inter). Edit here,
+   then copy this block unchanged into every template that has the markers
+   (scripts/check_design_sync.py fails when a copy differs). */
+:root {
+  --bg-canvas: #F5F5F0;
+  --surface-1: #FFFFFF;
+  --surface-2: #F0F0EA;
+  --text-primary: #1A1A2E;
+  --text-secondary: #4F5068;
+  --text-muted: #6B6B80;
+  --border-default: #E0E0DA;
+  --border-subtle: #ECECE6;
+  --nav-bg: #1E2233;
+  --nav-text: #F5F5F0;
+  --nav-text-muted: #8A8FA8;
+  --accent-primary: #FFC107;
+  --accent-faint: #FFF8E1;
+  --accent-text: #1A1A2E;
+  --fill: #1E2233;          /* level segments: navy on light (amber fails 3:1 here) */
+  --track: #E8E8E2;
+  --warning-fg: #854D0E;
+  --warning-bg: #FEF9C3;
+  --warning-border: #FDE68A;
+  --shadow-sm: 0 2px 6px rgba(16, 18, 22, 0.06);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --font: "Inter", "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-canvas: #111322; --surface-1: #1A1A2E; --surface-2: #1E2233;
+    --text-primary: #F5F5F0; --text-secondary: #D7D8E2; --text-muted: #8A8FA8;
+    --border-default: rgba(255,255,255,.11); --border-subtle: rgba(255,255,255,.06);
+    --nav-bg: #252A3F; --accent-faint: rgba(255,193,7,.07);
+    --fill: #FFC107; --track: #252A3F;
+    --warning-fg: #FFC107; --warning-bg: rgba(255,193,7,.14); --warning-border: rgba(255,193,7,.30);
+    --shadow-sm: 0 2px 6px rgba(0,0,0,.2); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg-canvas: #111322; --surface-1: #1A1A2E; --surface-2: #1E2233;
+  --text-primary: #F5F5F0; --text-secondary: #D7D8E2; --text-muted: #8A8FA8;
+  --border-default: rgba(255,255,255,.11); --border-subtle: rgba(255,255,255,.06);
+  --nav-bg: #252A3F; --accent-faint: rgba(255,193,7,.07);
+  --fill: #FFC107; --track: #252A3F;
+  --warning-fg: #FFC107; --warning-bg: rgba(255,193,7,.14); --warning-border: rgba(255,193,7,.30);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,.2); color-scheme: dark;
+}
+/* MODO-TOKENS-END */
+* { box-sizing: border-box; }
+body {
+  background: var(--bg-canvas); color: var(--text-primary); font-family: var(--font);
+  font-size: 14px; line-height: 1.5; margin: 0; letter-spacing: -0.006em;
+  font-feature-settings: "cv01", "ss03";
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card {
+  max-width: 640px; margin: 0 auto; background: var(--surface-1);
+  border: 1px solid var(--border-default); border-radius: 14px;
+  box-shadow: var(--shadow-sm); overflow: hidden;
+}
+/* Header: the Modo navy shell with the yellow accent. */
+.head { background: var(--nav-bg); color: var(--nav-text); padding: 20px 24px 22px; }
+.brand { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; }
+.mark {
+  width: 22px; height: 22px; border-radius: 6px; background: var(--accent-primary);
+  color: #1A1A2E; font-weight: 700; font-size: 13px; display: grid; place-items: center;
+}
+.kicker {
+  margin: 0; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--nav-text-muted);
+}
+h1 { font-size: 21px; line-height: 1.2; letter-spacing: -0.014em; margin: 0 0 6px; font-weight: 650; text-wrap: balance; }
+.sub { color: var(--nav-text-muted); margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+.body { padding: 20px 24px 24px; }
+.coverage {
+  margin: 0 0 4px; font-size: 13px; padding: 10px 12px; border-radius: 8px;
+  color: var(--warning-fg); background: var(--warning-bg); border: 1px solid var(--warning-border);
+}
+h2 {
+  font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-muted); margin: 20px 0 10px; font-weight: 600;
+}
+ul.caps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+ul.caps li {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center;
+  padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-subtle);
+}
+ul.caps li:first-child[data-level] { border-color: var(--accent-primary); background: var(--accent-faint); }
+.name { font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.level { color: var(--text-secondary); font-size: 13px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.level b { color: var(--text-primary); font-weight: 650; font-size: 15px; }
+.bar { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; height: 8px; }
+.seg { border-radius: 9999px; background: var(--track); }
+.seg.on { background: var(--fill); }
+li[data-confidence="medium"] .seg.on { background: color-mix(in srgb, var(--fill) 65%, var(--track)); }
+li[data-confidence="low"] .seg.on {
+  background: repeating-linear-gradient(135deg, var(--fill) 0 3px, var(--track) 3px 6px);
+}
+.track-empty {
+  grid-column: 1 / -1; height: 8px; border-radius: 9999px;
+  border: 1.5px dashed var(--text-muted); opacity: .55;
+}
+.meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+/* outline pill */
+.trend {
+  display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px;
+  border-radius: 9999px; background: var(--surface-2); color: var(--text-primary); font-weight: 600;
+}
+.trend .arrow { font-size: 13px; line-height: 1; }
+.pill {
+  display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 9999px;
+  border: 1px solid var(--border-default); color: var(--text-secondary); font-weight: 500;
+}
+blockquote {
+  margin: 0 0 10px; padding: 10px 12px; border-left: 3px solid var(--accent-primary);
+  background: var(--surface-2); border-radius: 0 8px 8px 0; overflow-wrap: anywhere;
+}
+blockquote p { margin: 0; color: var(--text-primary); }
+blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; font-weight: 500; }
+.tip {
+  background: var(--accent-faint); border: 1px solid var(--border-default);
+  border-radius: 10px; padding: 12px 14px; overflow-wrap: anywhere;
+}
+.tip p { margin: 0; }
+.tip .for { color: var(--text-secondary); font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.next { display: flex; gap: 10px; align-items: flex-start; margin: 0; }
+.next svg { flex: none; margin-top: 2px; color: var(--text-muted); }
+.label {
+  margin: 0; padding: 12px 24px; border-top: 1px solid var(--border-default);
+  background: var(--surface-2); color: var(--text-muted); font-size: 12px;
+}
+</style>
+
+<!-- Skill: replace ONLY the JSON between the two MODO-DATA markers. Do not edit anything else. -->
+<main class="card" aria-labelledby="t">
+  <header class="head">
+    <div class="brand"><span class="mark" aria-hidden="true">M</span><p class="kicker">Modo · AI capability card</p></div>
+    <h1 id="t">Your AI capabilities in this chat</h1>
+    <p class="sub" id="chat"></p>
+  </header>
+  <div class="body">
+    <p class="coverage" id="coverage" hidden></p>
+    <h2>Capabilities</h2>
+    <ul class="caps" id="caps"></ul>
+    <div id="ev-wrap" hidden>
+      <h2>Your strengths, in your words</h2>
+      <div id="evidence"></div>
+    </div>
+    <div id="growth-wrap" hidden>
+      <h2>One thing to try</h2>
+      <div class="tip"><p class="for" id="growth-for"></p><p id="growth"></p></div>
+    </div>
+    <div id="next-wrap" hidden>
+      <h2>Next</h2>
+      <p class="next"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span id="next"></span></p>
+    </div>
+  </div>
+  <p class="label">Self-assessment by Claude using Modo rubric v1.1 — not verified.</p>
+</main>
+
+<!-- MODO-DATA-START -->
+<script type="application/json" id="passport-data">
+{"chat": "", "sessions": 1, "capabilities": [], "evidence": [], "growth": null, "next_action": ""}
+</script>
+<!-- MODO-DATA-END -->
+
+<script>
+(function () {
+  var CONF = { low: 0, medium: 1, high: 2 };
+  var data = JSON.parse(document.getElementById("passport-data").textContent);
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function shown(c) { return [1, 2, 3, 4, 5].indexOf(c.level) >= 0; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  var caps = (data.capabilities || []).map(function (c, i) { return { c: c, i: i }; });
+  /* Strengths first: highest level, then higher confidence, then rubric order; not shown last. */
+  caps.sort(function (a, b) {
+    var sa = shown(a.c), sb = shown(b.c);
+    if (sa !== sb) return sa ? -1 : 1;
+    if (sa && a.c.level !== b.c.level) return b.c.level - a.c.level;
+    if (sa && a.c.confidence !== b.c.confidence) return (CONF[b.c.confidence] || 0) - (CONF[a.c.confidence] || 0);
+    return a.i - b.i;
+  });
+  var ordered = caps.map(function (x) { return x.c; });
+  var nShown = ordered.filter(shown).length;
+  var multi = data.scope === "multi_chat";
+  var ARROW = { up: "\u2191", flat: "\u2192", down: "\u2193" };
+
+  if (nShown) {
+    var top = ordered[0];
+    document.getElementById("t").textContent = (multi ? "Strongest across these chats: " : "Strongest in this chat: ") + top.name;
+  } else if (multi) {
+    document.getElementById("t").textContent = "Your AI capabilities across these chats";
+  }
+  var sessions = data.sessions || 1;
+  if (multi) {
+    var range = data.date_range || [];
+    document.getElementById("chat").textContent = "Based on " + sessions + (sessions === 1 ? " chat" : " chats") +
+      (range.length === 2 ? ", " + (range[0] === range[1] ? range[0] : range[0] + " to " + range[1]) : "") +
+      ", against Modo rubric v1.1.";
+  } else if (data.chat) {
+    document.getElementById("chat").textContent = "Assessment of " + data.chat +
+      ". Based on " + sessions + (sessions === 1 ? " chat" : " chats") + ", against Modo rubric v1.1.";
+  }
+  if (ordered.length === 5) {
+    /* A capability withheld because the runs disagreed was shown; it is not missing. */
+    var missing = ordered.filter(function (c) { return !shown(c) && c.agreement !== "runs disagreed"; });
+    nShown = ordered.length - missing.length;
+    var cov = document.getElementById("coverage");
+    cov.hidden = nShown === 5;
+    cov.textContent = multi
+      ? (nShown === 4
+        ? "These chats show 4 of 5 capabilities. A chat with different work could show " + missing[0].name + "."
+        : "These chats show only " + nShown + " of 5 capabilities, so this is a partial picture.")
+      : nShown === 4
+      ? "This chat shows 4 of 5 capabilities. One more chat with different work could show " + missing[0].name + "."
+      : "This chat shows only " + nShown + " of 5 capabilities, so this is a partial picture. Assess 2–3 more chats with different kinds of work to see the rest.";
+  }
+
+  var list = document.getElementById("caps");
+  ordered.forEach(function (c) {
+    var li = el("li");
+    li.setAttribute("data-capability", c.name);
+    li.appendChild(el("div", "name", c.name));
+    var meta = el("div", "meta");
+    if (shown(c)) {
+      li.setAttribute("data-level", c.level);
+      li.setAttribute("data-confidence", c.confidence);
+      var lv = el("div", "level");
+      lv.appendChild(el("span", null, "Level "));
+      lv.appendChild(el("b", null, String(c.level)));
+      lv.appendChild(el("span", null, " of 5"));
+      li.appendChild(lv);
+      var bar = el("div", "bar");
+      bar.setAttribute("role", "img");
+      bar.setAttribute("aria-label", "Level " + c.level + " of 5");
+      for (var k = 1; k <= 5; k++) bar.appendChild(el("span", k <= c.level ? "seg on" : "seg"));
+      li.appendChild(bar);
+      if (multi && ARROW[c.trend]) {
+        li.setAttribute("data-trend", c.trend);
+        var tr = el("span", "trend");
+        tr.setAttribute("role", "img");
+        tr.setAttribute("aria-label", "Trend: " + c.trend);
+        var ar = el("span", "arrow", ARROW[c.trend]);
+        ar.setAttribute("aria-hidden", "true");
+        tr.appendChild(ar);
+        tr.appendChild(el("span", null, cap(c.trend)));
+        meta.appendChild(tr);
+      }
+      meta.appendChild(el("span", "pill", cap(c.confidence) + " confidence"));
+      if (multi && c.chats_shown) meta.appendChild(el("span", null, "Shown in " + c.chats_shown + " of " + sessions + " chats"));
+      if (multi && c.best_shown) meta.appendChild(el("span", null, "Best shown: Level " + c.best_shown));
+    } else {
+      li.appendChild(el("div", "level", multi ? "Not shown in these chats" : "Not shown in this chat"));
+      var empty = el("div", "track-empty");
+      empty.setAttribute("aria-hidden", "true");
+      li.appendChild(empty);
+    }
+    if (c.agreement) meta.appendChild(el("span", null, c.agreement));
+    li.appendChild(meta);
+    list.appendChild(li);
+  });
+
+  var ev = (data.evidence || []).slice(0, 2);
+  if (ev.length) {
+    document.getElementById("ev-wrap").hidden = false;
+    var box = document.getElementById("evidence");
+    ev.forEach(function (e) {
+      var b = el("blockquote");
+      b.appendChild(el("p", null, "“" + e.quote + "”"));
+      b.appendChild(el("footer", null, e.source ? e.capability + " \u00b7 " + e.source : e.capability));
+      box.appendChild(b);
+    });
+  }
+  if (data.growth && data.growth.tip) {
+    document.getElementById("growth-wrap").hidden = false;
+    document.getElementById("growth-for").textContent = data.growth.capability;
+    document.getElementById("growth").textContent = data.growth.tip;
+  }
+  if (data.next_action) {
+    document.getElementById("next-wrap").hidden = false;
+    document.getElementById("next").textContent = data.next_action;
+  }
+})();
+</script>
