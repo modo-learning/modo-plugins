@@ -9,7 +9,21 @@ table here matches the rubric's.
     derive(seen, user_messages)   one run, one capability -> (level, confidence)
     combine(runs)                 3 or 5 runs of one capability -> final result
     coverage(levels)              the coverage line for a result, or None
+    assess(data)                  all runs of a chat -> every level, as JSON
+
+Command line (the ChatGPT version runs this in its code tool, so the levels come
+from this arithmetic, not from the model's reading of the rule):
+
+    python3 derive_levels.py runs.json      # or the JSON on stdin
+
+runs.json: {"user_messages": 7, "runs": [RUN, RUN, RUN]} where each RUN maps
+a capability name to the behaviours noted in that run, as [message, id] pairs:
+{"Verification": [[2, "V4b"], [6, "V5a"]], "Delegation": [[7, "D1u"]], ...}.
+A capability with nothing noted may be left out or given [].
 """
+
+import json
+import sys
 
 NOT_SHOWN = "not shown"
 DISAGREED = "runs disagreed"  # shown as not shown, but counted as shown for coverage
@@ -110,3 +124,67 @@ def coverage(levels):
                 f"work could show {missing[0]}.")
     return (f"This chat shows only {shown} of 5 capabilities, so this is a partial picture. "
             "Assess 2–3 more chats with different kinds of work to see the rest.")
+
+
+CAPABILITIES = {"Problem Solving": "P", "Verification": "V", "Workflow Design": "W",
+                "Delegation": "D", "Strategic Thinking": "S"}
+
+
+class RunsError(ValueError):
+    pass
+
+
+def _runs_seen(data):
+    if not isinstance(data, dict) or set(data) != {"user_messages", "runs"}:
+        raise RunsError('expected exactly {"user_messages": N, "runs": [...]}')
+    n, runs = data["user_messages"], data["runs"]
+    if not isinstance(n, int) or isinstance(n, bool) or n < 1:
+        raise RunsError("user_messages must be a positive integer")
+    if not isinstance(runs, list) or len(runs) not in (3, 5):
+        raise RunsError("runs must be a list of 3 or 5 runs")
+    out = []
+    for i, run in enumerate(runs, 1):
+        if not isinstance(run, dict) or set(run) - set(CAPABILITIES):
+            raise RunsError(f"run {i}: keys must be capability names {list(CAPABILITIES)}")
+        per_cap = {}
+        for cap, prefix in CAPABILITIES.items():
+            pairs = run.get(cap, [])
+            seen = []
+            for pair in pairs if isinstance(pairs, list) else [None]:
+                if not (isinstance(pair, list) and len(pair) == 2):
+                    raise RunsError(f"run {i}, {cap}: each behaviour is [message, id]")
+                m, b = pair
+                if not isinstance(m, int) or isinstance(m, bool) or not 1 <= m <= n:
+                    raise RunsError(f"run {i}, {cap}: message {m!r} is not 1 to {n}")
+                if b not in BEHAVIOURS or not b.startswith(prefix):
+                    raise RunsError(f"run {i}, {cap}: {b!r} is not a {cap} behaviour id")
+                seen.append((m, b))
+            per_cap[cap] = sorted(seen)
+        out.append(per_cap)
+    return n, out
+
+
+def assess(data):
+    """Every level of one chat from all its runs: the final result per capability."""
+    n, runs = _runs_seen(data)
+    result, levels = {}, {}
+    for cap in CAPABILITIES:
+        derived = [derive(run[cap], n) for run in runs]
+        final = combine(derived)
+        final["runs"] = [lvl for lvl, _ in derived]
+        result[cap] = final
+        levels[cap] = NOT_SHOWN if final["level"] == DISAGREED else final["level"]
+    shown_for_coverage = {c: (lvl if result[c]["level"] != DISAGREED else 1) for c, lvl in levels.items()}
+    differ = any(len(set(result[c]["runs"])) > 1 for c in CAPABILITIES)
+    return {"capabilities": result, "coverage": coverage(shown_for_coverage),
+            "runs_agree": not differ,
+            "needs_more_runs": len(runs) == 3 and differ}
+
+
+if __name__ == "__main__":
+    raw = open(sys.argv[1]).read() if len(sys.argv) > 1 else sys.stdin.read()
+    try:
+        print(json.dumps(assess(json.loads(raw)), indent=2))
+    except (RunsError, json.JSONDecodeError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        sys.exit(1)
