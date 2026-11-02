@@ -4,8 +4,10 @@ PROPOSED RULES, pending product sign-off. The rules are arithmetic on purpose:
 the same chat results always give the same combined result, and the model
 never "averages by feel".
 
-Input: a list of ChatResults (see validate_chat_result.py), each already valid.
-A chat that is too short is listed but scores nothing.
+Input: one entry per confirmed chat: a valid ChatResult (see
+validate_chat_result.py), or the agent's {"chat_id": ..., "error": ...} for a
+chat that could not be read. Too-short and could-not-be-read chats are counted
+but score nothing.
 
 Per capability, over the scored chats where it was shown (level 1 to 5):
 
@@ -28,7 +30,7 @@ Per capability, over the scored chats where it was shown (level 1 to 5):
 Coverage: how many of the five capabilities were shown in at least one chat.
 
 Usage:
-    python3 -I scripts/aggregate_chats.py results.json   # a JSON list of ChatResults
+    python3 -I scripts/aggregate_chats.py results.json   # a JSON list, one entry per chat
 """
 
 import json
@@ -68,29 +70,51 @@ def trend(dated):
     return "up" if later > earlier else "down" if later < earlier else "flat"
 
 
-def aggregate(results):
-    scored = [r for r in results if not r["too_short"]]
+def failed(result):
+    """A chat whose agent returned no ChatResult: {"chat_id": ..., "error": ...} (brief, step 1), or nothing."""
+    return not isinstance(result, dict) or "error" in result
+
+
+def combine(chats):
+    """The combined capabilities and coverage for the scored chats.
+
+    chats: (date, levels) per scored chat, levels = {capability key: 1-5 or
+    "not_shown"}; date is an ISO date or timestamp. The trend orders the chats
+    by date, oldest first (a stable sort: chats with the same date keep the
+    order given). aggregate() and validate_assessment_record.py both use this.
+    """
     capabilities = {}
     for cap in CAPABILITIES:
-        dated = [(r["updated_at"], r["capabilities"][cap]["level"]) for r in scored
-                 if r["capabilities"][cap]["level"] != LEVEL_NOT_SHOWN]
-        levels = [lvl for _, lvl in dated]
-        if not levels:
+        dated = [(date, levels[cap]) for date, levels in chats if levels[cap] != LEVEL_NOT_SHOWN]
+        shown = [lvl for _, lvl in dated]
+        if not shown:
             capabilities[cap] = {"level": LEVEL_NOT_SHOWN, "confidence": "low", "best_shown": None,
                                  "trend": None, "chats_shown": 0}
             continue
-        capabilities[cap] = {"level": lower_median(levels), "confidence": combined_confidence(levels),
-                             "best_shown": best_shown(levels), "trend": trend(dated),
-                             "chats_shown": len(levels)}
+        capabilities[cap] = {"level": lower_median(shown), "confidence": combined_confidence(shown),
+                             "best_shown": best_shown(shown), "trend": trend(dated),
+                             "chats_shown": len(shown)}
+    return {"coverage": sum(1 for c in capabilities.values() if c["level"] != LEVEL_NOT_SHOWN),
+            "capabilities": capabilities}
+
+
+def aggregate(results):
+    """Combine the ChatResults of the confirmed chats, failed reads included.
+
+    The counts use the multi-chat record's names (RECORD.md, chats_assessed):
+    count = every confirmed chat; scored = valid and not too short;
+    too_short = too_short true; could_not_be_read = failed(result);
+    from / to = the oldest and newest scored chat's date (None if none scored).
+    """
+    read = [r for r in results if not failed(r)]
+    scored = [r for r in read if not r["too_short"]]
     dates = sorted(r["updated_at"][:10] for r in scored)
-    return {
-        "chats_listed": len(results),
-        "chats_scored": len(scored),
-        "chats_too_short": len(results) - len(scored),
-        "date_range": [dates[0], dates[-1]] if dates else None,
-        "coverage": sum(1 for c in capabilities.values() if c["level"] != LEVEL_NOT_SHOWN),
-        "capabilities": capabilities,
-    }
+    out = {"chats_assessed": {"count": len(results), "scored": len(scored), "too_short": len(read) - len(scored),
+                              "could_not_be_read": len(results) - len(read),
+                              "from": dates[0] if dates else None, "to": dates[-1] if dates else None}}
+    out.update(combine([(r["updated_at"], {cap: r["capabilities"][cap]["level"] for cap in CAPABILITIES})
+                        for r in scored]))
+    return out
 
 
 if __name__ == "__main__":
@@ -98,7 +122,7 @@ if __name__ == "__main__":
         print(__doc__)
         sys.exit(2)
     results = json.loads(pathlib.Path(sys.argv[1]).read_text())
-    problems = [f"result {i}: {e}" for i, r in enumerate(results) for e in validate(r)]
+    problems = [f"result {i}: {e}" for i, r in enumerate(results) if not failed(r) for e in validate(r)]
     if problems:
         print("\n".join(problems))
         sys.exit(1)

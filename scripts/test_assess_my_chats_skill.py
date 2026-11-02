@@ -144,8 +144,8 @@ class Aggregation(unittest.TestCase):
         for r in results:
             self.assertEqual(validate(r), [], r["chat_id"])
         out = aggregate(results)
-        self.assertEqual((out["chats_listed"], out["chats_scored"], out["chats_too_short"]), (3, 2, 1))
-        self.assertEqual(out["date_range"], ["2026-10-27", "2026-10-30"])
+        self.assertEqual(out["chats_assessed"], {"count": 3, "scored": 2, "too_short": 1,
+                                                 "could_not_be_read": 0, "from": "2026-10-27", "to": "2026-10-30"})
         self.assertEqual(out["coverage"], 5)
         # pricing (10-27): P3 V4 W4 D4 S4; merge (10-30): P3 V3 W2, D and S not shown.
         expected = {

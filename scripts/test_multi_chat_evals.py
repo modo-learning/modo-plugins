@@ -149,8 +149,8 @@ class Cases(unittest.TestCase):
         # Chats 1, 3, 4, 5 of the list: merge, pricing, offsite, cover letter.
         confirmed = [gen.expected(f) for _, t, _, f in gen.LISTED if t in gen.SCORED_CHATS]
         out = aggregate(confirmed)
-        self.assertEqual((out["chats_listed"], out["chats_scored"], out["chats_too_short"]), (4, 3, 1))
-        self.assertEqual(out["date_range"], ["2026-10-24", "2026-10-30"])
+        self.assertEqual(out["chats_assessed"], {"count": 4, "scored": 3, "too_short": 1,
+                                                 "could_not_be_read": 0, "from": "2026-10-24", "to": "2026-10-30"})
         graders = gen.CASES["chats-scored"]["graders"]
         self.assertIn("Chats: 4 confirmed, 3 scored, 1 too short", graders["chats-line.md"])
         self.assertIn("3 of your chats \\(2026-10-24 to 2026-10-30\\)", graders["opening-line.md"])

@@ -66,9 +66,21 @@ class Counting(unittest.TestCase):
     def test_too_short_chats_are_listed_but_not_scored(self):
         results = [chat(1, 3), chat(2, 4, user_messages=2), chat(3, 3)]
         out = aggregate(results)
-        self.assertEqual((out["chats_listed"], out["chats_scored"], out["chats_too_short"]), (3, 2, 1))
-        self.assertEqual(out["date_range"], ["2026-10-01", "2026-10-03"])
+        self.assertEqual(out["chats_assessed"], {"count": 3, "scored": 2, "too_short": 1, "could_not_be_read": 0,
+                                                 "from": "2026-10-01", "to": "2026-10-03"})
         self.assertEqual(out["capabilities"]["verification"]["chats_shown"], 2)
+
+    def test_failed_reads_count_as_could_not_be_read_not_too_short(self):
+        # What an agent returns when the tool fails or the chat is flagged (brief, step 1).
+        failed = {"chat_id": "c9", "error": "tool error"}
+        out = aggregate([chat(1, 3), failed, chat(2, 4, user_messages=2), None])
+        self.assertEqual(out["chats_assessed"], {"count": 4, "scored": 1, "too_short": 1, "could_not_be_read": 2,
+                                                 "from": "2026-10-01", "to": "2026-10-01"})
+        self.assertEqual(out["capabilities"]["verification"]["level"], 3)
+
+    def test_counts_use_the_records_names(self):
+        from validate_assessment_record import ASSESSED_FIELDS
+        self.assertEqual(set(aggregate([chat(1, 3)])["chats_assessed"]), ASSESSED_FIELDS)
 
     def test_not_shown_anywhere(self):
         out = aggregate([chat(1), chat(2)])
@@ -82,7 +94,8 @@ class Counting(unittest.TestCase):
 
     def test_no_chats(self):
         out = aggregate([])
-        self.assertEqual((out["chats_scored"], out["date_range"], out["coverage"]), (0, None, 0))
+        a = out["chats_assessed"]
+        self.assertEqual((a["scored"], a["from"], a["to"], out["coverage"]), (0, None, None, 0))
 
     def test_lower_median(self):
         self.assertEqual([lower_median(x) for x in ([1], [1, 2], [1, 2, 3], [4, 1, 3, 2])], [1, 1, 2, 2])
