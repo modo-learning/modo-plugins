@@ -245,21 +245,32 @@ assessment as a report, and nothing is written unless they ask.
 as code. When you have a code tool, the runs only note behaviours and the
 script sets every level:
 
-1. In each run, note the behaviours per message, by id and message number, and
-   stop there: don't work out levels yourself.
+1. Do each run **separately**: go through the messages again and write that
+   run's own behaviour list, without copying an earlier run. Note each
+   behaviour as `[message number, id, "the user's exact words that show it"]`
+   and stop there: don't work out levels yourself. Note a behaviour only when
+   the message's own words show it, and code higher tiers only when the words
+   meet that row of the table exactly; when in doubt, use the lower tier.
 2. Write `derive_levels.py` in your code tool from the text you read in this
-   skill's `scripts` folder, exactly as read. A code tool won't find the
-   skill's files on disk; a copy written from the text you read is the script.
-3. Run it with `{"user_messages": <the count from step 1>, "runs": [<run 1>,
-   <run 2>, <run 3>]}`, each run mapping a capability name ("Problem Solving",
+   skill's `scripts` folder, exactly as read, every line. A code tool won't
+   find the skill's files on disk; a copy written from the text you read is
+   the script. Don't shorten or rewrite it.
+3. Run it with `{"user_messages": <the count from step 1>, "messages": [<the
+   user's messages, in order, as in the chat>], "runs": [<run 1>, <run 2>,
+   <run 3>]}`, each run mapping a capability name ("Problem Solving",
    "Verification", "Workflow Design", "Delegation", "Strategic Thinking") to its
-   `[message, id]` pairs. If the output says `"needs_more_runs": true`, do 2
-   more runs and run it again with all 5.
-4. Take every level, confidence, agreement and the coverage line from the
-   output exactly, including "not shown" and "runs disagreed". Never change a
-   level because it looks too high or too low. If the script reports an error,
-   fix the input (an unknown id, a wrong message number) and run it again.
-5. Code D1u for every vague handoff whose result no later message checks, as
+   behaviours. If the output says `"needs_more_runs": true`, do 2 more separate
+   runs and run it again with all 5.
+4. The output must say `"self_check": "passed"`. If it doesn't, or the script
+   fails its self check, your copy is wrong: write the file again exactly and
+   rerun. Never score without a passing self check.
+5. Take every level, confidence, agreement, the coverage line and the runs line
+   (`runs_line`) from the output exactly, including "not shown", "runs
+   disagreed" and "Scored once". Never change a level because it looks too high
+   or too low. Behaviours listed under `dropped` had no exact quote and don't
+   count; don't add them back. If the script reports an error, fix the input and
+   run it again.
+6. Code D1u for every vague handoff whose result no later message checks, as
    the rubric's D1u row says; the script applies the Delegation cap.
 
 Without a code tool, apply the level rule by hand as described above.
