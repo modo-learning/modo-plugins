@@ -66,9 +66,12 @@ Read both in full before step 3.
 ## 0. Can this run here?
 
 This skill needs the past-chat tools `recent_chats` and `read_conversation`,
-which exist only in claude.ai chats (web or desktop).
+which exist only in claude.ai chats (web or desktop). Look for them by their
+names, with or without a prefix (such as `mcp__…__recent_chats`), among your
+tools and the ones a tool search can load. If both are there, go to step 1,
+wherever you are running. Otherwise read nothing:
 
-- **In Claude Code or Cowork**: say in one short message that assessing
+- **Neither tool, in Claude Code or Cowork**: say in one short message that assessing
   several chats works only in a claude.ai chat with chat search on, and that
   /assess-my-ai-work can assess this one session or chat here. Stop.
 - **In claude.ai without those tools**: chat search is off. Say so, and that
