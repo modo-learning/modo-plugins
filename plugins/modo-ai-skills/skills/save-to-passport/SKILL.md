@@ -147,13 +147,13 @@ no arguments, then show what it returned, in plain text:
 ```
 Your Modo passport.
 
-Latest level per capability (rubric v1):
+Latest level per capability (rubric v1.1):
 Problem Solving: Level 4 of 5 (confidence: medium), from 2026-10-20
 ...
 Strategic Thinking: Not shown yet
 
 History (newest first):
-- 2026-10-20, "Q3 pricing analysis for the board" (rubric v1): Problem Solving 4, Verification 4, Workflow Design 2, Delegation 1, Strategic Thinking not shown
+- 2026-10-20, "Q3 pricing analysis for the board" (rubric v1.1): Problem Solving 4, Verification 4, Workflow Design 2, Delegation 1, Strategic Thinking not shown
 ```
 
 Use the five capabilities in rubric order; a capability with no latest level
@@ -166,4 +166,4 @@ an error, say the passport couldn't be read and that they can try again later.
 Every response from this skill, including questions, refusals and the
 passport, ends with this line exactly, on its own line, after everything else:
 
-Self-assessment by Claude using Modo rubric v1 — not verified.
+Self-assessment by Claude using Modo rubric v1.1 — not verified.
