@@ -39,6 +39,8 @@ SCHEMA = pathlib.Path(__file__).resolve().parent / "schemas" / "agent-plugins-1.
 SCHEMA_URL = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
 
 SKILLS = ("assess-my-ai-work", "help-me-improve", "export-assessment", "modo-design")
+# Files only the OpenAI build ships, copied byte for byte from their single source.
+EXTRA = {"skills/assess-my-ai-work/scripts/derive_levels.py": ROOT / "scripts" / "derive_levels.py"}
 SHARED_AS_IS = re.compile(r"^(rubric-v[0-9.]+\.md|RECORD\.md|assessment-record\.schema\.json)$")
 LABEL_FROM = "Self-assessment by Claude using Modo rubric"
 LABEL_TO = "Self-assessment by ChatGPT using Modo rubric"
@@ -145,6 +147,9 @@ def build(out: pathlib.Path, market: pathlib.Path) -> None:
             target = out / rel
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(transform(pathlib.PurePosixPath(*rel.parts[1:]), path.read_bytes()))
+    for rel, source in EXTRA.items():
+        (out / rel).parent.mkdir(parents=True, exist_ok=True)
+        (out / rel).write_bytes(source.read_bytes())
     for patch in OVERLAYS.rglob("*.patch"):
         rel = patch.relative_to(OVERLAYS)
         if rel.parts[0] not in SKILLS or not (SOURCE / "skills" / rel.parent / rel.stem).exists():

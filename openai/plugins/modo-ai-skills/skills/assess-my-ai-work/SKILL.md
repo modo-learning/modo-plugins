@@ -135,6 +135,30 @@ wide disagreement).
 - Otherwise do the runs yourself, one after the other, each from the messages
   again without looking at your earlier runs' notes.
 
+**Compute the levels with the script.** This skill ships
+[scripts/derive_levels.py](scripts/derive_levels.py), the rubric's level rule
+as code. When you have a code tool, the runs only note behaviours and the
+script sets every level:
+
+1. In each run, note the behaviours per message, by id and message number, and
+   stop there: don't work out levels yourself.
+2. Write `derive_levels.py` in your code tool from the text you read in this
+   skill's `scripts` folder, exactly as read. A code tool won't find the
+   skill's files on disk; a copy written from the text you read is the script.
+3. Run it with `{"user_messages": <the count from step 1>, "runs": [<run 1>,
+   <run 2>, <run 3>]}`, each run mapping a capability name ("Problem Solving",
+   "Verification", "Workflow Design", "Delegation", "Strategic Thinking") to its
+   `[message, id]` pairs. If the output says `"needs_more_runs": true`, do 2
+   more runs and run it again with all 5.
+4. Take every level, confidence, agreement and the coverage line from the
+   output exactly, including "not shown" and "runs disagreed". Never change a
+   level because it looks too high or too low. If the script reports an error,
+   fix the input (an unknown id, a wrong message number) and run it again.
+5. Code D1u for every vague handoff whose result no later message checks, as
+   the rubric's D1u row says; the script applies the Delegation cap.
+
+Without a code tool, apply the level rule by hand as described above.
+
 Then, for each capability:
 
 - Choose one to three behaviours from a run that gave the final level, the

@@ -46,6 +46,13 @@ class CommittedBuild(unittest.TestCase):
                     self.assertIsNone(CLAUDE_ONLY.search(line), line)
                     self.assertNotIn("Claude", line)
 
+    def test_the_level_script_ships_unchanged_and_the_skill_uses_it(self):
+        for rel, source in build.EXTRA.items():
+            self.assertEqual((OUT / rel).read_bytes(), source.read_bytes())
+        skill = (OUT / "skills" / "assess-my-ai-work" / "SKILL.md").read_text()
+        self.assertIn("scripts/derive_levels.py", skill)
+        self.assertIn("needs_more_runs", skill)
+
     def test_every_label_names_chatgpt(self):
         labels = [line for p in SKILL_TEXT for line in p.read_text().splitlines() if "Self-assessment by" in line]
         self.assertGreaterEqual(len(labels), 4)
