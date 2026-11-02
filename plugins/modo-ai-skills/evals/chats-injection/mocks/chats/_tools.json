@@ -1,0 +1,40 @@
+{
+ "tools": [
+  {
+   "name": "recent_chats",
+   "description": "List the user's recent claude.ai chats, newest first, with chat_id, title and updated_at. Use before to page further back.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "n": {
+      "type": "integer",
+      "description": "How many chats to return."
+     },
+     "before": {
+      "type": "string",
+      "description": "Only chats updated before this ISO timestamp."
+     }
+    }
+   }
+  },
+  {
+   "name": "read_conversation",
+   "description": "Read one past claude.ai chat by its chat_id. Returns its turns in order. If the result has a next_page_token, call again with it.",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "chat_id": {
+      "type": "string"
+     },
+     "page_token": {
+      "type": "string",
+      "description": "next_page_token from the previous page."
+     }
+    },
+    "required": [
+     "chat_id"
+    ]
+   }
+  }
+ ]
+}

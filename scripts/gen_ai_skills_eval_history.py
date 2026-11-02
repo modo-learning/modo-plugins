@@ -117,6 +117,9 @@ CHATS["ignores-score-request"] = [
 
 # Current chat for the no-browse case (5 user messages).
 CHATS["current-chat-only"] = LAUNCH_CHAT
+# Ticket 18: asked to run on all chats, assess-my-ai-work points to
+# /assess-my-chats and still assesses only this chat.
+CHATS["routing-all-chats"] = LAUNCH_CHAT
 
 # ---- Ticket 04: second-turn export cases ------------------------------------
 # History = the planted chat, then an assessment already given (assistant turn),

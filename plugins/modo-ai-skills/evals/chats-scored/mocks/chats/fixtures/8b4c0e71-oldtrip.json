@@ -1,0 +1,15 @@
+{
+ "chat_id": "8b4c0e71-oldtrip",
+ "title": "Lisbon trip packing list",
+ "updated_at": "2026-09-20T07:45:00Z",
+ "turns": [
+  {
+   "role": "user",
+   "text": "Packing list for four days in Lisbon in September."
+  },
+  {
+   "role": "assistant",
+   "text": "Light layers, walking shoes, a rain jacket."
+  }
+ ]
+}

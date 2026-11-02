@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: routing-all-chats
+description: assess-my-ai-work is asked to run on all chats; says it assesses one chat at a time and that /assess-my-chats does several claude.ai chats, reads nothing else, and assesses only the current chat (5 user messages).
+plugins: ["../.."]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill]

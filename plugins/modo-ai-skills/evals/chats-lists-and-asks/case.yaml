@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: chats-lists-and-asks
+description: "Asked to assess recent chats with chat tools present: lists the 6 titled chats from the last 30 days newest first, counts the untitled and flagged ones as skipped, leaves out the September chat, reads nothing and asks."
+plugins: ["../.."]
+runs: 1
+execution:
+  max_turns: 15
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Agent]

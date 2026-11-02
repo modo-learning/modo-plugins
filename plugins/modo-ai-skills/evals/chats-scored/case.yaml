@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: chats-scored
+description: "Second turn: the user confirms chats 1, 3, 4 and 5. Reads exactly those four, scores 3 (strong pricing chat, weak offsite chat, merge chat with an assessor note), counts the cover letter as too short, gives the chats line, levels and the per-chat table."
+plugins: ["../.."]
+runs: 1
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 40
+  timeout_seconds: 2400
+  allowed_tools: [Read, Glob, Grep, Skill, Agent]
