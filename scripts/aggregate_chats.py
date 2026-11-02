@@ -44,7 +44,7 @@ def lower_median(values):
     return ordered[(len(ordered) - 1) // 2]
 
 
-def _confidence(levels):
+def combined_confidence(levels):
     n, spread = len(levels), max(levels) - min(levels)
     if n >= 3 and spread <= 1:
         return "high"
@@ -53,12 +53,12 @@ def _confidence(levels):
     return "low"
 
 
-def _best(levels):
+def best_shown(levels):
     repeated = [lvl for lvl in set(levels) if levels.count(lvl) >= 2]
     return max(repeated) if repeated else None
 
 
-def _trend(dated):
+def trend(dated):
     if len(dated) < 4:
         return None
     levels = [lvl for _, lvl in sorted(dated, key=lambda d: d[0])]
@@ -78,8 +78,8 @@ def aggregate(results):
             capabilities[cap] = {"level": "not_shown", "confidence": "low", "best_shown": None,
                                  "trend": None, "chats_shown": 0}
             continue
-        capabilities[cap] = {"level": lower_median(levels), "confidence": _confidence(levels),
-                             "best_shown": _best(levels), "trend": _trend(dated),
+        capabilities[cap] = {"level": lower_median(levels), "confidence": combined_confidence(levels),
+                             "best_shown": best_shown(levels), "trend": trend(dated),
                              "chats_shown": len(levels)}
     dates = sorted(r["updated_at"][:10] for r in scored)
     return {
