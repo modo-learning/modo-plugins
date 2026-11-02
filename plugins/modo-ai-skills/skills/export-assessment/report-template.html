@@ -4,7 +4,10 @@
 /* Modo AI Skills assessment report, for the PDF export. Style: the
    modo-design skill (Modo tokens, card layout). Same content and order as the
    Markdown report in SKILL.md step 4: title, date line, label, capability
-   table in rubric order, notes, approved evidence, the record block last. */
+   table in rubric order, notes, approved evidence, the record block last.
+   A multi-chat record ("scope": "multi_chat") adds best shown, trend and
+   chats shown to the table and a "Chats assessed" table before the evidence
+   (proposal, decided 2026-11-02, flag for review: Angelina). */
 /* MODO-TOKENS-START */
 /* Modo design tokens, taken from modo-frontend src/styles/tokens.css (Modo v2:
    navy shell, Modo yellow accent, warm neutral surfaces, Inter). Edit here,
@@ -98,6 +101,9 @@ ul.ev li {
 }
 ul.ev li span { display: block; color: var(--text-muted); font-size: 12px; font-weight: 500; margin-top: 4px; }
 .none { color: var(--text-secondary); margin: 0; }
+/* Multi-chat record (proposal, decided 2026-11-02, flag for review: Angelina). */
+td.num, th.num { text-align: center; font-variant-numeric: tabular-nums; }
+td.trend { white-space: nowrap; }
 pre {
   margin: 0; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--border-default);
   border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 11px; line-height: 1.5;
@@ -122,12 +128,21 @@ pre {
     <p class="label">Self-assessment by Claude using Modo rubric v1.1 — not verified.</p>
     <h2>Capabilities</h2>
     <table>
-      <thead><tr><th>Capability</th><th>Level</th><th>Confidence</th></tr></thead>
+      <thead><tr id="head-row"><th>Capability</th><th>Level</th><th>Confidence</th></tr></thead>
       <tbody id="rows"></tbody>
     </table>
     <div class="notes">
-      <p>Levels run from 1 to 5. "Not shown" means nothing in the chat bears on that capability. Confidence is low, medium or high, as defined in the rubric. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
+      <p id="notes-single">Levels run from 1 to 5. "Not shown" means nothing in the chat bears on that capability. Confidence is low, medium or high, as defined in the rubric. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
+      <p id="notes-multi" hidden>Levels run from 1 to 5. Each level combines the scored chats that show the capability: the middle of their levels, the lower one on a tie. "Best shown" is the highest level reached in at least 2 chats. The trend compares earlier and later chats and needs 4 or more. "Not shown" means no scored chat bears on that capability. Confidence is low, medium or high, by how many chats show the capability and how close their levels are. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
       <p id="ns-note" hidden>Note: for a capability that is not shown, the record gives confidence "low", because no moment in the chat supports a level.</p>
+    </div>
+    <div id="chats-wrap" hidden>
+      <h2>Chats assessed</h2>
+      <table>
+        <thead><tr><th class="num">#</th><th>Chat</th><th>Date</th><th>Result</th><th class="num">P</th><th class="num">V</th><th class="num">W</th><th class="num">D</th><th class="num">S</th></tr></thead>
+        <tbody id="chats"></tbody>
+      </table>
+      <div class="notes"><p>Newest first. P, V, W, D, S: Problem Solving, Verification, Workflow Design, Delegation, Strategic Thinking. A dash means not shown in that chat, or the chat was not scored.</p></div>
     </div>
     <h2>Evidence you approved</h2>
     <div id="evidence"></div>
@@ -162,8 +177,25 @@ pre {
     document.getElementById("t").textContent = "Modo AI Skills assessment: " + rec.session_title;
     document.title = "Modo AI Skills assessment: " + rec.session_title;
   }
-  document.getElementById("date").textContent =
-    "Chat date: " + (rec.session_date || "") + ". Rubric: v1.1. Based on 1 chat.";
+  var multi = rec.scope === "multi_chat";
+  var ARROW = { up: "\u2191", flat: "\u2192", down: "\u2193" };
+  var DASH = "\u2013";
+  var RESULT = { scored: "scored", too_short: "too short", could_not_be_read: "could not be read" };
+  var chats = rec.chats || [];
+  var sum = rec.chats_assessed || {};
+  if (multi) {
+    document.getElementById("date").textContent = "Chats: " + (sum.from === sum.to ? sum.from : sum.from + " to " + sum.to) +
+      ". Rubric: v1.1. Based on " + sum.scored + (sum.scored === 1 ? " chat." : " chats.");
+    var head = document.getElementById("head-row");
+    ["Best shown", "Trend", "Shown in"].forEach(function (h) { head.appendChild(el("th", null, h)); });
+    document.getElementById("notes-single").hidden = true;
+    document.getElementById("notes-multi").hidden = false;
+    document.getElementById("ns-note").textContent =
+      'Note: for a capability that is not shown, the record gives confidence "low", because no scored chat supports a level.';
+  } else {
+    document.getElementById("date").textContent =
+      "Chat date: " + (rec.session_date || "") + ". Rubric: v1.1. Based on 1 chat.";
+  }
 
   var rows = document.getElementById("rows");
   var anyNotShown = false;
@@ -188,16 +220,41 @@ pre {
       tr.appendChild(lv);
       tr.appendChild(el("td", null, c.confidence + " (see note)"));
     }
+    if (multi) {
+      tr.appendChild(el("td", null, c.best_shown ? "Level " + c.best_shown : DASH));
+      tr.appendChild(el("td", "trend", ARROW[c.trend] ? ARROW[c.trend] + " " + c.trend : DASH));
+      tr.appendChild(el("td", null, c.chats_shown + " of " + sum.scored));
+    }
     rows.appendChild(tr);
   });
   document.getElementById("ns-note").hidden = !anyNotShown;
+
+  if (multi) {
+    document.getElementById("chats-wrap").hidden = false;
+    var tbody = document.getElementById("chats");
+    chats.forEach(function (ch, i) {
+      var tr = el("tr");
+      tr.setAttribute("data-chat", String(i + 1));
+      tr.appendChild(el("td", "num", String(i + 1)));
+      tr.appendChild(el("td", null, ch.title));
+      tr.appendChild(el("td", null, ch.date));
+      tr.appendChild(el("td", null, RESULT[ch.result] || ch.result));
+      ORDER.forEach(function (o) {
+        var lv = ch.levels ? ch.levels[o[0]] : null;
+        tr.appendChild(el("td", "num", typeof lv === "number" ? String(lv) : DASH));
+      });
+      tbody.appendChild(tr);
+    });
+  }
 
   var box = document.getElementById("evidence");
   if (rec.evidence && rec.evidence.length) {
     var ul = el("ul", "ev");
     rec.evidence.forEach(function (e) {
       var li = el("li", null, "“" + e.quote + "”");
-      li.appendChild(el("span", null, NAMES[e.capability] || e.capability));
+      var name = NAMES[e.capability] || e.capability;
+      var ch = multi && typeof e.chat === "number" ? chats[e.chat - 1] : null;
+      li.appendChild(el("span", null, ch ? name + " \u00b7 " + ch.title + ", " + ch.date : name));
       ul.appendChild(li);
     });
     box.appendChild(ul);
