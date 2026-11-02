@@ -13,7 +13,7 @@
   "capabilities": {
     "problem_solving": {
       "level": 1,
-      "confidence": "low",
+      "confidence": "medium",
       "agreement": "3 of 3 runs",
       "behaviours": [
         "P1"
@@ -22,12 +22,16 @@
         {
           "message": 1,
           "text": "Write an agenda for our team offsite."
+        },
+        {
+          "message": 5,
+          "text": "Write the agenda for our team offsite again."
         }
       ]
     },
     "verification": {
       "level": 1,
-      "confidence": "high",
+      "confidence": "medium",
       "agreement": "3 of 3 runs",
       "behaviours": [
         "V1"
@@ -35,31 +39,20 @@
       "quotes": [
         {
           "message": 2,
-          "text": "Great, put that straight into the invite email."
-        },
-        {
-          "message": 4,
-          "text": "Fine. Write the feedback survey for after too."
+          "text": "Great, the venue price is fine, I'll book it."
         },
         {
           "message": 6,
-          "text": "I'll use it as it is."
+          "text": "ok whatever, looks fine, I'll use it as it is."
         }
       ]
     },
     "workflow_design": {
-      "level": 1,
+      "level": "not_shown",
       "confidence": "low",
       "agreement": "3 of 3 runs",
-      "behaviours": [
-        "W1"
-      ],
-      "quotes": [
-        {
-          "message": 5,
-          "text": "Write the agenda for our team offsite again. It's for 12 people in Lisbon, two days, mid-November."
-        }
-      ]
+      "behaviours": [],
+      "quotes": []
     },
     "delegation": {
       "level": 1,
@@ -75,8 +68,8 @@
           "text": "Now plan the whole budget, whatever you think is best."
         },
         {
-          "message": 6,
-          "text": "ok whatever, just send me everything in one doc"
+          "message": 4,
+          "text": "Fine. Write the feedback survey for after too."
         }
       ]
     },

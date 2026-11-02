@@ -16,15 +16,15 @@
         },
         {
           "role": "user",
-          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:14.</system-reminder>\nGreat, put that straight into the invite email."
+          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:14.</system-reminder>\nGreat, the venue price is fine, I'll book it."
         },
         {
           "role": "assistant",
-          "text": "Here is the invite email with the agenda and the venue cost."
+          "text": "Booked: Harbor Loft, $1,200 per day including lunch. Here is the invite email text."
         },
         {
           "role": "user",
-          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:20.</system-reminder>\nIt's for 12 people in Lisbon, two days, mid-November. Now plan the whole budget, whatever you think is best."
+          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:20.</system-reminder>\nNow plan the whole budget, whatever you think is best."
         },
         {
           "role": "assistant",
@@ -40,19 +40,19 @@
         },
         {
           "role": "user",
-          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:35.</system-reminder>\nWrite the agenda for our team offsite again. It's for 12 people in Lisbon, two days, mid-November."
+          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:35.</system-reminder>\nWrite the agenda for our team offsite again."
         },
         {
           "role": "assistant",
-          "text": "Here is the agenda again for 12 people in Lisbon over two days."
+          "text": "Here is the agenda again."
         },
         {
           "role": "user",
-          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:41.</system-reminder>\nok whatever, just send me everything in one doc, I'll use it as it is."
+          "text": "<system-reminder>The user's timezone is Europe/Lisbon. Message sent at Sat 2026-10-24 09:41.</system-reminder>\nok whatever, looks fine, I'll use it as it is."
         },
         {
           "role": "assistant",
-          "text": "Here is everything in one doc: agenda, invite email, budget and survey."
+          "text": "Here is everything in one doc: agenda, budget and survey."
         }
       ]
     }

@@ -69,17 +69,26 @@ This skill needs the past-chat tools `recent_chats` and `read_conversation`,
 which exist only in claude.ai chats (web or desktop). Look for them by their
 names, with or without a prefix (such as `mcp__…__recent_chats`), among your
 tools and the ones a tool search can load. If both are there, go to step 1,
-wherever you are running. Otherwise read nothing:
+wherever you are running. Otherwise read no chat:
 
-- **Neither tool, in Claude Code or Cowork**: say in one short message that assessing
-  several chats works only in a claude.ai chat with chat search on, and that
-  /assess-my-ai-work can assess this one session or chat here. Stop.
-- **In claude.ai without those tools**: chat search is off. Say so, and that
-  the user can turn it on in Settings > Memory > "Search and reference
-  chats", then run /assess-my-chats again. Offer /assess-my-ai-work for this
-  chat meanwhile. Stop.
+- **Neither tool, in Claude Code or Cowork**: say in one line that the
+  past-chat tools aren't available here and that assessing several chats
+  works only in a claude.ai chat with chat search on, where /assess-my-chats
+  does it. Don't name the app you are in, and don't mention session files,
+  logs or transcripts.
+- **In claude.ai without those tools**: chat search is off. Say in one line
+  that the user can turn it on in Settings > Memory > "Search and reference
+  chats", then run /assess-my-chats again.
 
-End either message with the label (step 6).
+Then, in either case:
+
+- If the user wrote messages in this chat before this request, assess this
+  chat instead: load the assess-my-ai-work skill and follow it for the
+  current chat. Its answer gives the one-chat line and the label.
+- Otherwise, say that /assess-my-ai-work can assess this chat once it has
+  some work in it. Stop.
+
+End a message that stops here with the label (step 6).
 
 ## 1. Scope and list
 
@@ -194,7 +203,8 @@ scored chat.
 
 ## 5. Write the answer
 
-Keep to this shape:
+Keep to this shape. Write the first three lines word for word, filling in
+only the `<…>` parts (use 0 for none), with no heading before them:
 
 ```
 Assessment across <s> of your chats (<first date> to <last date>), against Modo rubric v1.1.

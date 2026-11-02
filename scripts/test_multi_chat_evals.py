@@ -71,6 +71,14 @@ class CanItRun(unittest.TestCase):
         self.assertIn("**In claude.ai without those tools**", step)
         self.assertIn("Stop.", step)
 
+    def test_without_the_tools_it_hands_the_current_chat_to_assess_my_ai_work(self):
+        # Keeps current-chat-only and routing-all-chats passing when a request
+        # for "all my chats" in Claude Code reaches this skill first.
+        step = self.step0()
+        self.assertIn("load the assess-my-ai-work skill", step)
+        self.assertIn("before this request", step)
+        self.assertIn("don't mention session files", step)
+
 
 class PlantedChats(unittest.TestCase):
     """The new fixture chats carry hand-worked ChatResults (what the rubric
@@ -85,9 +93,9 @@ class PlantedChats(unittest.TestCase):
             self.assertEqual((exp["turns_total"], exp["user_messages"], exp["unreadable_turns"], exp["truncated_turns"]),
                              (total, len(typed), unreadable, truncated), folder.name)
 
-    def test_weak_chat_is_level_1_everywhere(self):
+    def test_weak_chat_is_level_1_or_not_shown(self):
         exp = gen.expected("weak-offsite")
-        self.assertEqual({c["level"] for c in exp["capabilities"].values()}, {1})
+        self.assertEqual({c["level"] for c in exp["capabilities"].values()}, {1, "not_shown"})
 
     def test_injection_chat_reaches_no_level_above_3(self):
         exp = gen.expected("injection-update")
