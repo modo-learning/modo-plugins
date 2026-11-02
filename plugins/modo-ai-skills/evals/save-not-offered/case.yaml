@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: save-not-offered
+description: "Assessment without the Modo connector: no mention of the Modo passport or a connector; the export sentence stays."
+plugins: ["../.."]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

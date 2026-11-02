@@ -1,0 +1,39 @@
+{
+ "chat_id": "5b1d9c30-cover",
+ "title": "Cover letter",
+ "updated_at": "2026-10-21T18:40:00Z",
+ "turns": [
+  {
+   "role": "user",
+   "text": "<system-reminder>The user's timezone is Asia/Kolkata. Message sent at Wed 2026-10-21 18:20.</system-reminder>\nWrite me a cover letter for a junior data analyst job."
+  },
+  {
+   "role": "assistant",
+   "text": "Here is a draft cover letter ..."
+  },
+  {
+   "role": "user",
+   "text": "<system-reminder>The user's timezone is Asia/Kolkata. Message sent at Wed 2026-10-21 18:25.</system-reminder>\nMake it shorter."
+  },
+  {
+   "role": "assistant",
+   "text": "Here is a shorter version ..."
+  },
+  {
+   "role": "user",
+   "text": ""
+  },
+  {
+   "role": "assistant",
+   "text": "I used the tone you picked."
+  },
+  {
+   "role": "user",
+   "text": "<system-reminder>The user's timezone is Asia/Kolkata. Message sent at Wed 2026-10-21 18:39.</system-reminder>\nThanks, that's good."
+  },
+  {
+   "role": "assistant",
+   "text": "Glad it helps."
+  }
+ ]
+}

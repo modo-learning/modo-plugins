@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/modo-learning/modo-plugins/plugins/modo-ai-skills/skills/assess-my-chats/chat-result.schema.json",
+  "title": "Modo AI Skills ChatResult",
+  "description": "What one chat agent in assess-my-chats returns for one past chat (chat-agent-brief.md, step 4). Rules a schema cannot express: too_short is true exactly when user_messages is under 4, and then runs is 0, run_kind is \"none\" and every capability is not_shown with agreement \"\"; otherwise runs is 3 or 5 and matches the n in agreement; \"runs disagreed\" means not_shown; behaviour ids belong to their own capability (P, V, W, D, S); a shown capability has 1 to 3 quotes and a not_shown one has none; a quote's message is at most user_messages and its text is a word-for-word excerpt of that message. The ChatResult validator in the modo-plugins repo checks all of these and is authoritative. An agent that cannot read its chat returns {\"chat_id\": ..., \"error\": ...} instead, which is not a ChatResult.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["chat_id", "title", "updated_at", "turns_total", "user_messages", "unreadable_turns",
+               "attachments_seen", "truncated_turns", "too_short", "runs", "run_kind", "capabilities"],
+  "properties": {
+    "chat_id": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "title": { "type": "string" },
+    "updated_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}" },
+    "turns_total": { "type": "integer", "minimum": 0 },
+    "user_messages": { "type": "integer", "minimum": 0 },
+    "unreadable_turns": { "type": "integer", "minimum": 0 },
+    "attachments_seen": { "type": "boolean" },
+    "truncated_turns": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+    "too_short": { "type": "boolean" },
+    "runs": { "enum": [0, 3, 5] },
+    "run_kind": { "enum": ["subagents", "one_response", "none"] },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking"],
+      "properties": {
+        "problem_solving": { "$ref": "#/$defs/capability" },
+        "verification": { "$ref": "#/$defs/capability" },
+        "workflow_design": { "$ref": "#/$defs/capability" },
+        "delegation": { "$ref": "#/$defs/capability" },
+        "strategic_thinking": { "$ref": "#/$defs/capability" }
+      }
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "confidence", "agreement", "behaviours", "quotes"],
+      "properties": {
+        "level": { "oneOf": [{ "type": "integer", "minimum": 1, "maximum": 5 }, { "const": "not_shown" }] },
+        "confidence": { "enum": ["low", "medium", "high"] },
+        "agreement": { "type": "string", "pattern": "^([1-5]) of ([35]) runs$|^runs disagreed$|^$" },
+        "behaviours": { "type": "array", "maxItems": 3,
+                        "items": { "type": "string", "pattern": "^[PVWDS][1-5][a-z]?$" } },
+        "quotes": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/quote" } }
+      }
+    },
+    "quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["message", "text"],
+      "properties": {
+        "message": { "type": "integer", "minimum": 1 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "\\S" }
+      }
+    }
+  }
+}

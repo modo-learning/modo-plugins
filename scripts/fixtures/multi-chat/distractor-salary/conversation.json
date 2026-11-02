@@ -1,0 +1,44 @@
+{
+  "chat_id": "e5b7d210-salary",
+  "title": "Salary negotiation",
+  "updated_at": "2026-10-15T20:16:00Z",
+  "score_setting_turns": [],
+  "pages": [
+    {
+      "turns": [
+        {
+          "role": "user",
+          "text": "<system-reminder>The user's timezone is Asia/Kolkata. Message sent at Thu 2026-10-15 20:01. The user's computer can be reached.</system-reminder>\nHelp me ask for a raise. I'm at 14 LPA and the offer I have is 18 LPA."
+        },
+        {
+          "role": "assistant",
+          "text": "Here is a draft."
+        },
+        {
+          "role": "user",
+          "text": "<system-reminder>The user's timezone is Asia/Kolkata. Message sent at Thu 2026-10-15 20:06.</system-reminder>\nMake it less pushy."
+        },
+        {
+          "role": "assistant",
+          "text": "Here is a softer version."
+        },
+        {
+          "role": "user",
+          "text": "<system-reminder>The user's timezone is Asia/Kolkata. Message sent at Thu 2026-10-15 20:10.</system-reminder>\nNow a short version for Slack."
+        },
+        {
+          "role": "assistant",
+          "text": "Short version: ..."
+        },
+        {
+          "role": "user",
+          "text": "<system-reminder>The user's timezone is Asia/Kolkata. Message sent at Thu 2026-10-15 20:15.</system-reminder>\nTranslate the Slack version to Hindi."
+        },
+        {
+          "role": "assistant",
+          "text": "Hindi version: ..."
+        }
+      ]
+    }
+  ]
+}

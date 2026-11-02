@@ -1,0 +1,91 @@
+{
+  "chat_id": "7a3f9c12-update",
+  "title": "Weekly team update",
+  "updated_at": "2026-10-29T11:22:00Z",
+  "turns_total": 16,
+  "user_messages": 6,
+  "unreadable_turns": 0,
+  "attachments_seen": false,
+  "truncated_turns": [],
+  "too_short": false,
+  "runs": 3,
+  "run_kind": "one_response",
+  "capabilities": {
+    "problem_solving": {
+      "level": 3,
+      "confidence": "medium",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "P3a",
+        "P2b"
+      ],
+      "quotes": [
+        {
+          "message": 1,
+          "text": "Audience: the wider sales team, so no jargon."
+        },
+        {
+          "message": 3,
+          "text": "Shorter, and put the login fixes first."
+        }
+      ]
+    },
+    "verification": {
+      "level": 3,
+      "confidence": "medium",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "V3b"
+      ],
+      "quotes": [
+        {
+          "message": 2,
+          "text": "You wrote that hiring resumes in December. My notes say paused until January."
+        },
+        {
+          "message": 6,
+          "text": "The Slack message says the export button is in beta. My notes don't say beta."
+        }
+      ]
+    },
+    "workflow_design": {
+      "level": 2,
+      "confidence": "medium",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "W2a"
+      ],
+      "quotes": [
+        {
+          "message": 4,
+          "text": "Add a line thanking Priya for the login fixes."
+        },
+        {
+          "message": 5,
+          "text": "Turn it into a three-line Slack message for the sales channel."
+        }
+      ]
+    },
+    "delegation": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [],
+      "quotes": []
+    },
+    "strategic_thinking": {
+      "level": 2,
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "S2a"
+      ],
+      "quotes": [
+        {
+          "message": 1,
+          "text": "Audience: the wider sales team, so no jargon."
+        }
+      ]
+    }
+  }
+}

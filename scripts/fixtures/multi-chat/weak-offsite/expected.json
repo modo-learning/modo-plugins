@@ -1,0 +1,91 @@
+{
+  "chat_id": "4d2e81b7-offsite",
+  "title": "Team offsite agenda",
+  "updated_at": "2026-10-24T09:42:00Z",
+  "turns_total": 12,
+  "user_messages": 6,
+  "unreadable_turns": 0,
+  "attachments_seen": false,
+  "truncated_turns": [],
+  "too_short": false,
+  "runs": 3,
+  "run_kind": "one_response",
+  "capabilities": {
+    "problem_solving": {
+      "level": 1,
+      "confidence": "medium",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "P1"
+      ],
+      "quotes": [
+        {
+          "message": 1,
+          "text": "Write an agenda for our team offsite."
+        },
+        {
+          "message": 5,
+          "text": "Write the agenda for our team offsite again."
+        }
+      ]
+    },
+    "verification": {
+      "level": 1,
+      "confidence": "medium",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "V1"
+      ],
+      "quotes": [
+        {
+          "message": 2,
+          "text": "Great, the venue price is fine, I'll book it."
+        },
+        {
+          "message": 6,
+          "text": "ok whatever, looks fine, I'll use it as it is."
+        }
+      ]
+    },
+    "workflow_design": {
+      "level": "not_shown",
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [],
+      "quotes": []
+    },
+    "delegation": {
+      "level": 1,
+      "confidence": "medium",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "D1u",
+        "D1"
+      ],
+      "quotes": [
+        {
+          "message": 3,
+          "text": "Now plan the whole budget, whatever you think is best."
+        },
+        {
+          "message": 4,
+          "text": "Fine. Write the feedback survey for after too."
+        }
+      ]
+    },
+    "strategic_thinking": {
+      "level": 1,
+      "confidence": "low",
+      "agreement": "3 of 3 runs",
+      "behaviours": [
+        "S1"
+      ],
+      "quotes": [
+        {
+          "message": 3,
+          "text": "whatever you think is best"
+        }
+      ]
+    }
+  }
+}

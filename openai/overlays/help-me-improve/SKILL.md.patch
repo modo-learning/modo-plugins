@@ -1,0 +1,45 @@
+ChatGPT/Codex changes to skills/help-me-improve/SKILL.md.
+Each FIND must appear exactly once in the Claude source; the build fails otherwise.
+
+<<<<<<< FIND
+Use when the user runs /help-me-improve, or asks how to get better
+=======
+Use when the user picks help-me-improve, or asks how to get better
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+that capability's behaviour table (its id and tier). No generic tips ("double-check everything",
+"be clearer").
+=======
+that capability's behaviour table (its id and tier). No generic tips ("double-check everything",
+"be clearer"). The rubric was first written for Claude: wherever it says
+"Claude", read "the AI assistant" (here, ChatGPT).
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+Try this next time: "<a prompt to paste to Claude, ready as it stands>"
+```
+
+- The prompt is written to Claude, in full sentences. If you know the user's
+=======
+Try this next time: "<a prompt to paste to ChatGPT, ready as it stands>"
+```
+
+- The prompt is written to ChatGPT, in full sentences. If you know the user's
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  1. A tool that proposes a skill for the user to save (claude.ai shows it as
+     a "Save skill" card). The user still decides by saving or dismissing it.
+  2. A skill-creator skill: hand it the technique and prompts.
+  3. Otherwise write the complete skill here in the chat: a front matter
+     block with `name` (lowercase, hyphens) and a `description` saying when
+     to use it, then the instructions. Tell them to save it as a skill from
+     Claude's skills settings.
+=======
+  1. A skill-creator skill: hand it the technique and prompts.
+  2. Otherwise write the complete skill here in the chat: a `SKILL.md` with a
+     front matter block holding `name` (lowercase, hyphens) and a
+     `description` saying when to use it, then the instructions. Tell them
+     they can add it as a skill in ChatGPT where their plan offers skills.
+>>>>>>> REPLACE
