@@ -1,0 +1,92 @@
+"""python3 -m unittest scripts/test_aggregate_chats.py
+
+The worked examples below are the table to show when the rules are reviewed:
+each row is per-chat levels (oldest first) -> level, best, confidence, trend.
+"""
+
+import pathlib
+import sys
+import unittest
+
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from aggregate_chats import aggregate, lower_median  # noqa: E402
+from validate_chat_result import CAPABILITIES, validate  # noqa: E402
+
+
+def chat(day, verification="not_shown", user_messages=6):
+    too_short = user_messages < 4
+    caps = {}
+    for cap in CAPABILITIES:
+        level = verification if cap == "verification" and not too_short else "not_shown"
+        shown = level != "not_shown"
+        caps[cap] = {"level": level, "confidence": "medium" if shown else "low",
+                     "agreement": "" if too_short else "3 of 3 runs",
+                     "behaviours": [f"V{level}a"] if shown and level != 1 else (["V1"] if shown else []),
+                     "quotes": [{"message": 1, "text": "check it"}] if shown else []}
+    return {"chat_id": f"c{day}", "title": f"chat {day}", "updated_at": f"2026-10-{day:02d}T10:00:00Z",
+            "turns_total": user_messages * 2, "user_messages": user_messages, "unreadable_turns": 0,
+            "attachments_seen": False, "truncated_turns": [], "too_short": too_short,
+            "runs": 0 if too_short else 3, "run_kind": "none" if too_short else "one_response",
+            "capabilities": caps}
+
+
+# levels oldest first -> (level, best_shown, confidence, trend)
+WORKED = [
+    ([3], (3, None, "low", None)),
+    ([3, 4], (3, None, "medium", None)),
+    ([2, 4], (2, None, "low", None)),
+    ([3, 3, 4], (3, 3, "high", None)),
+    ([2, 3, 4], (3, None, "medium", None)),
+    ([1, 3, 5], (3, None, "low", None)),
+    ([2, 2, 4, 4], (2, 4, "medium", "up")),
+    ([4, 4, 3, 3], (3, 4, "high", "down")),
+    ([3, 3, 3, 3, 3], (3, 3, "high", "flat")),
+    ([2, 3, 5, 4, 4], (4, 4, "low", "up")),
+]
+
+
+class WorkedExamples(unittest.TestCase):
+    def test_the_worked_examples_table(self):
+        for levels, (level, best, confidence, trend) in WORKED:
+            with self.subTest(levels=levels):
+                results = [chat(i + 1, lvl) for i, lvl in enumerate(levels)]
+                for r in results:
+                    self.assertEqual(validate(r), [])
+                v = aggregate(results)["capabilities"]["verification"]
+                self.assertEqual((v["level"], v["best_shown"], v["confidence"], v["trend"]),
+                                 (level, best, confidence, trend))
+                self.assertEqual(v["chats_shown"], len(levels))
+
+    def test_trend_uses_dates_not_list_order(self):
+        results = [chat(20, 4), chat(1, 2), chat(25, 4), chat(5, 2)]
+        self.assertEqual(aggregate(results)["capabilities"]["verification"]["trend"], "up")
+
+
+class Counting(unittest.TestCase):
+    def test_too_short_chats_are_listed_but_not_scored(self):
+        results = [chat(1, 3), chat(2, 4, user_messages=2), chat(3, 3)]
+        out = aggregate(results)
+        self.assertEqual((out["chats_listed"], out["chats_scored"], out["chats_too_short"]), (3, 2, 1))
+        self.assertEqual(out["date_range"], ["2026-10-01", "2026-10-03"])
+        self.assertEqual(out["capabilities"]["verification"]["chats_shown"], 2)
+
+    def test_not_shown_anywhere(self):
+        out = aggregate([chat(1), chat(2)])
+        self.assertEqual(out["capabilities"]["verification"],
+                         {"level": "not_shown", "confidence": "low", "best_shown": None, "trend": None,
+                          "chats_shown": 0})
+        self.assertEqual(out["coverage"], 0)
+
+    def test_coverage_counts_capabilities_shown_at_least_once(self):
+        self.assertEqual(aggregate([chat(1, 3), chat(2)])["coverage"], 1)
+
+    def test_no_chats(self):
+        out = aggregate([])
+        self.assertEqual((out["chats_scored"], out["date_range"], out["coverage"]), (0, None, 0))
+
+    def test_lower_median(self):
+        self.assertEqual([lower_median(x) for x in ([1], [1, 2], [1, 2, 3], [4, 1, 3, 2])], [1, 1, 2, 2])
+
+
+if __name__ == "__main__":
+    unittest.main()
