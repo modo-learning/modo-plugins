@@ -1,0 +1,76 @@
+ChatGPT/Codex changes to skills/export-assessment/SKILL.md.
+
+Each FIND must appear exactly once in the Claude source; the build fails otherwise.
+
+<<<<<<< FIND
+Use when the user runs /export-assessment, or asks to export, save, download or keep their assessment or report, to get it as Markdown or a PDF, or to upload it to Modo. Saving to the Modo passport through the Modo connector is the save-to-passport skill, not this one."
+=======
+Use when the user picks export-assessment, or asks to export, save, download or keep their assessment or report, to get it as Markdown or a PDF, or to upload it to Modo."
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+**Read RECORD.md in full before you build anything.** Follow its fields and
+limits exactly.
+=======
+**Read RECORD.md in full before you build anything.** Follow its fields and
+limits exactly. RECORD.md was first written for Claude and also describes a
+Modo connector that this version doesn't have: wherever it says "Claude", read
+"the AI assistant", and ignore its parts about saving through the connector.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  notes, no improvements or prompts from the assessment, nothing from Claude's
+  replies.
+=======
+  notes, no improvements or prompts from the assessment, nothing from the
+  assistant's replies.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  capability, and never a quote from Claude's replies.
+=======
+  capability, and never a quote from the assistant's replies.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+file-creation tool). Reading and searching tools don't count. If you are not
+=======
+file-creation tool, or a code tool that can create a file the user downloads).
+Reading and searching tools don't count. If you are not
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+- **You can create files here.** "This is exactly what would be saved as
+  `modo-assessment-<session_date>.md` in the current folder. Say 'save it' (or
+  give another name or place) and I will; nothing is written until then."
+  Create the file, with exactly the text shown, only after the user says so.
+  Then say the path. Don't save anywhere else and don't save a second copy.
+=======
+- **You can create files here.** "This is exactly what would be saved as
+  `modo-assessment-<session_date>.md`. Say 'save it' (or give another name)
+  and I will; nothing is written until then." Create the file, with exactly
+  the text shown, only after the user says so. Then give its download link or
+  path. Don't save anywhere else and don't save a second copy.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+Then create the PDF with whatever file creation you have in this session and
+the user's approval. Say where it is.
+=======
+Then create the PDF with whatever file creation you have in this session (in
+ChatGPT, usually its code tool) and the user's approval. Give the download link
+or say where it is.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+If you have no way to create a PDF in this session, say so in one line *before*
+the report (so the record block stays last), don't claim that a PDF exists,
+don't describe a tool you don't have, and give the Markdown report as the
+export.
+=======
+If you have no way to create a PDF in this session, say so in one line *before*
+the report (so the record block stays last), don't claim that a PDF exists,
+don't describe a tool you don't have, and give the Markdown report as the
+export. In that same line, say they can still get a PDF by copying the report
+into a document and using Print, then Save as PDF.
+>>>>>>> REPLACE

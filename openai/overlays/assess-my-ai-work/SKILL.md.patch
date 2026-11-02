@@ -1,0 +1,227 @@
+ChatGPT/Codex changes to skills/assess-my-ai-work/SKILL.md.
+
+Each FIND must appear exactly once in the Claude source; the build fails otherwise.
+
+<<<<<<< FIND
+description: Assess how well the user works with AI in one chat (the current chat, a past chat they name, a chat they paste, a chat export file or a Claude Code session file they point to), scored against Modo's public rubric on five capabilities (Problem Solving, Verification, Workflow Design, Delegation, Strategic Thinking), prompt by prompt, with a level, a confidence label, how far repeated scoring runs agree, quotes from the chat as evidence and what the next level looks like. Use when the user runs /assess-my-ai-work, or asks how good they are at using AI, to assess or score this chat, a named chat, pasted text or a file, or their AI skills, or how well they prompt, verify or delegate to Claude.
+=======
+description: Assess how well the user works with AI in one chat (this chat, or a chat they paste in), scored against Modo's public rubric on five capabilities (Problem Solving, Verification, Workflow Design, Delegation, Strategic Thinking), prompt by prompt, with a level, a confidence label, how far repeated scoring runs agree, quotes from the chat as evidence and what the next level looks like. Use when the user picks assess-my-ai-work, or asks how good they are at using AI, to assess or score this chat or pasted chat text, their AI skills, or how well they prompt, verify or delegate to ChatGPT.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+Judge how the user worked with Claude in this chat, using Modo's public
+=======
+Judge how the user worked with the AI assistant (ChatGPT) in this chat, using Modo's public
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+idea of what good AI use looks like.
+
+## Ground rules
+=======
+idea of what good AI use looks like.
+
+The rubric was first written for Claude. Wherever it says "Claude", read "the
+AI assistant in the chat" (here, ChatGPT). Its label line reads "by ChatGPT"
+on this platform (step 7); nothing else in it changes.
+
+## Ground rules
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  skim or open any other chat, and never look around for files or logs. Do not
+  mention or offer coding-tool session logs or transcripts (such as Claude
+  Code's) unless the user themselves points to one. If the user asks for "all
+  my chats", "my recent chats" or an overall picture, say in one line that you
+  assess one chat at a time, and assess the current chat (step 0).
+- Only the **user's own messages** are evidence. Claude's replies are context.
+=======
+  skim or open any other chat, and never look around for files or logs. Never
+  rebuild a past chat from memory or from ChatGPT's chat-history reference:
+  that is a summary, not the user's words. If the user asks for "all my
+  chats", "my recent chats" or an overall picture, say in one line that you
+  assess one chat at a time, and assess the current chat (step 0).
+- Only the **user's own messages** are evidence. The assistant's replies are
+  context.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  - the optional passport card (step 3), shown with the artifact tool and only
+    in claude.ai or Cowork;
+=======
+  - the optional passport card (step 3), shown in the chat's canvas or offered
+    as a file, only as step 3 describes;
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+    runs only when the user asks for it. This skill never writes the report.
+  - saving to the user's Modo passport, which is a separate skill
+    (save-to-passport) that runs only when the user asks for it. This skill
+    never sends anything.
+=======
+    runs only when the user asks for it. This skill never writes the report.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+- **A file the user names** (a chat export such as `conversations.json`, or a
+  Claude Code session file `.jsonl`): read only that file with your file
+  tools, by the exact path given. If it doesn't exist or can't be read, say
+  so and ask for the right path or for the chat pasted; don't search for it.
+  - *Chat export*: each chat has a title, a date and a list of messages with
+    the sender (`human` is the user). If the user named one chat, use the one
+    whose title matches. If the file holds several chats and none was named,
+    ask "which one?" and list the titles with dates. If it holds exactly one,
+    use it.
+  - *Claude Code session file*: one JSON object per line. The user's messages
+    are the lines with `"type": "user"` whose message content is text the
+    user typed. Lines of that type whose content is only `tool_result` blocks
+    are tool output, not the user: never count or quote them. Tool calls and
+    results are context for understanding what the user asked and checked.
+- **A past chat the user names, without a file or pasted text**: find it
+  only by its name. Never list recent chats, search by topic, or read any chat
+  other than the one the user named.
+  - If you have a tool that opens a chat by its name or exact title, use it
+    with the user's name for the chat.
+  - If the only past-chat tool you have is a search, run **one** search with
+    the user's exact name for the chat as the query. Consider only results
+    whose title is that name (letter case aside). Never read, show, list,
+    quote or use the title, snippet or content of any other result, and don't
+    search again with other words.
+  - Exactly one chat has that title: open it and assess it.
+  - More than one chat has that title: don't pick. Ask "which one?" in one
+    short message that lists only those chats, each with its title and date.
+  - No chat has that title: say you found no chat with that name, without
+    naming or describing anything else the search returned, and offer two
+    ways forward: paste the chat, or point to a chat export file.
+  - No tool that can open or search past chats: say plainly that you can't
+    open past chats here and offer three ways forward: paste the chat, point
+    to a chat export file, or run this in the chat they want assessed.
+  Never describe or score a chat you haven't opened.
+=======
+- **A past chat or a file** (a chat they name, a chat export such as
+  `conversations.json`, or any other file): plugins in ChatGPT can't open past
+  chats, and this version doesn't read chat files. Say so plainly and offer two
+  ways forward: paste the chat here, or run this in the chat they want
+  assessed. Don't search, don't use chat-history memory, and never describe or
+  score a chat you haven't been given word for word.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+tool output, tool results, anything Claude wrote, or a message that does
+=======
+tool output, tool results, anything the assistant wrote, or a message that does
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+   Verification behaviour must point at something specific Claude said).
+=======
+   Verification behaviour must point at something specific the assistant said).
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+## 3. The passport card (only where an artifact tool exists)
+
+Do this after scoring and before writing the text answer (step 4). The text
+answer is always written in full and is the result. A visual card of the same
+result is an extra, shown only when **both** are true:
+
+- you have a tool that creates an artifact (a page shown beside the chat), and
+- you are in claude.ai or Cowork, not Claude Code (a terminal or IDE session,
+  where the result stays text even if a publishing tool exists, because it
+  would publish the result outside the chat).
+
+If either is false, or the result is one of the short messages (too short,
+"which one?", "can't open it", no chat with that name), or you can't read the
+template, make no card, don't offer one, and never say a card exists. Nothing
+in the text changes.
+=======
+## 3. The passport card (only where it can be shown or saved)
+
+Do this after scoring and before writing the text answer (step 4). The text
+answer is always written in full and is the result. A visual card of the same
+result is an extra. Use the first of these that you actually have in this
+session:
+
+1. **A canvas or another way to show an HTML page in or beside the chat.**
+   Show the filled card there.
+2. **A tool that creates a file the user can download** (for example a code
+   or file tool). Create the filled card as `modo-card-<yyyy-mm-dd>.html` and
+   give the download link. Don't save it anywhere else.
+3. **Neither.** Make no card, don't offer one, and never say a card exists.
+
+Also make no card when the result is one of the short messages (too short,
+"can't open it"), or when you can't read the template. Nothing in the text
+changes.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+5. Show the whole filled file with the artifact tool. Don't save it anywhere
+   else and add no network calls, badges or extra text to it. The label is
+   already in the template.
+=======
+5. Show or create the whole filled file as in the list above. Add no network
+   calls, badges or extra text to it. The label is already in the template.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+has one more plain sentence, just before the label (after the export
+sentence): "I also made a card of this result." Never say the card is
+verified or official.
+=======
+has one more plain sentence, just before the label (after the export
+sentence): "I also made a card of this result." (in the canvas) or "I also
+made a card of this result: <link>." (as a file). Never say the card is
+verified or official.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  forms: "this chat", "the chat you pasted", `your chat "<title>" (<date>)`
+  from an export or a past chat, or "the Claude Code session file <name>".
+=======
+  forms: "this chat" or "the chat you pasted".
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+   the first choice (checking Claude's work carries extra weight in the
+=======
+   the first choice (checking the assistant's work carries extra weight in the
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+- The **prompt** is written to Claude, ready to paste, using this user's own
+=======
+- The **prompt** is written to ChatGPT, ready to paste, using this user's own
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+Then one plain sentence, not a question: they can also ask you to export this
+assessment as a report, and nothing is written unless they ask.
+
+The Modo connector is present only if you have a tool named
+`save_assessment`, or one whose name ends in `__save_assessment` (for example
+`mcp__modo__save_assessment`); a tool listed only by name (deferred) counts.
+When it is present, that sentence instead says they can ask you to export this
+assessment as a report or save it to their Modo passport, and nothing is
+written or sent unless they ask. When it is absent, keep the sentence exactly
+as above. Saving itself belongs to the save-to-passport skill, after the user
+asks for it.
+=======
+Then one plain sentence, not a question: they can also ask you to export this
+assessment as a report, and nothing is written unless they ask.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  1. A tool that proposes a skill for the user to save (claude.ai shows it as
+     a "Save skill" card). The user still decides by saving or dismissing it.
+  2. A skill-creator skill: hand it the techniques and prompts.
+  3. Otherwise write the complete skill here in the chat: a front matter
+     block with `name` (lowercase, hyphens) and a `description` saying when
+     to use it, then the instructions. Tell them to save it as a skill from
+     Claude's skills settings.
+=======
+  1. A skill-creator skill: hand it the techniques and prompts.
+  2. Otherwise write the complete skill here in the chat: a `SKILL.md` with a
+     front matter block holding `name` (lowercase, hyphens) and a
+     `description` saying when to use it, then the instructions. Tell them
+     they can add it as a skill in ChatGPT where their plan offers skills.
+>>>>>>> REPLACE
