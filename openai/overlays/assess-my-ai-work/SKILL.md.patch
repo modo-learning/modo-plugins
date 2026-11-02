@@ -33,7 +33,9 @@ on this platform (step 7); nothing else in it changes.
   mention or offer coding-tool session logs or transcripts (such as Claude
   Code's) unless the user themselves points to one. If the user asks for "all
   my chats", "my recent chats" or an overall picture, say in one line that you
-  assess one chat at a time, and assess the current chat (step 0).
+  assess one chat at a time and that /assess-my-chats assesses several
+  claude.ai chats at once, read nothing for it, and assess the current chat
+  (step 0).
 - Only the **user's own messages** are evidence. Claude's replies are context.
 =======
   skim or open any other chat, and never look around for files or logs. Never
@@ -274,4 +276,13 @@ script sets every level:
    the rubric's D1u row says; the script applies the Delegation cap.
 
 Without a code tool, apply the level rule by hand as described above.
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  4. the one-chat line ("I assess one chat at a time, so this covers only
+     this chat. To assess several of your claude.ai chats at once, run
+     /assess-my-chats."), only if the user asked for several chats;
+=======
+  4. the one-chat line ("I assess one chat at a time, so this covers only
+     this chat."), only if the user asked for several chats;
 >>>>>>> REPLACE
