@@ -30,6 +30,12 @@ as a zip; see [its README](plugins/modo-ai-skills/README.md#install).
 **ChatGPT and Codex:** a single-chat build of Modo AI Skills is generated in
 `openai/`; see [openai/README.md](openai/README.md).
 
+Ready-made zips for both builds are on the
+[releases page](https://github.com/modo-learning/modo-plugins/releases).
+For the whole flow in one place (install on each platform, assessing one or
+several chats, export and save, a demo script, and how to maintain the
+plugin), read the [Modo AI Skills guide](docs/modo-ai-skills-guide.md).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
