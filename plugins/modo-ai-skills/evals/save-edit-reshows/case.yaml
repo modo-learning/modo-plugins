@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: save-edit-reshows
+description: "Third turn: the user drops a quote and says save; Claude shows the updated record and asks again; nothing is sent yet."
+plugins: ["../.."]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: save-proposes
+description: "Second turn with the connector: the user asks to save; Claude shows the exact record and asks; nothing is sent."
+plugins: ["../.."]
+runs: 2
+context:
+  history_file: history.jsonl
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]

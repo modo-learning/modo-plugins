@@ -11,7 +11,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from validate_assessment_record import extract_block, validate  # noqa: E402
+from validate_assessment_record import extract_block, last_json_block, validate  # noqa: E402
 
 LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
 
@@ -178,6 +178,23 @@ class Extract(unittest.TestCase):
 
 
 SKILL = pathlib.Path(__file__).parent.parent / "plugins" / "modo-ai-skills" / "skills" / "export-assessment"
+
+
+class LastJsonBlock(unittest.TestCase):
+    """A chat reply that shows a record and then asks a question."""
+
+    def test_question_may_follow_the_block(self):
+        text = report(json.dumps(GOOD), "\nSay \"send it\" to save exactly this record.\n")
+        self.assertEqual(last_json_block(text), GOOD)
+
+    def test_last_of_two_blocks(self):
+        text = report(json.dumps({"a": 1})) + report(json.dumps(GOOD), "\nOK?\n")
+        self.assertEqual(last_json_block(text), GOOD)
+
+    def test_none_without_a_block_or_with_bad_json(self):
+        self.assertIsNone(last_json_block("no block"))
+        self.assertIsNone(last_json_block(None))
+        self.assertIsNone(last_json_block(report("{not json", "\nOK?\n")))
 
 
 class Docs(unittest.TestCase):

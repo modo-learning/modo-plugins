@@ -133,6 +133,20 @@ def validate(record, convention=True):
     return errors
 
 
+def last_json_block(text):
+    """The last ```json block in a message, parsed, or None.
+
+    Unlike extract_block, any text may follow the block (a chat reply that
+    shows a record and then asks a question)."""
+    matches = list(FENCE.finditer(text or ""))
+    if not matches:
+        return None
+    try:
+        return json.loads(matches[-1].group(1))
+    except json.JSONDecodeError:
+        return None
+
+
 def extract_block(text):
     """Return the record from the last ```json fence in a report.
 
