@@ -213,7 +213,13 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
 
   if (nShown) {
     var top = ordered[0];
-    document.getElementById("t").textContent = (multi ? "Strongest across these chats: " : "Strongest in this chat: ") + top.name;
+    /* Several chats: name every capability tied with the top one on level and confidence, in rubric order. */
+    var tied = multi ? ordered.filter(function (c) {
+      return shown(c) && c.level === top.level && c.confidence === top.confidence;
+    }) : [top];
+    var names = tied.map(function (c) { return c.name; });
+    var joined = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0];
+    document.getElementById("t").textContent = (multi ? "Strongest across these chats: " : "Strongest in this chat: ") + joined;
   } else if (multi) {
     document.getElementById("t").textContent = "Your AI capabilities across these chats";
   }

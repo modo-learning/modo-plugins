@@ -308,6 +308,9 @@ class ExportAndSave(unittest.TestCase):
         self.assertIn("date_range", body)
         self.assertIn("I also made a card of this result.", body)
 
+    def test_card_headline_names_ties(self):
+        self.assertIn('"Strongest across these chats: Problem Solving and Delegation"', text())
+
     def test_export_skill_accepts_a_multi_chat_result(self):
         body = folded(EXPORT)
         self.assertIn("assess-my-chats", body)

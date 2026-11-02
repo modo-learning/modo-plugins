@@ -277,6 +277,30 @@ class RenderMultiChat(unittest.TestCase):
         self.assertIn("Your AI capabilities across these chats", text)
         self.assertNotIn("this chat", text)
 
+    def test_headline_names_every_capability_tied_at_the_top(self):
+        # Live test 2026-11-02, defect 4: Problem Solving and Delegation both level 4.
+        data = json.loads(json.dumps(MULTI_SAMPLE))
+        for c in data["capabilities"]:
+            if c["name"] in ("Problem Solving", "Delegation"):
+                c.update(level=4, confidence="medium")
+        text = text_of(body_text(render(data)))
+        self.assertIn("Strongest across these chats: Problem Solving and Delegation", text)
+
+    def test_headline_names_several_tied_in_rubric_order(self):
+        data = json.loads(json.dumps(MULTI_SAMPLE))
+        for c in data["capabilities"][:4]:
+            c.update(level=3, confidence="high")
+        text = text_of(body_text(render(data)))
+        self.assertIn("Strongest across these chats: Problem Solving, Verification, Workflow Design and Delegation",
+                      text)
+
+    def test_a_tie_on_level_but_not_confidence_names_one(self):
+        data = json.loads(json.dumps(MULTI_SAMPLE))
+        data["capabilities"][3].update(level=3, confidence="medium")   # V is 3 high
+        text = text_of(body_text(render(data)))
+        self.assertIn("Strongest across these chats: Verification", text)
+        self.assertNotIn("Verification and", text)
+
     def test_single_chat_card_has_no_trend(self):
         self.assertFalse([i for i in items(render(SAMPLE)) if "data-trend" in i])
 

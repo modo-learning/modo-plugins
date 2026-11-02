@@ -303,7 +303,9 @@ never say a card exists.
    "next_action": "<the Next step line>"}`.
 3. Copy everything from the answer: the same levels, confidences, best
    shown, trends, counts and quotes. The card orders the capabilities itself
-   and draws the trend arrows.
+   and draws the trend arrows. Its headline names the strongest capability;
+   when several tie on level and confidence it names them all, in rubric
+   order ("Strongest across these chats: Problem Solving and Delegation").
 4. Escape the JSON properly and write `\u003c` for any `<` inside a quote.
 5. Show the whole filled file with the artifact tool. Don't save it anywhere
    else. The label is already in the template.
