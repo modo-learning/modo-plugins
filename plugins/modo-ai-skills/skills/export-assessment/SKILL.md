@@ -17,7 +17,9 @@ limits exactly.
 ## Ground rules
 
 - Export only an assessment that was given earlier in this conversation by the
-  assess-my-ai-work skill. Take the levels and confidence from it as they
+  assess-my-ai-work skill, or a result across several chats given by the
+  assess-my-chats skill (then also follow [Multi-chat result](#multi-chat-result)).
+  Take the levels and confidence from it as they
   stand. Don't re-score and don't read any chat again, except to check that
   each quote is word for word what the user wrote in the assessed chat.
 - Never search for, list or open other chats or files, and never mention or
@@ -37,7 +39,8 @@ limits exactly.
 ## 1. Is there something to export?
 
 Use the most recent assessment in this conversation: a response with the
-five capability blocks (in any order: v1.1 lists the strongest first). There is nothing to export when there is none, or when
+five capability blocks (in any order: v1.1 lists the strongest first), from
+assess-my-ai-work or, across several chats, from assess-my-chats. There is nothing to export when there is none, or when
 the last assess-my-ai-work response was only a short message ("too short to
 judge", "which one?", "can't open that chat" or "no chat with that name")
 with no scores. Then say in one line that there is nothing to export yet and
@@ -190,7 +193,7 @@ Build the PDF from [report-template.html](report-template.html) so it has
 Modo's look (the modo-design skill): read the template, replace only the JSON
 between the `MODO-DATA-START` and `MODO-DATA-END` markers with the record
 (exactly the record in the report's final block; write `<` inside a string as
-`<`), change nothing else, and print that page to PDF. The template lays
+`\u003c`), change nothing else, and print that page to PDF. The template lays
 out the same content in the same order, record last. If you can't render HTML
 to PDF here, make the PDF your usual way with the same content and order.
 
@@ -203,6 +206,63 @@ If you have no way to create a PDF in this session, say so in one line *before*
 the report (so the record block stays last), don't claim that a PDF exists,
 don't describe a tool you don't have, and give the Markdown report as the
 export.
+
+## Multi-chat result
+
+A result from assess-my-chats (it opens "Assessment across <s> of your
+chats" and ends with a per-chat table) is exported as a **multi-chat record**:
+read "Multi-chat record" in RECORD.md in full. Steps 1 to 7 apply, with these
+changes. This shape is a proposal (decided 2026-11-02, flag for review).
+
+- **Don't open any chat.** The main chat never held the transcripts; each
+  quote was checked word for word by the agent that read its chat. The user's
+  approval in step 3 is the check here. Say neither more nor less.
+- **Quotes**: only the Evidence quotes the result showed, each tied to its
+  capability and to its chat by number (`chat`, the row in the per-chat
+  table). Same limits and order as step 2.
+- **Chat titles are the user's content, like quotes.** By default the record
+  and report name the chats `"Chat 1"`, `"Chat 2"`, … in the order of the
+  per-chat table. Show the titles in the plan and ask; use them only after
+  the user says "with titles" (or names the ones to keep). Each title at most
+  120 characters.
+- **Title**: "Assessment across <s> chats" unless the user gives another.
+  **Date**: the newest scored chat's date (no question needed).
+- The plan in step 2 adds, after the quotes:
+
+  ```
+  Chats (named "Chat 1" to "Chat <c>" unless you say "with titles"):
+  1. <title> (<date>), scored
+  2. <title> (<date>), too short
+  ...
+  ```
+
+- **The record**: copy every level, confidence, best shown, trend and count
+  from the result as it stands, and each chat's levels from its row. Keys in
+  this order: `rubric_version`, `scope`, `capabilities`,
+  `evidence`, `session_title`, `session_date`, `chats_assessed`, `chats`,
+  `coverage`, with `"scope": "multi_chat"`. If the result's numbers don't follow the aggregation rules in
+  RECORD.md, say so and export nothing; never fix a level yourself.
+- **The report** (step 4) has this header line instead of "Chat date: …":
+  `Chats: <from> to <to>. Rubric: v1.1. Based on <scored> chats.` The
+  capability table adds the columns Best shown, Trend (↑ up, → flat, ↓ down,
+  or –) and Shown in (`<chats_shown> of <scored>`). Its notes read:
+
+  ```
+  Levels run from 1 to 5. Each level combines the scored chats that show the
+  capability: the middle of their levels, the lower one on a tie. "Best shown"
+  is the highest level reached in at least 2 chats. The trend compares earlier
+  and later chats and needs 4 or more. "Not shown" means no scored chat bears
+  on that capability. Confidence is low, medium or high, by how many chats show
+  the capability and how close their levels are. The table is in rubric order.
+  This is for your own development, not for hiring or other employment
+  decisions.
+  ```
+
+  After the notes, a "Chats assessed" table: `| # | Chat | Date | Result | P | V | W | D | S |`,
+  newest first, a level or – per capability. Each evidence line ends with
+  its chat: `- Verification: "<quote>" (Chat 4, 2026-10-14)`.
+- The PDF uses the same report-template.html; it lays out a multi-chat record
+  itself.
 
 ## 7. The label
 

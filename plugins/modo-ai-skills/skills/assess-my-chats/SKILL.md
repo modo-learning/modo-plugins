@@ -28,7 +28,13 @@ Decided 2026-11-02, flag for review:
 4. The rubric copy in this folder is kept identical by check_rubric_sync.py.
 5. Agents score with run_kind "one_response" (no nested agents), batches of 5.
 6. The current chat is left out of the list.
-Export and save of a multi-chat result need the multi-chat record (ticket 17).
+7. Export and save hand off to export-assessment and save-to-passport, which
+   build the multi-chat record (export-assessment/RECORD.md, "Multi-chat
+   record", a proposal). Save works only once modo-mcp accepts that record
+   (docs/ai-skills/modo-mcp-multi-chat-followup.md).
+8. The card is a copy of assess-my-ai-work/passport-card.html, kept
+   identical by check_rubric_sync.py; its multi-chat look is a proposal for
+   Angelina.
 -->
 
 # Assess my chats
@@ -76,7 +82,7 @@ which exist only in claude.ai chats (web or desktop).
   chats", then run /assess-my-chats again. Offer /assess-my-ai-work for this
   chat meanwhile. Stop.
 
-End either message with the label (step 6).
+End either message with the label (step 7).
 
 ## 1. Scope and list
 
@@ -237,13 +243,45 @@ Next step: <one line>
 - **Next step**: for the lowest shown capability (Verification first if it is
   3 or lower), "Next step: run /help-me-improve for <capability>." When
   nothing was shown, suggest assessing chats with longer, different work.
-- **Export line**: "Exporting or saving a result across several chats is not
-  available yet. To keep one chat's result, run /assess-my-ai-work on that
-  chat and export it." (The multi-chat record and card are ticket 17. When it
-  lands, this hands off to export-assessment and save-to-passport.) Make no
-  card.
+- **Export line**: "You can keep this result: /export-assessment makes a
+  report (you approve every quote and whether chat titles go in), and
+  /save-to-passport saves it to your Modo passport once the Modo connector
+  accepts results across several chats." Nothing is exported or saved until
+  the user asks; those skills do it, not this one.
+- **Card line**: "I also made a card of this result.", only if a card was
+  made (step 6), just before the label.
 
-## 6. The label
+## 6. The card (only where an artifact tool exists)
+
+Do this after step 4 and show it with the answer. The text answer is always
+written in full and is the result. Make a card only when **both** are true:
+you have a tool that creates an artifact (a page shown beside the chat), and
+you are in claude.ai or Cowork, not Claude Code. If either is false, no chat
+was scored, or you can't read the template, make no card, don't offer one and
+never say a card exists.
+
+1. Read [passport-card.html](passport-card.html) from this skill's folder.
+2. Replace only the JSON between `<!-- MODO-DATA-START -->` and
+   `<!-- MODO-DATA-END -->`; change nothing else. The JSON holds exactly:
+   `{"scope": "multi_chat", "sessions": <s, the scored chats>,
+   "date_range": ["<first date>", "<last date>"],
+   "capabilities": [five objects in rubric order, each {"name": "<capability
+   name>", "level": 1-5 or "not_shown", "confidence": "low|medium|high",
+   "best_shown": 1-5 or null, "trend": "up|flat|down" or null,
+   "chats_shown": <n>} (omit confidence for not_shown)],
+   "evidence": [one or two objects {"capability": "<name>", "quote": "<exact
+   quote>", "source": "<chat title as in the answer>, <date>"}, from the
+   strongest capabilities],
+   "growth": null,
+   "next_action": "<the Next step line>"}`.
+3. Copy everything from the answer: the same levels, confidences, best
+   shown, trends, counts and quotes. The card orders the capabilities itself
+   and draws the trend arrows.
+4. Escape the JSON properly and write `\u003c` for any `<` inside a quote.
+5. Show the whole filled file with the artifact tool. Don't save it anywhere
+   else. The label is already in the template.
+
+## 7. The label
 
 Every response from this skill, including the list, the question in step 2
 and the short messages, ends with this line exactly, on its own line:
