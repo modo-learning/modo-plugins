@@ -1,0 +1,33 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "modo-ai-skills",
+  "version": "0.2.3",
+  "description": "Assess how well you work with AI against Modo's public rubric: scored prompt by prompt, with a level, confidence, run agreement and quoted evidence for five capabilities, from this chat or a chat you paste. Then get help with one capability, a Modo card and a PDF report. For your own development, not for hiring decisions.",
+  "author": {
+    "name": "Modo",
+    "url": "https://github.com/modo-learning"
+  },
+  "homepage": "https://github.com/modo-learning/modo-plugins",
+  "repository": "https://github.com/modo-learning/modo-plugins",
+  "license": "MIT",
+  "keywords": [
+    "ai skills",
+    "assessment",
+    "rubric",
+    "modo"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Modo AI Skills",
+        "shortDescription": "Assess how you work with AI, get help improving, and keep a Modo card and PDF report.",
+        "developerName": "Modo",
+        "defaultPrompt": [
+          "Assess this chat with Modo AI Skills",
+          "Help me improve at verifying AI answers",
+          "Export my assessment as a PDF"
+        ]
+      }
+    }
+  }
+}

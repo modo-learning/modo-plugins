@@ -1,0 +1,20 @@
+{
+  "name": "modo-plugins",
+  "interface": {
+    "displayName": "Modo plugins"
+  },
+  "plugins": [
+    {
+      "name": "modo-ai-skills",
+      "source": {
+        "source": "local",
+        "path": "./openai/plugins/modo-ai-skills"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
