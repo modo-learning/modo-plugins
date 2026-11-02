@@ -42,6 +42,17 @@ from rubric_common import CAPABILITIES, LEVEL_NOT_SHOWN  # noqa: E402
 from validate_chat_result import validate  # noqa: E402
 
 
+# The thresholds. The skill text (assess-my-chats/SKILL.md, step 4), RECORD.md
+# and export-assessment/SKILL.md state them in words, since no script runs in
+# claude.ai; test_assess_my_chats_skill.py checks the words match these.
+BEST_MIN_CHATS = 2      # best_shown: a level reached in at least this many chats
+HIGH_MIN_CHATS = 3      # high confidence: shown in at least this many chats ...
+CLOSE_SPREAD = 1        # ... with a spread of at most this
+MEDIUM_CHATS = 2        # medium: shown in exactly this many chats with a close spread,
+MEDIUM_SPREAD = 2       # or in HIGH_MIN_CHATS or more with exactly this spread
+TREND_MIN_CHATS = 4     # trend: only when shown in at least this many chats
+
+
 def lower_median(values):
     ordered = sorted(values)
     return ordered[(len(ordered) - 1) // 2]
@@ -49,20 +60,20 @@ def lower_median(values):
 
 def combined_confidence(levels):
     n, spread = len(levels), max(levels) - min(levels)
-    if n >= 3 and spread <= 1:
+    if n >= HIGH_MIN_CHATS and spread <= CLOSE_SPREAD:
         return "high"
-    if (n == 2 and spread <= 1) or (n >= 3 and spread == 2):
+    if (n == MEDIUM_CHATS and spread <= CLOSE_SPREAD) or (n >= HIGH_MIN_CHATS and spread == MEDIUM_SPREAD):
         return "medium"
     return "low"
 
 
 def best_shown(levels):
-    repeated = [lvl for lvl in set(levels) if levels.count(lvl) >= 2]
+    repeated = [lvl for lvl in set(levels) if levels.count(lvl) >= BEST_MIN_CHATS]
     return max(repeated) if repeated else None
 
 
 def trend(dated):
-    if len(dated) < 4:
+    if len(dated) < TREND_MIN_CHATS:
         return None
     levels = [lvl for _, lvl in sorted(dated, key=lambda d: d[0])]
     half = len(levels) // 2

@@ -10,9 +10,10 @@ named "chats" (case-level mocks only, so no other case gets chat tools):
 
 Claude sees them as mcp__chats__recent_chats and mcp__chats__read_conversation.
 The real tools' names in claude.ai carry no prefix, and their exact result
-shapes are not specified in the tests we have (docs/ai-skills/testing/
-chat-history-depth-test.md and agent-chat-tools-probe.md record only the
-fields and behaviour), so the shapes here are made up, like the chat-agent
+shapes are not specified in the tests we have (Modo workspace doc
+docs/ai-skills/testing/chat-history-depth-test.md (not in this repo) and
+Modo workspace doc docs/ai-skills/testing/agent-chat-tools-probe.md (not in
+this repo) record only the fields and behaviour), so the shapes here are made up, like the chat-agent
 fixtures'. Each chat comes back as ONE page with no next_page_token: a fixed
 mock can pick a file by one input field only, so a page token can't be
 followed (paging is covered by the chat-agent fixture tests instead).

@@ -146,7 +146,8 @@ class Validate(unittest.TestCase):
 
 
 # A multi-chat record, worked out by hand from the aggregation rules in
-# DESIGN-multi-chat-assessment.md ("Aggregation rules"). Chats newest first:
+# Modo workspace doc docs/ai-skills/DESIGN-multi-chat-assessment.md (not in this repo),
+# "Aggregation rules". Chats newest first:
 #   1 2026-10-30 scored     P3 V4 W2 D- S-
 #   2 2026-10-27 scored     P3 V4 W4 D4 S-
 #   3 2026-10-21 too short

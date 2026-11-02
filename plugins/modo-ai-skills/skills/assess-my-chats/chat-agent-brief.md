@@ -1,14 +1,12 @@
 <!--
 For maintainers. The orchestrator (assess-my-chats) passes this file verbatim
 to each chat agent, with chat_id, title and the text of rubric-v1.1.md.
-Sources: docs/ai-skills/DESIGN-multi-chat-assessment.md (Contracts, "Context,
-not just prompts", Coverage per chat, Fallbacks); docs/ai-skills/testing/
-chat-history-depth-test.md ("Full verification"); ticket 12 probe, 2026-11-02
-(docs/ai-skills/testing/agent-chat-tools-probe.md: agents can call
-read_conversation, no nested agents, large pages saved to files, reminder on
-the first message too, duplicate titles); scripts/validate_chat_result.py
-(ChatResult shape); skills/assess-my-ai-work/SKILL.md steps 1 and 2.
-Checked by scripts/test_chat_agent_brief.py.
+Facts this relies on (live tests, 2026-11-01 and 2026-11-02): agents can call
+read_conversation and start no agents of their own; large pages are saved to
+files; the reminder block comes on the first message too; titles repeat.
+The ChatResult shape is chat-result.schema.json in this folder (step 4).
+Extraction follows assess-my-ai-work/SKILL.md steps 1 and 2. The modo-plugins
+repo has the validator and tests that keep this brief in step.
 -->
 
 # Chat agent brief

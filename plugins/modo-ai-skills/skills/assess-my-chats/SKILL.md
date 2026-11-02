@@ -5,15 +5,15 @@ description: Assess how well the user works with AI across several of their past
 
 <!--
 For maintainers.
-Sources: docs/ai-skills/DESIGN-multi-chat-assessment.md (architecture, scope,
-privacy, aggregation rules); docs/ai-skills/testing/chat-history-depth-test.md
-(recent_chats paged by `before`; untitled chats are empty; Cowork Tasks not
-listed; flagged chats redacted); docs/ai-skills/testing/agent-chat-tools-probe.md
-(ticket 12: agents read their own chat, no nested agents, 5 agents per batch,
-first agent call once returned "not run", duplicate titles).
-Aggregation is the procedure scripts/aggregate_chats.py implements (rules are
-a proposal pending product sign-off). The ChatResult shape is
-scripts/validate_chat_result.py. Checked by scripts/test_assess_my_chats_skill.py.
+Facts this relies on (live tests, 2026-11-01 and 2026-11-02): recent_chats is
+paged by `before`; untitled chats are empty; Cowork Tasks are not listed;
+flagged chats come back redacted; agents can read their own chat but start no
+agents of their own; 5 agents per batch worked; a first agent call once
+returned "not run"; titles repeat.
+This file is the source of the aggregation rules (step 4) in claude.ai, where
+no script runs. They are a proposal pending product sign-off. The ChatResult
+shape is chat-result.schema.json in this folder. The modo-plugins repo has a
+reference implementation and tests that keep the numbers here in step.
 
 Decided 2026-11-02, flag for review:
 1. Minimum length is the rubric's: at least 4 typed user messages. The chat
@@ -30,8 +30,7 @@ Decided 2026-11-02, flag for review:
 6. The current chat is left out of the list.
 7. Export and save hand off to export-assessment and save-to-passport, which
    build the multi-chat record (export-assessment/RECORD.md, "Multi-chat
-   record", a proposal). Save works only once modo-mcp accepts that record
-   (docs/ai-skills/modo-mcp-multi-chat-followup.md).
+   record", a proposal). Save works only once modo-mcp accepts that record.
 8. The card is a copy of assess-my-ai-work/passport-card.html, kept
    identical by check_rubric_sync.py; its multi-chat look is a proposal for
    Angelina.

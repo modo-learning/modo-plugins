@@ -6,7 +6,7 @@ conversation. The main conversation checks each result here before combining
 them: the shape, the rubric's levels and behaviour ids, and that every quote is
 a word-for-word excerpt of the user message it names.
 
-Shape (design: Modo/docs/ai-skills/DESIGN-multi-chat-assessment.md):
+Shape (design: Modo workspace doc docs/ai-skills/DESIGN-multi-chat-assessment.md (not in this repo)):
 
 {
   "chat_id": "514e1c85-...",            the past-chat tool's id

@@ -78,8 +78,7 @@ authoritative** where they differ:
 ## Multi-chat record (proposal)
 
 **Proposal, decided 2026-11-02, flag for review** (card look: Angelina;
-server acceptance: Keith). Source: DESIGN-multi-chat-assessment.md
-("Changes to other parts", "Privacy", "Aggregation rules"). The Modo connector
+server acceptance: Keith). The Modo connector
 does not accept this shape yet: save works only once modo-mcp accepts it.
 
 A multi-chat record has every single-chat field, with these changes, and the
@@ -112,16 +111,33 @@ fields below. `rubric_version` stays `"v1.1"`.
 Rules that tie the record together (the validator checks each one):
 
 - The combined `level`, `confidence`, `best_shown`, `trend` and `chats_shown`
-  of every capability are exactly what the aggregation rules give for the
-  per-chat levels in `chats` (the rules `scripts/aggregate_chats.py`
-  implements; for the trend, chats are ordered oldest first by their place in
-  `chats`).
+  of every capability are exactly what the aggregation rules below give for
+  the per-chat levels in `chats`.
 - `coverage` is the number of capabilities whose combined level is not
   `"not_shown"`.
 - The counts in `chats_assessed` match `chats`; `from`, `to` and
   `session_date` match the scored chats' dates.
 - A per-chat summary holds no quotes, no message counts and nothing else from
   the chat. Quotes are only in `evidence`, after the user approved them.
+
+The aggregation rules (the same as assess-my-chats, step 4), per capability,
+over the scored chats where it was shown (level 1 to 5):
+
+- `level`: the median of their levels; with an even number, the lower of the
+  two middle ones.
+- `best_shown`: the highest level reached in at least 2 chats; `null` if no
+  level was reached twice.
+- `confidence`: high when shown in 3 or more chats with a spread (highest
+  minus lowest) of at most 1; medium when shown in 2 chats with a spread of
+  at most 1, or in 3 or more chats with a spread of 2; low otherwise.
+- `trend`: only when shown in 4 or more chats, else `null`. Order those chats
+  by date, oldest first (two chats with the same date: the one later in
+  `chats` counts as older). Take the median (lower middle) of the earlier half
+  and of the later half; with an odd number, leave out the middle chat.
+  `"up"` if the later is higher, `"down"` if lower, else `"flat"`.
+- `chats_shown`: how many scored chats show it.
+- Shown in no scored chat: `"not_shown"`, confidence `"low"`, `best_shown`
+  and `trend` `null`, `chats_shown` 0.
 
 ### Multi-chat example
 
