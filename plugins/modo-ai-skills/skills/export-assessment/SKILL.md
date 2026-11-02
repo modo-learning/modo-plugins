@@ -194,6 +194,11 @@ between the `MODO-DATA-START` and `MODO-DATA-END` markers with the record
 out the same content in the same order, record last. If you can't render HTML
 to PDF here, make the PDF your usual way with the same content and order.
 
+Either way, the PDF holds the report exactly: the header line as written in
+step 4 with nothing added to it, and the record block printed as in the report,
+the same JSON with its 2-space indentation and line breaks, in a monospaced
+font.
+
 If you have no way to create a PDF in this session, say so in one line *before*
 the report (so the record block stays last), don't claim that a PDF exists,
 don't describe a tool you don't have, and give the Markdown report as the
