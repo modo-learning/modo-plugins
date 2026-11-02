@@ -164,7 +164,9 @@ reminder block. Replace any quote that fails, or drop the behaviour it backs.
 ## 4. Return the ChatResult
 
 Return exactly one JSON object with these fields and no others, and no text
-before or after it:
+before or after it. Its JSON Schema is
+[chat-result.schema.json](chat-result.schema.json) in this folder; the table
+and the rules in this brief say the same.
 
 | Field | Value |
 | --- | --- |

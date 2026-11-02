@@ -161,6 +161,8 @@ def _capability(cap, c, too_short, runs, users, messages):
     if not isinstance(behaviours, list):
         errors.append(f"{where}.behaviours: must be a list")
         behaviours = []
+    if len(behaviours) > 3:
+        errors.append(f"{where}.behaviours: at most 3")
     for b in behaviours:
         if b not in BEHAVIOURS or not str(b).startswith(PREFIX[cap]):
             errors.append(f"{where}.behaviours: {b!r} is not a rubric v1.1 {cap} behaviour id")
