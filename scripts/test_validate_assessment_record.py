@@ -198,6 +198,41 @@ def multi(**changes):
     return r
 
 
+def record_from_results(results):
+    """A multi-chat record built the way the skill builds it: aggregate() over the
+    ChatResults, chats newest first by updated_at."""
+    from aggregate_chats import aggregate
+    out = aggregate(results)
+    newest = sorted(results, key=lambda r: r["updated_at"], reverse=True)
+    chats = [{"title": f"Chat {i}", "date": r["updated_at"][:10],
+              "result": "too_short" if r["too_short"] else "scored",
+              "levels": None if r["too_short"] else {k: c["level"] for k, c in r["capabilities"].items()}}
+             for i, r in enumerate(newest, 1)]
+    return {"rubric_version": "v1.1", "scope": "multi_chat", "capabilities": out["capabilities"],
+            "evidence": [], "session_title": "Assessment across chats",
+            "session_date": out["chats_assessed"]["to"], "chats_assessed": out["chats_assessed"],
+            "chats": chats, "coverage": out["coverage"]}
+
+
+class SameArithmeticAsAggregate(unittest.TestCase):
+    def test_a_record_built_from_aggregate_is_valid(self):
+        from test_aggregate_chats import chat
+        results = [chat(1, 3), chat(5, 2), chat(5, 4), chat(9, 3), chat(12, 4, user_messages=2)]
+        results[2]["updated_at"] = "2026-10-05T18:00:00Z"   # same day as chat(5, 2), later
+        record = record_from_results(results)
+        # Oldest first by time: 3, 2, 4, 3 -> earlier half 2, later half 3: up.
+        self.assertEqual(record["capabilities"]["verification"]["trend"], "up")
+        self.assertEqual(validate(record), [])
+
+    def test_trend_follows_the_dates(self):
+        from test_aggregate_chats import chat
+        record = record_from_results([chat(1, 4), chat(3, 4), chat(6, 2), chat(8, 2)])
+        self.assertEqual(record["capabilities"]["verification"]["trend"], "down")
+        self.assertEqual(validate(record), [])
+        record["capabilities"]["verification"]["trend"] = "up"
+        self.assertIn("capabilities.verification.trend: is 'up', the per-chat levels give 'down'", validate(record))
+
+
 class ValidateMultiChat(unittest.TestCase):
     def test_good_multi_chat_record_passes(self):
         self.assertEqual(validate(MULTI), [])

@@ -22,7 +22,7 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from aggregate_chats import best_shown, combined_confidence, lower_median, trend  # noqa: E402
+from aggregate_chats import combine  # noqa: E402
 from rubric_common import (CAPABILITIES, CONFIDENCE, LEVEL_NOT_SHOWN, MAX_QUOTE,  # noqa: E402
                            is_date as _is_date, is_int as _is_int, is_level as _is_level)
 
@@ -212,9 +212,10 @@ def _validate_multi(record, convention, errors):
     if errors:
         return
 
-    # Recompute the combined levels with the same arithmetic as aggregate_chats.py.
-    oldest_first = [c for _, c in reversed(scored)]
-    shown_count = 0
+    # Recompute the combined levels with aggregate_chats.combine, the function
+    # aggregate() uses. Oldest first by date; chats with the same date keep their
+    # place in reverse (chats is newest first).
+    combined = combine([(c["date"], c["levels"]) for _, c in reversed(scored)])
     for name in CAPABILITIES:
         entry = record["capabilities"][name]
         where = f"capabilities.{name}"
@@ -224,18 +225,11 @@ def _validate_multi(record, convention, errors):
             errors.append(f"{where}.trend: must be 'up', 'flat', 'down' or null")
         if not (_is_int(entry["chats_shown"]) and entry["chats_shown"] >= 0):
             errors.append(f"{where}.chats_shown: must be a whole number, 0 or more")
-        dated = [(i, c["levels"][name]) for i, c in enumerate(oldest_first) if c["levels"][name] != LEVEL_NOT_SHOWN]
-        levels = [lvl for _, lvl in dated]
-        if levels:
-            shown_count += 1
-            want = {"level": lower_median(levels), "confidence": combined_confidence(levels),
-                    "best_shown": best_shown(levels), "trend": trend(dated), "chats_shown": len(levels)}
-        else:
-            want = {"level": "not_shown", "confidence": "low", "best_shown": None, "trend": None, "chats_shown": 0}
-        for key, value in want.items():
+        for key, value in combined["capabilities"][name].items():
             if entry[key] != value:
                 errors.append(f"{where}.{key}: is {entry[key]!r}, the per-chat levels give {value!r}")
 
+    shown_count = combined["coverage"]
     coverage = record["coverage"]
     if coverage != shown_count or not _is_int(coverage):
         errors.append(f"coverage: must be {shown_count}, the number of capabilities shown in a scored chat")
