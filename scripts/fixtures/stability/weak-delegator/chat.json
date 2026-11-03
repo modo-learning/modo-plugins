@@ -1,0 +1,46 @@
+{
+  "id": "weak-delegator",
+  "title": "Arts grant application",
+  "updated_at": "2026-10-26T19:05:00Z",
+  "source": "synthetic: written for ticket 33 with planted behaviours; every name and figure is invented",
+  "turns": [
+    {"user": "I'm applying for the city arts grant, deadline 14 March. The panel cares most about community reach. Our project: free printmaking workshops for teenagers in two libraries, 10 sessions, 15 places each.",
+     "assistant": "That's a strong fit for a reach-focused panel. Do you want me to start on the application?"},
+    {"user": "Write the whole application, all sections, whatever you think works.",
+     "assistant": "Here is a full draft: summary, need, activities, reach (300 participants across both libraries), partners, evaluation and sustainability."},
+    {"user": "Also do the budget section, make up reasonable numbers.",
+     "assistant": "Budget: tutor fees €3,000, materials €1,200, room hire €0 (libraries in kind), promotion €400. Total €4,600."},
+    {"user": "You said 300 participants. 10 sessions with 15 places is 150. Which is it?",
+     "assistant": "You're right, it's 150 places. I've changed the reach section to 150 participants."},
+    {"user": "Fine. Now write the impact section too.",
+     "assistant": "Impact: participants gain practical printmaking skills, confidence and a portfolio piece; the libraries gain a new teenage audience."},
+    {"user": "Great, I'll paste it all in and submit.",
+     "assistant": "Good luck with the application."}
+  ],
+  "planted": {
+    "Problem Solving": [[1, "P3a"]],
+    "Verification": [[4, "V3b"], [6, "V1"]],
+    "Workflow Design": [],
+    "Delegation": [[2, "D1u"], [3, "D1u"], [5, "D2a"]],
+    "Strategic Thinking": [[1, "S3a"]]
+  },
+  "expected": {
+    "bands": {
+      "Problem Solving": [3],
+      "Verification": [2, 3],
+      "Workflow Design": ["not shown", 2],
+      "Delegation": [1, 2],
+      "Strategic Thinking": [2, 3]
+    },
+    "overall": ["Practitioner"],
+    "reasons": {
+      "Problem Solving": "Message 1 gives the audience, the panel's priority and the project facts (P3a, 3); nothing at tier 4.",
+      "Verification": "One real check (message 4, V3b) against accepting made-up budget numbers and submitting unchecked (message 6, V1). Contrary moments equal positive ones, so the rule caps it at 2; a run that misses the V1 gives 3.",
+      "Workflow Design": "Each section is asked for on its own with no plan; a run may count message 5 as a next step building on earlier work (W2a, 2).",
+      "Delegation": "Whole application and budget handed over with no brief and never reviewed (D1u twice); the impact section is a minimal brief (D2a). Contrary moments outnumber positive ones, so 2 at most.",
+      "Strategic Thinking": "The grant deadline and the panel's priority are named in message 1 (S3a, 3); a run that reads it as purpose in passing gives 2.",
+      "overall": "Problem Solving 3, Verification 2 or 3, Delegation 1 or 2, Strategic Thinking 2 or 3. 4 shown capabilities reach Level 2; Level 3 needs Verification and Strategic Thinking both at 3 on top of Problem Solving, which the planted reading does not give."
+    },
+    "review": "proposal: Angelina to review the bands"
+  }
+}

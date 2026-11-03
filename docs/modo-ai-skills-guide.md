@@ -34,7 +34,7 @@ or upload a zip:
 
 ```sh
 git clone https://github.com/modo-learning/modo-plugins.git && cd modo-plugins
-git archive --format=zip -o modo-ai-skills.zip HEAD:plugins/modo-ai-skills -- . ':!evals'
+git archive --format=zip -o modo-ai-skills.zip HEAD:plugins/modo-ai-skills -- . ':!evals' ':!evals-stability'
 ```
 
 Then Customize → Plugins → Add → Upload plugin, choose the zip. If an older
@@ -188,6 +188,7 @@ it. Use real-work chats; test chats come back too short.
 | `openai/plugins/modo-ai-skills/` | Generated ChatGPT/Codex build: never edit by hand |
 | `scripts/` | Level rule (`derive_levels.py`), aggregation (`aggregate_chats.py`), validators, checks, build, tests |
 | `plugins/modo-ai-skills/evals/` | `claude plugin eval` cases |
+| `plugins/modo-ai-skills/evals-stability/` | Stability cases, generated from `scripts/fixtures/stability/` before a run; git-ignored, never shipped |
 
 ### After any change
 
@@ -219,13 +220,42 @@ server for `recent_chats` and `read_conversation`, made by
 `scripts/gen_multi_chat_evals.py`. The mock returns each chat as one page, so
 paging is covered only by live tests.
 
+**Stability (same chat, same result).** The golden chats in
+`scripts/fixtures/stability/` (see its README) become the `stab-*` cases in
+their own eval dir, so a normal eval run never starts them. They are
+generated before each run and not committed (they would ship with a
+marketplace install and push the plugin over the 512-file store limit). Each run is a
+full paid assessment; keep the output outside the repo:
+
+```sh
+python3 -I scripts/gen_stability_evals.py           # writes the cases (git-ignored)
+# smoke pass: 4 chats x 5 runs (about $20)
+for c in strong-verifier weak-delegator all-level-1 mixed; do
+  claude plugin eval plugins/modo-ai-skills --eval-dir evals-stability --case "stab-$c" \
+    --runs 5 --model opus --ablation none --no-publish --output-dir "../stability-runs/<date>/$c"
+done
+python3 scripts/stability_report.py --model=opus ../stability-runs/<date>/*/aggregate-result.json \
+  > docs/stability/<date>.md
+```
+
+Full pass: every `stab-*` chat case with `--runs 10`, and `stab-multi-set`
+with `--runs 5`.
+
+The report exits 1 if any metric misses the pass bar (ticket 33, a proposal
+until Angelina and Keith confirm it).
+
 ### Release
 
 1. Raise `version` in `plugins/modo-ai-skills/.claude-plugin/plugin.json` and
    in `.claude-plugin/marketplace.json`, then rebuild (the ChatGPT build takes
    the same version).
 2. Run every check above.
-3. PR to `main`. No AI attribution in commits or the PR body.
+3. Stability: run the stability cases and keep the report in
+   `docs/stability/<date>.md` (smoke pass, 4 chats × 5 runs, before every
+   release and after any change to the rubric, the chat-agent brief or the
+   assess skills; the full pass before a minor or major version). It must
+   pass.
+4. PR to `main`. No AI attribution in commits or the PR body.
 
 ### Open items (2026-11-03)
 

@@ -110,7 +110,7 @@ The marketplace there reads only `main`, so upload the plugin as a zip:
 
    ```
    git fetch origin main
-   git archive --format=zip -o modo-ai-skills.zip origin/main:plugins/modo-ai-skills -- . ':!evals'
+   git archive --format=zip -o modo-ai-skills.zip origin/main:plugins/modo-ai-skills -- . ':!evals' ':!evals-stability'
    ```
 
 2. Open **Customize → Plugins → Add → Upload plugin** and choose the zip.

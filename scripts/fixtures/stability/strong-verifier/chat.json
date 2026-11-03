@@ -1,0 +1,111 @@
+{
+  "id": "strong-verifier",
+  "title": "Survey findings for product review",
+  "updated_at": "2026-10-28T14:10:00Z",
+  "source": "synthetic: written for ticket 33 with planted behaviours; every name and figure is invented",
+  "turns": [
+    {
+      "user": "I'm preparing the customer survey summary for Thursday's product review. 412 responses, scored 1 to 5 on onboarding, support and price. Averages: onboarding 3.8, support 4.1, price 2.9. Draft the key findings in five bullets.",
+      "assistant": "- Support is the strongest area at 4.1.\n- Onboarding is solid at 3.8.\n- Price is the lowest-rated area by a wide margin at 2.9.\n- All 412 respondents rated support highly overall.\n- Satisfaction is up on last year across all three areas."
+    },
+    {
+      "user": "You wrote that price is the lowest-rated area by a wide margin. 2.9 against 3.8 is 0.9 points. Is that a wide margin on a 5-point scale? Show me how you decided that.",
+      "assistant": "I called it wide because 0.9 is almost a full point, but I had no threshold behind it. On a 5-point scale a 0.9 gap is notable rather than wide. I'll say \"price trails onboarding by 0.9 points\" instead."
+    },
+    {
+      "user": "I checked the raw file: support has 388 responses, not 412, because 24 people skipped it. Redo the support bullet with the right base.",
+      "assistant": "- Support is the strongest area at 4.1, from the 388 people who answered it."
+    },
+    {
+      "user": "Give me the share of 4s and 5s for each area. I'll recompute them in my spreadsheet before they go in.",
+      "assistant": "Onboarding 71%, support 82%, price 38%."
+    },
+    {
+      "user": "Onboarding matches my sheet at 71%. Support is off: I get 78% and you have 82%. Fix it and show the count you used.",
+      "assistant": "I divided by 368 by mistake. 303 of the 388 support answers are 4 or 5, which is 78%."
+    },
+    {
+      "user": "78% now, matches. Before I send this: the onboarding and support figures are checked against the raw file, the bullet about last year is not, because I don't have last year's data here. Mark that bullet unverified.",
+      "assistant": "Done. The last bullet now reads: \"Satisfaction is up on last year across all three areas (unverified: last year's data not checked).\""
+    }
+  ],
+  "planted": {
+    "Problem Solving": [
+      [
+        1,
+        "P3a"
+      ]
+    ],
+    "Verification": [
+      [
+        2,
+        "V3a"
+      ],
+      [
+        2,
+        "V4a"
+      ],
+      [
+        3,
+        "V3b"
+      ],
+      [
+        4,
+        "V5a"
+      ],
+      [
+        5,
+        "V4b"
+      ],
+      [
+        5,
+        "V4c"
+      ],
+      [
+        6,
+        "V5b"
+      ]
+    ],
+    "Workflow Design": [],
+    "Delegation": [],
+    "Strategic Thinking": [
+      [
+        1,
+        "S2a"
+      ]
+    ]
+  },
+  "expected": {
+    "bands": {
+      "Problem Solving": [
+        3,
+        4
+      ],
+      "Verification": [
+        4,
+        5
+      ],
+      "Workflow Design": [
+        "not shown"
+      ],
+      "Delegation": [
+        "not shown"
+      ],
+      "Strategic Thinking": [
+        2
+      ]
+    },
+    "overall": [
+      "Practitioner"
+    ],
+    "reasons": {
+      "Problem Solving": "Message 1 gives audience, data and output (P3a, 3). Supplying the averages could be read as P4b, but nothing else backs a 4, so 4 is the edge of the band.",
+      "Verification": "Planted at tier 4 and 5 in every message from 2 to 6 (V4a, V3b, V5a, V4b, V4c, V5b); 5 by the rule, 4 if a run misses the tier 5 moments.",
+      "Workflow Design": "No plan, template or reuse; each step is a reaction, not a stated order.",
+      "Delegation": "Every request is a scoped task with a check; no handoff of a whole job.",
+      "Strategic Thinking": "Thursday's product review is named as the purpose in passing (S2a, 2). Nothing is prioritised by it, so S3a (3) does not apply.",
+      "overall": "3 capabilities are shown: Problem Solving 3 or 4, Verification 4 or 5, Strategic Thinking 2. All 3 reach Level 2, only 2 reach Level 3, so Practitioner."
+    },
+    "review": "proposal: Angelina to review the bands"
+  }
+}

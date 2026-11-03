@@ -1,0 +1,48 @@
+{
+  "id": "mixed",
+  "title": "Release notes for six updates",
+  "updated_at": "2026-10-30T11:20:00Z",
+  "source": "synthetic: written for ticket 33 with planted behaviours; every name and figure is invented",
+  "turns": [
+    {"user": "We need release notes for 6 product updates. Steps: first you list the changes from the changelog I paste below, then I pick the order, then you draft each note in one template, then I review. Changelog: dark mode; CSV export; faster search; SSO for teams; new onboarding tour; bulk delete.",
+     "assistant": "Got it. Send the template when you're ready and I'll start with the list."},
+    {"user": "Template: a one-line headline, two sentences on what changed, one line on who it affects. Use it for all six. A good note is under 50 words and has no marketing adjectives.",
+     "assistant": "Understood: headline, two sentences, who it affects, under 50 words, plain wording."},
+    {"user": "Show me the list of changes before you draft anything.",
+     "assistant": "1. Dark mode 2. CSV export 3. Faster search 4. SSO for teams 5. New onboarding tour 6. Bulk delete"},
+    {"user": "Order: 3, 1, 5, 2, 6, 4. Now draft all six in the template, using that list.",
+     "assistant": "Here are the six notes in your order, each in the template."},
+    {"user": "Notes 2 and 5 break the template: they have three sentences on what changed. Fix those two only and leave the rest.",
+     "assistant": "Fixed: notes 2 and 5 now have two sentences each. The others are unchanged."},
+    {"user": "Good. Ship them as they are.",
+     "assistant": "They're ready to publish."},
+    {"user": "Save this whole process as a reusable prompt I can use for next month's release.",
+     "assistant": "Here is a reusable prompt with the four steps, the template and the review point."}
+  ],
+  "planted": {
+    "Problem Solving": [[1, "P4a"], [2, "P5b"], [5, "P3b"]],
+    "Verification": [[6, "V1"]],
+    "Workflow Design": [[1, "W3a"], [2, "W4a"], [3, "W4b"], [4, "W3b"], [7, "W5a"]],
+    "Delegation": [[1, "D3b"], [4, "D3a"], [5, "D4b"]],
+    "Strategic Thinking": []
+  },
+  "expected": {
+    "bands": {
+      "Problem Solving": [4, 5],
+      "Verification": [1, "not shown"],
+      "Workflow Design": [4, 5],
+      "Delegation": [3, 4],
+      "Strategic Thinking": ["not shown"]
+    },
+    "overall": ["Orchestrator", "Delegator"],
+    "reasons": {
+      "Problem Solving": "The work is broken into steps (P4a, 1), success criteria are set before drafting (P5b, 2: under 50 words, no adjectives) and a specific flaw is named (P3b, 5). 5 by the rule; 4 if a run reads message 2 as constraints only.",
+      "Verification": "Notes built from the user's own changelog are shipped with no check of their content (V1, 6). A run may find nothing that needed a check.",
+      "Workflow Design": "Ordered steps, a fixed template for six items, a check between stages and a request to reuse the process (W3a, W4a, W4b, W3b, W5a): 5; 4 if a run does not count W5a.",
+      "Delegation": "The order decision is kept (D3b), drafting is handed over with scope and format (D3a) and the result is reviewed and partly corrected (D4b): 4. 3 if a run does not count message 5 as reviewing a handoff.",
+      "Strategic Thinking": "No goal beyond the notes, no trade-offs.",
+      "overall": "Problem Solving and Workflow Design are 4 or 5. With Delegation at 4, 3 capabilities reach Level 4: Orchestrator. With Delegation at 3, Delegator. The planted reading is Orchestrator; Delegator is the accepted edge."
+    },
+    "review": "proposal: Angelina to review the bands"
+  }
+}
