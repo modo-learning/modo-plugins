@@ -15,7 +15,7 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import subprocess  # noqa: E402
 import json  # noqa: E402
-from derive_levels import BEHAVIOURS, RunsError, assess, combine, coverage, derive, self_check  # noqa: E402
+from derive_levels import BEHAVIOURS, RunsError, assess, combine, coverage, derive, overall, self_check  # noqa: E402
 
 RUBRIC = (pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills"
           / "skills" / "assess-my-ai-work" / "rubric-v1.1.md")
@@ -162,6 +162,7 @@ class Assess(unittest.TestCase):
             {"user_messages": 7, "runs": [RUN] * 3}), capture_output=True, text=True)
         self.assertEqual(ok.returncode, 0, ok.stderr)
         self.assertLessEqual(json.loads(ok.stdout)["capabilities"]["Delegation"]["level"], 3)
+        self.assertIn(json.loads(ok.stdout)["overall"]["title"], ("Explorer", "Practitioner", "Delegator", "Orchestrator"))
         bad = subprocess.run([sys.executable, "-I", str(script)], input="{}", capture_output=True, text=True)
         self.assertEqual(bad.returncode, 1)
         self.assertIn("error:", bad.stderr)
@@ -218,7 +219,81 @@ class Honesty(unittest.TestCase):
     def test_self_check_passes_and_is_reported(self):
         self.assertEqual(self_check(), "passed")
         out = assess({"user_messages": 7, "runs": [RUN] * 3})
-        self.assertEqual((out["self_check"], out["script_version"]), ("passed", "rubric-v1.1-levels-2"))
+        self.assertEqual((out["self_check"], out["script_version"]), ("passed", "rubric-v1.1-levels-3"))
+
+
+# The overall AI fluency level (Modo's ladder, "AI Fluency Levels", Johnny,
+# 2026-11-02): the highest L in 1..4 that at least 3 of the 5 capabilities
+# reach; fewer than 3 with a level gives none; Level 5 is never given from
+# chats. Decided 2026-11-03, flag for review (Angelina, Johnny).
+# Five capability levels in rubric order -> (overall level, title).
+OVERALL_WORKED = [
+    ([4, 4, 3, 2, "not_shown"], (3, "Delegator")),
+    ([5, 5, 5, 5, 5], (4, "Orchestrator")),
+    ([2, "not_shown", "not_shown", "not_shown", 1], (None, None)),
+    ([3, 3, 2, 2, 2], (2, "Practitioner")),
+    ([1, 1, 1, 1, 1], (1, "Explorer")),
+    ([1, 1, 1, "not shown", "not shown"], (1, "Explorer")),
+    ([5, 5, 5, 1, 1], (4, "Orchestrator")),
+    ([5, 4, 1, 1, "not_shown"], (1, "Explorer")),
+    ([4, 4, "runs disagreed", 4, "not shown"], (4, "Orchestrator")),
+    ([4, 4, "runs disagreed", "not shown", "not shown"], (None, None)),
+    (["not_shown"] * 5, (None, None)),
+]
+
+
+class Overall(unittest.TestCase):
+    def test_the_worked_examples_table(self):
+        for levels, want in OVERALL_WORKED:
+            with self.subTest(levels=levels):
+                got = overall(levels)
+                self.assertEqual((got["level"], got["title"]), want)
+
+    def test_the_line_names_the_title_and_the_rule(self):
+        self.assertEqual(overall([4, 4, 3, 2, "not_shown"])["line"],
+                         "Overall: Delegator (Level 3 of 4 on Modo's AI fluency ladder from chats; "
+                         "at least 3 of your 5 capabilities are at Level 3 or higher).")
+
+    def test_not_enough_shown_says_how_many_have_a_level(self):
+        self.assertEqual(overall([2, "not_shown", "not_shown", "not_shown", 1])["line"],
+                         "Overall: not enough shown (only 2 of your 5 capabilities have a level; "
+                         "an overall level needs at least 3).")
+        self.assertEqual(overall([2] + ["not shown"] * 4)["line"],
+                         "Overall: not enough shown (only 1 of your 5 capabilities has a level; "
+                         "an overall level needs at least 3).")
+
+    def test_the_multiplier_note_only_at_the_top_level_from_chats(self):
+        note = overall([5, 5, 5, 5, 5])["note"]
+        self.assertEqual(note, "Level 5 (Multiplier) is never given from chats: it needs evidence a chat "
+                               "doesn't hold, such as assets or agents your colleagues adopt and tracked time saved.")
+        self.assertIsNone(overall([4, 4, 3, 2, "not_shown"])["note"])
+        self.assertIsNone(overall(["not_shown"] * 5)["note"])
+
+    def test_accepts_a_mapping_of_capability_levels(self):
+        levels = dict(zip(Coverage.NAMES, [4, 4, 3, 2, "not shown"]))
+        self.assertEqual(overall(levels)["level"], 3)
+
+    def test_both_assess_skills_state_the_same_lines_and_rule(self):
+        skills = RUBRIC.parent.parent
+        lines = [overall([4, 4, 3, 2, "not_shown"])["line"], overall([5, 5, 5, 5, 5])["note"]]
+        generic = (overall([4, 4, 3, 2, "not_shown"])["line"].replace("Delegator", "<title>")
+                   .replace("Level 3 of", "Level <L> of").replace("Level 3 or", "Level <L> or"))
+        not_enough = overall([2, "not_shown", "not_shown", "not_shown", 1])["line"].replace("only 2", "only <n>")
+        for name in ("assess-my-ai-work", "assess-my-chats"):
+            body = re.sub(r"\s+", " ", (skills / name / "SKILL.md").read_text())
+            with self.subTest(name):
+                self.assertIn(generic, body)
+                self.assertIn(not_enough, body)
+                self.assertIn(lines[1], body)
+                self.assertIn("at least 3 of the 5 capabilities have a", body)
+                self.assertIn("Level 1 Explorer, Level 2 Practitioner, Level 3 Delegator, Level 4 Orchestrator", body)
+        self.assertIn(lines[0], re.sub(r"\s+", " ", (skills / "assess-my-ai-work" / "SKILL.md").read_text()))
+
+    def test_assess_reports_the_overall_level(self):
+        out = assess({"user_messages": 7, "runs": [RUN] * 3})
+        levels = [out["capabilities"][c]["level"] for c in Coverage.NAMES]
+        self.assertEqual(out["overall"], overall(levels))
+        self.assertIsNotNone(out["overall"]["level"])
 
 
 if __name__ == "__main__":
