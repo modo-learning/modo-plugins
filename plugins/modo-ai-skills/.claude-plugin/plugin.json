@@ -1,8 +1,8 @@
 {
   "name": "modo-ai-skills",
   "displayName": "Modo AI Skills",
-  "version": "0.3.0",
-  "description": "Assess how well you work with AI against Modo's public rubric: scored prompt by prompt with a published rule, a level, confidence, run agreement and quoted evidence for five capabilities, from one chat you choose or several past claude.ai chats. For your own development, not for hiring decisions.",
+  "version": "0.4.0",
+  "description": "Assess how well you work with AI against Modo's public rubric: scored prompt by prompt with a published rule, a level, confidence, run agreement and quoted evidence for five capabilities and one overall level on Modo's AI fluency ladder, from one chat you choose or several past claude.ai chats. For your own development, not for hiring decisions.",
   "author": {
     "name": "Modo",
     "url": "https://github.com/modo-learning"

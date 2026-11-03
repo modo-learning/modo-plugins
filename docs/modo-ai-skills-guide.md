@@ -1,6 +1,6 @@
 # Modo AI Skills: guide
 
-One page for using, demoing and maintaining Modo AI Skills 0.3.0. The plugin's
+One page for using, demoing and maintaining Modo AI Skills 0.4.0. The plugin's
 [README](../plugins/modo-ai-skills/README.md) has the full detail on each part;
 this guide puts the whole flow in order.
 
@@ -81,6 +81,19 @@ You get, strongest first, for each capability: "Level N of 5" or "not shown",
 a confidence label, how far 3 to 5 scoring runs agreed, a quote from your own
 messages, why that level, and what the next level looks like. Then two
 improvements with a prompt to try, and in claude.ai a card.
+
+**Overall level.** Near the top, one line gives an overall level on Modo's AI
+fluency ladder ("AI Fluency Levels", Modo, 2026-11-02): 1 Explorer, 2
+Practitioner, 3 Delegator, 4 Orchestrator, 5 Multiplier. It is the highest
+level L from 1 to 4 that at least 3 of the 5 capabilities reach ("not shown"
+reaches none). Fewer than 3 with a level: "not enough shown". Level 5 is never
+given from chats, because it needs evidence chats don't hold (assets and
+agents colleagues adopt, tracked time saved). Example: 4, 4, 3, 2, not shown
+gives Delegator. For several chats it uses the combined levels. It is worked
+out from the levels and is not stored in the record. The rule is in
+`scripts/derive_levels.py` (`overall`) and
+`plugins/modo-ai-skills/docs/framework-crosswalk.md`; decided 2026-11-03, flag
+for review (Angelina, Johnny).
 
 ## 4. Assess several chats at once (claude.ai only)
 
@@ -219,4 +232,6 @@ paging is covered only by live tests.
 - Modo server (modo-mcp, separate repo): serve rubric v1.1 and accept
   `scope: "multi_chat"`; until then multi-chat saves are not possible.
 - Design sign-off: the aggregation rules and the multi-chat card and report.
+- Review the overall level rule and its title on the card and report
+  (Angelina, Johnny); decided 2026-11-03.
 - Codex install and ChatGPT save-to-passport: not built or tested yet.

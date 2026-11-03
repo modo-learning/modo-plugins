@@ -17,9 +17,9 @@
     },
     {
       "name": "modo-ai-skills",
-      "description": "Assess how well you work with AI against Modo's public rubric: a level, confidence and quoted evidence for five capabilities.",
+      "description": "Assess how well you work with AI against Modo's public rubric, from one chat or several past claude.ai chats: a level, confidence and quoted evidence for five capabilities, and one overall level on Modo's AI fluency ladder.",
       "source": "./plugins/modo-ai-skills",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "license": "MIT",
       "category": "productivity"
     }
