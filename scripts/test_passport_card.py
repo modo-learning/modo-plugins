@@ -189,6 +189,69 @@ class Render(unittest.TestCase):
         self.assertIn("This chat shows only 0 of 5 capabilities", text)
 
 
+def overall_of(dom):
+    """(data-overall, text) of the card's overall AI fluency line."""
+    m = re.search(r'<p[^>]*id="fluency"[^>]*>.*?</p>', dom, flags=re.S)
+    return re.search(r'data-overall="([^"]+)"', m.group(0)).group(1), text_of(m.group(0))
+
+
+@unittest.skipUnless(CHROME, "no headless Chrome found")
+class RenderOverall(unittest.TestCase):
+    """The overall AI fluency title, worked out in the card from the five levels
+    (decided 2026-11-03, flag for review: Angelina, Johnny)."""
+
+    def with_levels(self, levels, base=SAMPLE):
+        data = json.loads(json.dumps(base))
+        for c, lvl in zip(data["capabilities"], levels):
+            c["level"] = lvl
+            if lvl == "not_shown":
+                c.pop("confidence", None)
+            else:
+                c.setdefault("confidence", "medium")
+        return render(data)
+
+    def test_sample_is_practitioner(self):
+        # Sample levels 4, 5, 2, 2, not shown: four at 2 or higher, two at 3 or higher.
+        level, text = overall_of(render(SAMPLE))
+        self.assertEqual(level, "2")
+        self.assertIn("Practitioner \u00b7 Level 2", text)
+        self.assertIn("at least 3 of 5 capabilities at Level 2 or higher", text)
+
+    def test_level_5_everywhere_is_capped_at_orchestrator(self):
+        level, text = overall_of(self.with_levels([5, 5, 5, 5, 5]))
+        self.assertEqual(level, "4")
+        self.assertIn("Orchestrator \u00b7 Level 4", text)
+        self.assertNotIn("Multiplier", text)
+
+    def test_fewer_than_3_shown_is_not_enough(self):
+        level, text = overall_of(self.with_levels([2, "not_shown", "not_shown", "not_shown", 1]))
+        self.assertEqual(level, "none")
+        self.assertIn("Overall: not enough shown", text)
+        self.assertNotRegex(text, r"Explorer|Practitioner|Delegator|Orchestrator")
+
+    def test_multi_chat_uses_the_combined_levels(self):
+        # Combined levels 2, 3, 2, 3, not shown.
+        level, text = overall_of(render(MULTI_SAMPLE))
+        self.assertEqual(level, "2")
+        self.assertIn("Practitioner \u00b7 Level 2", text)
+
+    def test_the_card_and_the_python_rule_agree_on_the_worked_examples(self):
+        from test_derive_levels import OVERALL_WORKED
+        from derive_levels import overall
+        for levels, _ in OVERALL_WORKED:
+            with self.subTest(levels=levels):
+                data = json.loads(json.dumps(SAMPLE))
+                for c, lvl in zip(data["capabilities"], levels):
+                    if isinstance(lvl, int):
+                        c.update(level=lvl, confidence="medium", agreement="3 of 3 runs")
+                    else:
+                        c.pop("confidence", None)
+                        c.update(level="not_shown",
+                                 agreement="runs disagreed" if lvl == "runs disagreed" else "3 of 3 runs")
+                want = overall(levels)["level"]
+                self.assertEqual(overall_of(render(data))[0], "none" if want is None else str(want))
+
+
 @unittest.skipUnless(CHROME, "no headless Chrome found")
 class RenderMultiChat(unittest.TestCase):
     """A result across several chats (assess-my-chats). Proposal: card look is Angelina's."""

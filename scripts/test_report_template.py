@@ -110,6 +110,61 @@ class Rendered(unittest.TestCase):
         self.assertNotIn("<script>alert(1)</script>", dom.split("<!-- MODO-DATA-END -->")[0])
 
 
+def overall_of(dom):
+    """(data-overall, text) of the report's overall AI fluency line."""
+    m = re.search(r'<p[^>]*id="fluency"[^>]*>.*?</p>', dom, re.S)
+    return re.search(r'data-overall="([^"]+)"', m.group(0)).group(1), text_of(m.group(0))
+
+
+def with_levels(levels):
+    rec = copy.deepcopy(RECORD)
+    for (key, c), lvl in zip(rec["capabilities"].items(), levels):
+        c["level"] = lvl if isinstance(lvl, int) else "not_shown"
+        c["confidence"] = "medium" if isinstance(lvl, int) else "low"
+    rec["evidence"] = [e for e in rec["evidence"] if rec["capabilities"][e["capability"]]["level"] != "not_shown"]
+    return rec
+
+
+@unittest.skipUnless(CHROME, "no Chrome found")
+class RenderedOverall(unittest.TestCase):
+    """The overall AI fluency title, worked out in the report from the capability
+    levels (decided 2026-11-03, flag for review: Angelina, Johnny). The record is unchanged."""
+
+    def test_single_chat_record_is_delegator(self):
+        # Levels 4, 5, 3, 3, not shown: four at 3 or higher, two at 4 or higher.
+        dom = render(RECORD)
+        level, text = overall_of(dom)
+        self.assertEqual(level, "3")
+        self.assertIn("Delegator \u00b7 Level 3", text)
+        self.assertIn("at least 3 of 5 capabilities at Level 3 or higher", text)
+        self.assertIn("It is not part of the record.", text_of(dom))
+
+    def test_multi_chat_record_uses_the_combined_levels(self):
+        level, text = overall_of(render(MULTI))
+        self.assertEqual(level, "2")
+        self.assertIn("Practitioner \u00b7 Level 2", text)
+
+    def test_not_enough_shown(self):
+        level, text = overall_of(render(with_levels([2, "not_shown", "not_shown", "not_shown", 1])))
+        self.assertEqual(level, "none")
+        self.assertIn("Overall: not enough shown", text)
+
+    def test_the_record_block_has_no_overall_field(self):
+        block = re.search(r'<pre id="record">(.*?)</pre>', render(RECORD), re.S).group(1)
+        self.assertNotIn("overall", block.lower())
+        self.assertNotIn("Delegator", block)
+
+    def test_the_report_and_the_python_rule_agree_on_the_worked_examples(self):
+        from test_derive_levels import OVERALL_WORKED
+        from derive_levels import overall
+        for levels, _ in OVERALL_WORKED:
+            with self.subTest(levels=levels):
+                rec = with_levels(levels)
+                self.assertEqual(validate(rec), [])
+                want = overall(levels)["level"]
+                self.assertEqual(overall_of(render(rec))[0], "none" if want is None else str(want))
+
+
 @unittest.skipUnless(CHROME, "no Chrome found")
 class RenderedMultiChat(unittest.TestCase):
     """A multi-chat record (RECORD.md "Multi-chat record"). Proposal: look is Angelina's."""
