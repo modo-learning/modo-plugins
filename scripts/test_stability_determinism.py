@@ -46,6 +46,17 @@ class SameInputSameOutput(unittest.TestCase):
             first = combine([derive(r, 7) for r in runs])
             self.assertEqual(first, combine([derive(list(r), 7) for r in runs]))
 
+    def test_combining_chats_does_not_depend_on_their_order(self):
+        import aggregate_chats
+        rnd = random.Random(34)
+        keys = ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")
+        for _ in range(300):
+            chats = [(f"2026-10-{d:02d}", {k: rnd.choice([1, 2, 3, 4, 5, "not_shown"]) for k in keys})
+                     for d in rnd.sample(range(1, 29), rnd.randint(1, 8))]
+            shuffled = chats[:]
+            rnd.shuffle(shuffled)
+            self.assertEqual(aggregate_chats.combine(chats), aggregate_chats.combine(shuffled))
+
     def test_title_does_not_depend_on_capability_order(self):
         for levels in ALL[::7]:
             self.assertEqual(overall(levels), overall(list(reversed(levels))))

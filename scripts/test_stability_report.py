@@ -100,15 +100,19 @@ class ParseAnswer(unittest.TestCase):
         self.assertEqual(r["behaviours"]["Strategic Thinking"], ["S2a"])
         self.assertEqual(r["behaviours"]["Workflow Design"], [])
 
-    def test_multi_chat_combined_and_per_chat_levels(self):
+    def test_multi_chat_combined_levels(self):
         r = sr.parse_answer(MULTI)
         self.assertEqual(r["levels"]["Verification"], 3)
         self.assertEqual(r["levels"]["Delegation"], "not shown")
         self.assertEqual(r["overall"], "not enough shown")
-        self.assertEqual(r["per_chat"]["Survey findings for product review"],
-                         {"Problem Solving": 3, "Verification": 5, "Workflow Design": "not shown",
-                          "Delegation": "not shown", "Strategic Thinking": 2})
-        self.assertEqual(r["per_chat"]["Cover letter"], "too short")
+        self.assertEqual(r["rubric"], "v1.1")
+
+    def test_behaviour_names_in_another_tense_still_map(self):
+        # The skill's own example label is "checked a fact"; the rubric says "Checks a fact".
+        text = SINGLE.replace("(V4b, message 5)", "(checked a fact, message 5)")
+        self.assertEqual(sr.parse_answer(text)["behaviours"]["Verification"], ["V5a", "V3b"])
+        text = SINGLE.replace("(V4b, message 5)", "(asked for the working, message 5)")
+        self.assertEqual(sr.parse_answer(text)["behaviours"]["Verification"], ["V5a", "V4a"])
 
     def test_missing_capability_is_an_error(self):
         with self.assertRaises(sr.ParseError):
@@ -221,6 +225,22 @@ class Records(unittest.TestCase):
         self.assertEqual(rs[0]["model"], "opus")
         self.assertIn("error", rs[1])
 
+    def test_model_flag_with_a_space_or_equals(self):
+        import contextlib
+        import io
+        import json
+        import tempfile
+        result = {"cases": [{"name": "stab-strong-verifier", "arms": {"with": [
+            {"graders": [{"type": "llm", "evidence": SINGLE}]}]}}]}
+        with tempfile.TemporaryDirectory() as t:
+            f = pathlib.Path(t) / "aggregate-result.json"
+            f.write_text(json.dumps(result))
+            for argv in (["--model", "opus", str(f)], ["--model=opus", str(f)]):
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    sr.main(argv)
+                self.assertIn("Models: opus.", out.getvalue())
+
 
 class GoldenSet(unittest.TestCase):
     """The golden chats are consistent with the published level rule."""
@@ -237,6 +257,15 @@ class GoldenSet(unittest.TestCase):
                 title = overall(list(levels.values()))["title"] or sr.NOT_ENOUGH
                 self.assertIn(title, chat["expected"]["overall"])
                 self.assertTrue(set(chat["expected"]["reasons"]) >= set(sr.CAPS) | {"overall"})
+
+    def test_expected_titles_are_exactly_the_titles_the_bands_allow(self):
+        import itertools
+        from derive_levels import overall
+        for cid, chat in sr.golden_chats().items():
+            with self.subTest(chat=cid):
+                reach = {overall(list(combo))["title"] or sr.NOT_ENOUGH
+                         for combo in itertools.product(*(chat["expected"]["bands"][cap] for cap in sr.CAPS))}
+                self.assertEqual(reach, set(chat["expected"]["overall"]))
 
     def test_multi_set_expectation_holds_the_planted_combined_result(self):
         import aggregate_chats
@@ -265,6 +294,9 @@ class GeneratedCases(unittest.TestCase):
             rows = [json.loads(x) for x in cases["stab-" + cid]["history.jsonl"].splitlines()]
             self.assertEqual([r["message"]["content"] for r in rows if r["type"] == "user"],
                              [t["user"] for t in chat["turns"]])
+        for name, files in cases.items():
+            skill = "assess-my-chats" if name.endswith(sr.MULTI_SET) else "assess-my-ai-work"
+            self.assertIn(skill, files["graders/skill-fired.md"])
         multi = cases["stab-" + sr.MULTI_SET]
         listed = json.loads(multi["mocks/chats/recent_chats.md"])["chats"]
         self.assertEqual(len(listed), len(sr.MULTI_SET_CHATS))

@@ -229,7 +229,7 @@ full paid assessment; keep the output outside the repo:
 
 ```sh
 python3 -I scripts/gen_stability_evals.py           # writes the cases (git-ignored)
-# smoke pass: 4 chats x 5 runs (about $20)
+# smoke pass: 4 chats x 5 runs (ticket 33 estimates about $20)
 for c in strong-verifier weak-delegator all-level-1 mixed; do
   claude plugin eval plugins/modo-ai-skills --eval-dir evals-stability --case "stab-$c" \
     --runs 5 --model opus --ablation none --no-publish --output-dir "../stability-runs/<date>/$c"

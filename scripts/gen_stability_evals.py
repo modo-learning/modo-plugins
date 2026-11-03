@@ -87,6 +87,7 @@ def single_case(chat):
         "prompt.md": ASK_SINGLE + "\n",
         "graders/shape.md": SHAPE_SINGLE,
         "graders/label.md": gm.LABEL_LAST,
+        "graders/skill-fired.md": gm.g_tool("Skill", r'"skill"\s*:\s*"(?:[\w-]+:)?assess-my-ai-work"'),
         "history.jsonl": "".join(json.dumps(r) + "\n" for r in single_history(chat)),
     }
 
@@ -125,6 +126,7 @@ def multi_case(chats):
         "prompt.md": "Yes, go ahead with all of them.\n",
         "graders/shape.md": SHAPE_MULTI,
         "graders/label.md": gm.LABEL_LAST,
+        "graders/skill-fired.md": gm.SKILL_FIRED,
         "history.jsonl": "".join(json.dumps(r) + "\n" for r in rows),
         f"{m}/{gm.LIST_TOOL}.md": json.dumps(listing, indent=1) + "\n",
         f"{m}/{gm.READ_TOOL}.md": gm.READ_BODY,

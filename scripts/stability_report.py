@@ -33,6 +33,9 @@ import sys
 from collections import Counter
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import aggregate_chats  # noqa: E402
+import derive_levels  # noqa: E402
+from check_eval_records import final_text  # noqa: E402
 
 
 def _delta2(metric, c, k, marg):
@@ -75,7 +78,7 @@ def alpha(units, metric="ordinal"):
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RUBRIC = ROOT / "plugins" / "modo-ai-skills" / "skills" / "assess-my-ai-work" / "rubric-v1.1.md"
 CAPS = ("Problem Solving", "Verification", "Workflow Design", "Delegation", "Strategic Thinking")
-NOT_SHOWN, DISAGREED, TOO_SHORT = "not shown", "runs disagreed", "too short"
+NOT_SHOWN, DISAGREED = "not shown", "runs disagreed"
 NOT_ENOUGH = "not enough shown"
 TITLES = ("Explorer", "Practitioner", "Delegator", "Orchestrator")
 
@@ -84,12 +87,18 @@ class ParseError(ValueError):
     pass
 
 
+def _name_key(label):
+    """A behaviour label made tense-blind: "Checked a fact", "checks a fact" and
+    "check a fact" give the same key (the skill's own example uses past tense)."""
+    return " ".join(re.sub(r"(?:ed|es|s)$", "", w) for w in label.lower().split())
+
+
 def behaviour_names(rubric=RUBRIC):
-    """{lower-case short name or id: id} from the rubric's behaviour tables."""
+    """{label key: id} for every behaviour id and short name in the rubric's tables."""
     out = {}
     for m in re.finditer(r"^\| *([PVWDS]\d[a-z]?) *\| *\d *\| *([^|]+?) *\|", rubric.read_text(), re.M):
         out[m.group(1).lower()] = m.group(1)
-        out[m.group(2).lower()] = m.group(1)
+        out[_name_key(m.group(2))] = m.group(1)
     return out
 
 
@@ -98,17 +107,12 @@ _LEVEL = re.compile(rf"^[*_ ]*({_CAP})[*_ ]*:[*_ ]*Level ([1-5]) of 5[*_ ]*\((?:
 _NOT = re.compile(rf"^[*_ ]*({_CAP})[*_ ]*:[*_ ]*Not shown in (?:this chat|these chats)[*_ ]*(\(runs disagreed\))?", re.M)
 _OVERALL = re.compile(r"^[*_ ]*Overall:[*_ ]*(?:(" + "|".join(TITLES) + r") \(Level [1-4]|(not enough shown))", re.M)
 _EVIDENCE = re.compile(r"^\s*Evidence \(([^,()]+), message \d+\)", re.M)
-_ROW = re.compile(r"^\| *\d+ *\| *(.+?) *\| *\d{4}-\d{2}-\d{2} *\|[^|]*\| *([^|]+?) *\|"
-                  r" *(\S+) *\| *(\S+) *\| *(\S+) *\| *(\S+) *\| *(\S+) *\|\s*$", re.M)
-
-
-def _cell(v):
-    return int(v) if v in "12345" and len(v) == 1 else NOT_SHOWN
+_RUBRIC = re.compile(r"against Modo rubric (v[\d.]+?)\.?\s*$", re.M)
 
 
 def parse_answer(text, names=None):
     """One assessment answer (single-chat or multi-chat shape) -> run record:
-    {"levels", "confidence", "behaviours", "overall", "per_chat" (multi only)}.
+    {"levels", "confidence", "behaviours", "overall", "rubric"}.
     Raises ParseError when a capability or the overall line is missing."""
     names = names or behaviour_names()
     levels, confidence, spans = {}, {}, []
@@ -131,18 +135,14 @@ def parse_answer(text, names=None):
     for i, (start, cap) in enumerate(spans):
         end = spans[i + 1][0] if i + 1 < len(spans) else len(text)
         for m in _EVIDENCE.finditer(text, start, end):
-            bid = names.get(m.group(1).strip().lower())
+            label = m.group(1).strip()
+            bid = names.get(label.lower()) or names.get(_name_key(label))
             if bid and bid not in behaviours[cap]:
                 behaviours[cap].append(bid)
     record = {"levels": {c: levels[c] for c in CAPS}, "confidence": {c: confidence[c] for c in CAPS},
               "behaviours": behaviours, "overall": overall.group(1) or overall.group(2)}
-    rows = list(_ROW.finditer(text))
-    if rows:
-        record["per_chat"] = {
-            m.group(1): ({c: _cell(v) for c, v in zip(CAPS, m.group(3, 4, 5, 6, 7))}
-                         if m.group(2).startswith("scored") else
-                         TOO_SHORT if m.group(2).startswith("too short") else m.group(2))
-            for m in rows}
+    rubric = _RUBRIC.search(text)
+    record["rubric"] = rubric.group(1) if rubric else "not specified"
     return record
 
 
@@ -180,6 +180,7 @@ def analyse(runs, golden):
         for cap in CAPS:
             values = [r["levels"][cap] for r in rs]
             c = _cell_metrics(values, g["bands"][cap] if g else None)
+            c["numeric"] = [v for v in values if _shown(v)]
             ids = Counter(b for r in rs for b in set(r.get("behaviours", {}).get(cap, [])))
             c.update(chat=chat, kind=kind, capability=cap,
                      behaviours={b: k / len(rs) for b, k in ids.most_common()})
@@ -192,9 +193,7 @@ def analyse(runs, golden):
     multi = [c for c in cells if c["kind"] == "multi"]
     banded = [c for c in single if c["accuracy"] is not None]
     accuracy = (sum(c["accuracy"] * c["n"] for c in banded) / sum(c["n"] for c in banded)) if banded else None
-    units = [[v for v in vals if _shown(v)] for vals in
-             ([v for v, k in c["seen"].items() for _ in range(k)] for c in single)]
-    a = alpha(units, "ordinal")
+    a = alpha([c["numeric"] for c in single], "ordinal")
 
     def row(metric, label, value, ok, shown):
         return {"metric": metric, "label": label, "value": value, "pass": ok, "shown": shown}
@@ -270,7 +269,10 @@ def markdown(m):
     out += [f"| {c['chat']} | {c['capability']} | "
             f"{', '.join(f'{b} {s:.0%}' for b, s in c['behaviours'].items())} |"
             for c in m["cells"] if c["behaviours"]]
-    out += ["", "Alpha: Krippendorff (2011), \"Computing Krippendorff's Alpha-Reliability\", ordinal metric; "
+    out += ["", "Flips: a capability withheld because its runs disagreed counts as not shown here (it is what the "
+            "user sees), although the overall rule and coverage count it as shown. Multi-chat answers name no "
+            "behaviours, so behaviour agreement covers single-chat runs only.",
+            "", "Alpha: Krippendorff (2011), \"Computing Krippendorff's Alpha-Reliability\", ordinal metric; "
             "units are (chat, capability), each run is an observer, \"not shown\" is missing.", ""]
     return "\n".join(out)
 
@@ -287,7 +289,6 @@ def golden_chats(folder=GOLDEN_DIR):
 
 
 def _title(levels):
-    import derive_levels
     t = derive_levels.overall(list(levels))
     return t["title"] or NOT_ENOUGH
 
@@ -298,7 +299,6 @@ def multi_expected(chats):
     its band (combined by aggregate_chats.combine, the published rule). Each
     capability is combined on its own, so the bands are found per capability
     and the titles over every mix of them."""
-    import aggregate_chats
     bands = {}
     for cap in CAPS:
         reach = set()
@@ -330,7 +330,6 @@ MULTI_SET_CHATS = ("strong-verifier", "weak-delegator", "all-level-1", "mixed", 
 def records(result_path, model=None):
     """Run records from one `claude plugin eval` aggregate-result.json of the
     stab-* cases: one per run, or {"error": ...} when the answer can't be read."""
-    from check_eval_records import final_text
     data = json.loads(pathlib.Path(result_path).read_text())
     out = []
     for case in data.get("cases", []):
@@ -341,7 +340,7 @@ def records(result_path, model=None):
         for arm_runs in case.get("arms", {}).values():
             for i, r in enumerate(arm_runs, 1):
                 base = {"chat": chat, "kind": "multi" if chat == MULTI_SET else "single", "run": i,
-                        "model": model or "not pinned", "rubric": "v1.1"}
+                        "model": model or "not pinned"}
                 text = final_text(r)
                 try:
                     if text is None:
@@ -354,8 +353,14 @@ def records(result_path, model=None):
 
 
 def main(argv):
-    """stability_report.py [--model NAME] aggregate-result.json [...]"""
-    model = next((a.split("=", 1)[1] for a in argv if a.startswith("--model=")), None)
+    """stability_report.py [--model NAME | --model=NAME] aggregate-result.json [...]"""
+    argv = list(argv)
+    model = None
+    if "--model" in argv:
+        i = argv.index("--model")
+        model = argv[i + 1] if i + 1 < len(argv) else None
+        del argv[i:i + 2]
+    model = next((a.split("=", 1)[1] for a in argv if a.startswith("--model=")), model)
     files = [a for a in argv if not a.startswith("--")]
     if not files:
         print(__doc__)
@@ -373,5 +378,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
     sys.exit(main(sys.argv[1:]))
