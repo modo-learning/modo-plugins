@@ -1,6 +1,6 @@
 # How Modo's rubric maps to the AI Fluency Framework
 
-Rubric version: v1.1. Checked: 2026-10-29.
+Rubric version: v1.1. Checked: 2026-10-29. Ladder section added: 2026-11-03.
 
 Modo scores five capabilities. This page shows how they line up with the
 **AI Fluency Framework** by Prof. Rick Dakan and Prof. Joseph Feller,
@@ -56,6 +56,79 @@ above is Modo's assignment.
   Claude produces an artifact show more goal-setting and formatting and less
   fact-checking and questioning. One chat is one sample, so assess a few
   chats with different kinds of work.
+
+## Modo's AI fluency ladder (overall level)
+
+Decided 2026-11-03, flag for review (Angelina, Johnny).
+
+Source: "AI Fluency Levels" (Modo, Johnny, 2026-11-02), an internal Modo
+document. It combines four public sources, named here only: BCG, "The AI
+Adoption Puzzle"; Anthropic, "AI Fluency Index"; OpenAI, "The State of
+Enterprise AI"; Zapier, "AI fluency rubric".
+
+The document defines five levels, each scored on the four 4D skills:
+
+| Ladder level | Name | In the document's words |
+|---|---|---|
+| 1 | Explorer | "Asks AI questions" |
+| 2 | Practitioner | "Uses AI on purpose" |
+| 3 | Delegator | "Hands off whole tasks" |
+| 4 | Orchestrator | "Directs agents" |
+| 5 | Multiplier | "Scales it for the team" |
+
+It gives two rules for a person's level: "A person's level is where most of
+their skills sit", and "Score a level when the signals hold for 30 days
+across at least three of the four skills."
+
+### How a Modo result gets an overall level
+
+Modo reads a capability at Level N as ladder Level N. This is a numeric
+alignment. The rubric's behaviour tables were not written against the
+ladder's per-skill descriptions, so the fit is approximate (the document
+says the same of its own sources: "Alignment is approximate").
+
+The rule, applied to the five levels of a result (one chat, or the combined
+levels of several chats):
+
+- The overall level is the highest L from 1 to 4 such that at least 3 of the
+  5 capabilities have a level of L or higher. "Not shown" (and "runs
+  disagreed") reaches no level.
+- If fewer than 3 capabilities have a level, there is no overall level: "not
+  enough shown".
+- Level 5, Multiplier, is never given from chats. Its signals in the
+  document are "Adoption by others" (cross-user usage data) and "Outcomes and
+  accountability" (outcome data and manager review), which a chat does not
+  hold.
+- The title is the ladder name of that level.
+
+"At least 3 of the 5 capabilities" is Modo's reading of "at least three of
+the four skills" and "where most of their skills sit": Modo scores five
+capabilities, not the four 4D skills (Diligence is not scored, and Workflow
+Design and Strategic Thinking are Modo additions; see above), and 3 of 5 is
+a majority.
+
+The 30-day condition is not checked. One chat has no time span, so the
+single-chat answer says one chat is a thin sample and points to
+/assess-my-chats. A multi-chat result covers the chats the user confirms (by
+default from the last 30 days); whether the signals "hold" over that time is
+not tested.
+
+The overall level is not stored in the assessment record. It is worked out
+from the capability levels wherever it is shown: the text answer, the card
+and the PDF report. The code is `overall()` in `scripts/derive_levels.py`;
+the card and report templates apply the same rule, and the tests check they
+agree on the worked examples.
+
+### Worked examples
+
+| Five levels | Overall level |
+|---|---|
+| 4, 4, 3, 2, not shown | 3 Delegator |
+| 5, 5, 5, 5, 5 | 4 Orchestrator (Level 5 is never given from chats) |
+| 3, 3, 2, 2, 2 | 2 Practitioner |
+| 1, 1, 1, 1, 1 | 1 Explorer |
+| 5, 4, 1, 1, not shown | 1 Explorer |
+| 2, 1, not shown, not shown, not shown | none ("not enough shown") |
 
 ## Not for employment decisions
 

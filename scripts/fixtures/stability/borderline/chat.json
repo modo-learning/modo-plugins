@@ -1,0 +1,44 @@
+{
+  "id": "borderline",
+  "title": "Berlin conference travel",
+  "updated_at": "2026-10-24T08:50:00Z",
+  "source": "synthetic: written for ticket 33 as the borderline edge case; every name and figure is invented",
+  "turns": [
+    {"user": "I'm sorting travel for 5 colleagues going to the sales conference in Berlin, 12 to 14 May. I need to get this approved by finance on Friday. Draft a travel plan.",
+     "assistant": "Plan: fly out 11 May, back 14 May evening, 3 nights at a hotel near the venue, about €850 a person. Total about €4,250."},
+    {"user": "Put it in a table: name, flight, hotel, cost.",
+     "assistant": "| Name | Flight | Hotel | Cost |\n| Ana | 11 May 07:10 | Hotel Mitte | €850 |\n| ... (five rows) |"},
+    {"user": "Are you sure about the conference dates? The organiser's page might say something else.",
+     "assistant": "I based them on your message. If the organiser's page differs, tell me the dates and I'll update the plan."},
+    {"user": "Add a column for the return flight.",
+     "assistant": "Added: all return on 14 May at 19:40."},
+    {"user": "Now write a short note to finance asking for approval of the total.",
+     "assistant": "Hi, please approve €4,250 for 5 people to attend the Berlin sales conference, 12 to 14 May. Details are in the attached table."}
+  ],
+  "planted": {
+    "Problem Solving": [[1, "P3a"], [2, "P3a"]],
+    "Verification": [[3, "V2a"]],
+    "Workflow Design": [[4, "W2a"], [5, "W3b"]],
+    "Delegation": [],
+    "Strategic Thinking": [[1, "S3a"]]
+  },
+  "expected": {
+    "bands": {
+      "Problem Solving": [3],
+      "Verification": [2, 3],
+      "Workflow Design": [2, 3],
+      "Delegation": ["not shown"],
+      "Strategic Thinking": [2, 3]
+    },
+    "overall": ["Practitioner", "Delegator"],
+    "reasons": {
+      "Problem Solving": "Context (people, dates, approval) and a format are given (P3a twice); no constraints or criteria at tier 4.",
+      "Verification": "The borderline on purpose: message 3 doubts the dates and names where to check, but checks nothing. Generic doubt (V2a, 2) or flagging missing context (V3c, 3) are both defensible.",
+      "Workflow Design": "Message 4 adds to the table (W2a); message 5 feeds the total into the finance note (W3b, 3) or is just a next step (2).",
+      "Delegation": "Small scoped requests inside one task; no handoff of a piece of work.",
+      "Strategic Thinking": "Finance approval on Friday is the goal (S3a, 3); a run may read it as purpose in passing (S2a, 2).",
+      "overall": "Planted: Problem Solving 3, Verification 2, Workflow Design 3, Strategic Thinking 3: Delegator. Any one of Verification, Workflow Design or Strategic Thinking reading one level lower moves it to Practitioner. This is the case for title hysteresis (ticket Part 5)."
+    },
+    "review": "proposal: Angelina to review the bands"
+  }
+}

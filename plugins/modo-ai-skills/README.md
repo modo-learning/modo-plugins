@@ -14,10 +14,11 @@ self-assessment for your own development. It is not intended for hiring,
 promotion, performance reviews or any other employment decision about you or
 anyone else.
 
-This version (0.3.0) carries **rubric v1.1**: scoring prompt by prompt against
+This version (0.4.0) carries **rubric v1.1**: scoring prompt by prompt against
 published behaviours, a fixed level rule, 3 to 5 scoring runs with their
-agreement shown, honest coverage for thin chats, and a redesigned card. See
-[What changed in v1.1](#what-changed-in-v11).
+agreement shown, honest coverage for thin chats, and a redesigned card. New
+in 0.4.0: one [overall level](#overall-level) on Modo's AI fluency ladder.
+See [What changed in v1.1](#what-changed-in-v11).
 
 It's made for people who use Claude every day for real work and want honest
 feedback on how they frame problems, check Claude's work, build repeatable
@@ -35,6 +36,8 @@ concrete to keep.
   made-up score and never level 1.
 - **A confidence label** (low, medium or high) on each level, set by how much
   the chat showed, as defined in the rubric.
+- **An overall level** on Modo's AI fluency ladder, such as "Overall:
+  Delegator (Level 3 of 4 …)", by a fixed rule (see [Overall level](#overall-level)).
 - **Run agreement**: the scoring runs 3 times (5 when the first 3 disagree),
   and each level says how many runs gave it. When runs disagree, confidence
   drops, or the capability is "not shown" instead of a guess.
@@ -89,7 +92,7 @@ outside service.
 
 ## Install
 
-This version (0.3.0, rubric v1.1) is on `main`. For the whole flow on one
+This version (0.4.0, rubric v1.1) is on `main`. For the whole flow on one
 page, see the [guide](../../docs/modo-ai-skills-guide.md). Ready-made zips
 are on the [releases page](https://github.com/modo-learning/modo-plugins/releases). The earlier rubric v1 build
 stays on the branch `modo-ai-skills-phase0` for comparison. A ChatGPT and
@@ -99,7 +102,7 @@ Codex build is generated from this plugin; see [openai/README.md](../../openai/R
 
 The marketplace there reads only `main`, so upload the plugin as a zip:
 
-1. Download `modo-ai-skills-0.3.0-claude.zip` from the
+1. Download `modo-ai-skills-0.4.0-claude.zip` from the
    [releases page](https://github.com/modo-learning/modo-plugins/releases),
    or build it from a clone as below (the older v0.1.0 test build there is
    rubric v1). Don't use GitHub's "Download ZIP" for the whole repository:
@@ -107,7 +110,7 @@ The marketplace there reads only `main`, so upload the plugin as a zip:
 
    ```
    git fetch origin main
-   git archive --format=zip -o modo-ai-skills.zip origin/main:plugins/modo-ai-skills -- . ':!evals'
+   git archive --format=zip -o modo-ai-skills.zip origin/main:plugins/modo-ai-skills -- . ':!evals' ':!evals-stability'
    ```
 
 2. Open **Customize → Plugins → Add → Upload plugin** and choose the zip.
@@ -406,6 +409,30 @@ style, the card and the PDF report (HTML pages whose small scripts lay out the
 result and make no network calls). It
 contains no connectors and no background processes. You can read all of it
 in the `skills/` folder.
+
+## Overall level
+
+Besides a level per capability, each result shows one **overall level** on
+Modo's AI fluency ladder (from "AI Fluency Levels", Modo, 2026-11-02): Level 1
+Explorer, Level 2 Practitioner, Level 3 Delegator, Level 4 Orchestrator,
+Level 5 Multiplier. The rule is fixed and published:
+
+- The overall level is the highest level L from 1 to 4 such that at least 3
+  of your 5 capabilities are at Level L or higher. "Not shown" reaches no
+  level.
+- If fewer than 3 capabilities have a level, there is no overall level ("not
+  enough shown").
+- Level 5, Multiplier, is never given from chats. It needs evidence a chat
+  doesn't hold, such as assets or agents your colleagues adopt and tracked
+  time saved.
+
+For example, levels 4, 4, 3, 2 and not shown give Delegator (Level 3). For
+several chats, the rule uses the combined levels. One chat is a thin sample:
+the ladder scores a level that holds for 30 days, so /assess-my-chats gives
+the better picture. The overall level is worked out from the capability
+levels wherever it is shown (the text, the card, the PDF report). It is not a
+separate field in the exported record. How the ladder maps to the rubric is
+in [docs/framework-crosswalk.md](docs/framework-crosswalk.md#modos-ai-fluency-ladder-overall-level).
 
 ## The rubric
 

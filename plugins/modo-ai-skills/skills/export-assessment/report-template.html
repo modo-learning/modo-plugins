@@ -82,6 +82,14 @@ body {
 .kicker { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--nav-text-muted); }
 h1 { font-size: 21px; line-height: 1.2; letter-spacing: -0.014em; margin: 0 0 6px; font-weight: 650; overflow-wrap: anywhere; }
 .sub { color: var(--nav-text-muted); margin: 0; font-size: 13px; }
+/* Overall AI fluency level (Modo's ladder), worked out below from the capability levels. */
+.fluency { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 10px; }
+.fluency-title {
+  display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 9999px;
+  background: var(--accent-primary); color: #1A1A2E; font-weight: 700; font-size: 13px;
+}
+.fluency[data-overall="none"] .fluency-title { background: transparent; color: var(--nav-text); border: 1px solid var(--nav-text-muted); font-weight: 600; }
+.fluency-why { color: var(--nav-text-muted); font-size: 12px; }
 .body { padding: 20px 28px 28px; }
 .label { margin: 0 0 4px; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 h2 { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin: 22px 0 10px; font-weight: 600; }
@@ -113,7 +121,7 @@ pre {
 @media print {
   body { background: #FFFFFF; padding: 0; }
   .card { border: 0; box-shadow: none; max-width: none; }
-  .head, .seg, ul.ev li, pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .head, .seg, .fluency-title, ul.ev li, pre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 
@@ -121,6 +129,7 @@ pre {
 <main class="card" aria-labelledby="t">
   <header class="head">
     <div class="brand"><span class="mark" aria-hidden="true">M</span><p class="kicker">Modo · AI skills assessment</p></div>
+    <p class="fluency" id="fluency" hidden><span class="fluency-title" id="fluency-title"></span><span class="fluency-why" id="fluency-why"></span></p>
     <h1 id="t">Modo AI Skills assessment</h1>
     <p class="sub" id="date"></p>
   </header>
@@ -134,6 +143,7 @@ pre {
     <div class="notes">
       <p id="notes-single">Levels run from 1 to 5. "Not shown" means nothing in the chat bears on that capability. Confidence is low, medium or high, as defined in the rubric. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
       <p id="notes-multi" hidden>Levels run from 1 to 5. Each level combines the scored chats that show the capability: the middle of their levels, the lower one on a tie. "Best shown" is the highest level reached in at least 2 chats. The trend compares earlier and later chats and needs 4 or more. "Not shown" means no scored chat bears on that capability. Confidence is low, medium or high, by how many chats show the capability and how close their levels are. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
+      <p id="overall-note">The overall level uses Modo's AI fluency ladder (Explorer, Practitioner, Delegator, Orchestrator, Multiplier): the highest level that at least 3 of the 5 capabilities reach. Chats give at most Level 4, Orchestrator; Level 5, Multiplier, needs evidence a chat doesn't hold, such as assets or agents colleagues adopt and tracked time saved. It is worked out from the levels above. It is not part of the record.</p>
       <p id="ns-note" hidden>Note: for a capability that is not shown, the record gives confidence "low", because no moment in the chat supports a level.</p>
     </div>
     <div id="chats-wrap" hidden>
@@ -196,6 +206,25 @@ pre {
     document.getElementById("date").textContent =
       "Chat date: " + (rec.session_date || "") + ". Rubric: v1.1. Based on 1 chat.";
   }
+
+  /* Overall AI fluency level, the same rule as derive_levels.overall() (decided 2026-11-03,
+     flag for review: Angelina, Johnny): the highest L in 1..4 that at least 3 of the 5
+     capabilities reach; fewer than 3 with a level gives none. Level 5 (Multiplier) is never
+     given from chats. Not stored in the record. */
+  var LADDER = ["", "Explorer", "Practitioner", "Delegator", "Orchestrator"];
+  var levels = ORDER.map(function (o) { var c = (rec.capabilities || {})[o[0]]; return c ? c.level : null; });
+  var overall = 0;
+  for (var L = 1; L <= 4; L++) {
+    if (levels.filter(function (v) { return [1, 2, 3, 4, 5].indexOf(v) >= 0 && v >= L; }).length >= 3) overall = L;
+  }
+  var fl = document.getElementById("fluency");
+  fl.hidden = false;
+  fl.setAttribute("data-overall", overall ? String(overall) : "none");
+  document.getElementById("fluency-title").textContent = overall
+    ? LADDER[overall] + " \u00b7 Level " + overall : "Overall: not enough shown";
+  document.getElementById("fluency-why").textContent = overall
+    ? "Overall AI fluency from " + (multi ? "these chats" : "this chat") + ": at least 3 of 5 capabilities at Level " + overall + " or higher"
+    : "An overall level needs at least 3 of 5 capabilities with a level";
 
   var rows = document.getElementById("rows");
   var anyNotShown = false;

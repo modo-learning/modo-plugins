@@ -266,8 +266,9 @@ script sets every level:
 4. The output must say `"self_check": "passed"`. If it doesn't, or the script
    fails its self check, your copy is wrong: write the file again exactly and
    rerun. Never score without a passing self check.
-5. Take every level, confidence, agreement, the coverage line and the runs line
-   (`runs_line`) from the output exactly, including "not shown", "runs
+5. Take every level, confidence, agreement, the coverage line, the runs line
+   (`runs_line`) and the overall line and its Multiplier note (`overall`:
+   `line`, and `note` when it is not null) from the output exactly, including "not shown", "runs
    disagreed" and "Scored once". Never change a level because it looks too high
    or too low. Behaviours listed under `dropped` had no exact quote and don't
    count; don't add them back. If the script reports an error, fix the input and
@@ -279,10 +280,22 @@ Without a code tool, apply the level rule by hand as described above.
 >>>>>>> REPLACE
 
 <<<<<<< FIND
-  4. the one-chat line ("I assess one chat at a time, so this covers only
+  5. the thin-sample line ("One chat is a thin sample: Modo's ladder scores a
+     level that holds for 30 days, so to see yours across several chats, run
+     /assess-my-chats in claude.ai.");
+  6. the one-chat line ("I assess one chat at a time, so this covers only
      this chat. To assess several of your claude.ai chats at once, run
      /assess-my-chats."), only if the user asked for several chats;
 =======
-  4. the one-chat line ("I assess one chat at a time, so this covers only
+  5. the thin-sample line ("One chat is a thin sample: Modo's ladder scores a
+     level that holds for 30 days, so assess a few more chats with different
+     kinds of work.");
+  6. the one-chat line ("I assess one chat at a time, so this covers only
      this chat."), only if the user asked for several chats;
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+One chat is a thin sample: Modo's ladder scores a level that holds for 30 days, so to see yours across several chats, run /assess-my-chats in claude.ai.
+=======
+One chat is a thin sample: Modo's ladder scores a level that holds for 30 days, so assess a few more chats with different kinds of work.
 >>>>>>> REPLACE

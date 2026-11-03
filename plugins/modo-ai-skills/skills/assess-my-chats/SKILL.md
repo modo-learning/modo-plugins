@@ -217,6 +217,21 @@ by feel:
 **Coverage**: how many of the five capabilities were shown in at least one
 scored chat.
 
+<!-- Maintainer: overall level rule decided 2026-11-03, flag for review
+(Angelina, Johnny). Source: "AI Fluency Levels" (Modo, Johnny, 2026-11-02).
+The plugin's framework crosswalk doc states the same rule and its
+worked examples; keep them in step. -->
+
+**Overall level**, from the five combined levels, also as arithmetic: the
+highest level L from 1 to 4 such that at least 3 of the 5 capabilities have a
+combined level of L or higher (not shown reaches no level). Fewer than 3 with
+a level: no overall level, "not enough shown". Level 5 is never given from
+chats: Multiplier needs evidence chats don't hold (assets and agents
+colleagues adopt, tracked time saved). The title is the name of that level on
+Modo's AI fluency ladder: Level 1 Explorer, Level 2 Practitioner, Level 3
+Delegator, Level 4 Orchestrator. Example: combined levels 4, 4, 3, 2, not
+shown give Delegator; 5, 5, 5, 5, 5 give Orchestrator.
+
 ## 5. Write the answer
 
 Keep to this shape. Write the first three lines word for word, filling in
@@ -231,6 +246,7 @@ Assessment across <s> of your chats (<first date> to <last date>), against Modo 
 Each chat was read and scored by its own agent, 3 or 5 times in one response.
 Chats: <c> confirmed, <s> scored, <t> too short (fewer than 4 typed user messages), <f> could not be read; <k> skipped before the list.
 <coverage line>
+<overall line>
 
 Verification: Level 3 of 5 (confidence: medium; shown in 2 of <s> chats; best shown: Level 3; trend: up)
   Evidence ("<chat title>", <date>, message 2): "<exact quote>"
@@ -259,6 +275,14 @@ Next step: <one line>
   title and date.
 - **Next level**: a behaviour of the next tier up in the rubric, in its
   terms.
+- **Overall line**, right after the coverage line (or after the chats line
+  when there is no coverage line): "Overall: <title> (Level <L> of 4 on
+  Modo's AI fluency ladder from chats; at least 3 of your 5 capabilities are
+  at Level <L> or higher)." or "Overall: not enough shown (only <n> of your 5
+  capabilities have a level; an overall level needs at least 3)." (with n of
+  1, "has a level"). When the overall level is 4, add: "Level 5 (Multiplier)
+  is never given from chats: it needs evidence a chat doesn't hold, such as
+  assets or agents your colleagues adopt and tracked time saved."
 - **Coverage line** (rubric "Coverage", for several chats): 4 of 5: "These
   chats show 4 of 5 capabilities. A chat with different work could show <the
   missing one>." 3 or fewer: "These chats show only N of 5 capabilities, so
@@ -303,7 +327,8 @@ never say a card exists.
    "next_action": "<the Next step line>"}`.
 3. Copy everything from the answer: the same levels, confidences, best
    shown, trends, counts and quotes. The card orders the capabilities itself
-   and draws the trend arrows. Its headline names the strongest capability;
+   and draws the trend arrows. It works out the overall title itself from
+   the levels, with the same rule as step 4. Its headline names the strongest capability;
    when several tie on level and confidence it names them all, in rubric
    order ("Strongest across these chats: Problem Solving and Delegation").
 4. Escape the JSON properly and write `\u003c` for any `<` inside a quote.

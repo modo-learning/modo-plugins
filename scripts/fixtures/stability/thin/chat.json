@@ -1,0 +1,85 @@
+{
+  "id": "thin",
+  "title": "Median function fix",
+  "updated_at": "2026-10-29T21:15:00Z",
+  "source": "synthetic: written for ticket 33 as the thin edge case (4 typed messages); every name and figure is invented",
+  "turns": [
+    {
+      "user": "This Python function should return the median of a list but it's wrong for even-length lists: def median(xs): xs.sort(); return xs[len(xs)//2]",
+      "assistant": "For even lengths you need the mean of the two middle values:\n\ndef median(xs):\n    xs = sorted(xs)\n    n = len(xs)\n    mid = n // 2\n    return xs[mid] if n % 2 else (xs[mid - 1] + xs[mid]) / 2"
+    },
+    {
+      "user": "Before I use it: for [1, 2, 3, 4] it must give 2.5 and for [5, 1, 3] it must give 3.",
+      "assistant": "Both hold: [1, 2, 3, 4] gives 2.5 and [5, 1, 3] gives 3."
+    },
+    {
+      "user": "I ran both in my terminal: 2.5 and 3. Good.",
+      "assistant": "Great."
+    },
+    {
+      "user": "Add a docstring and a test for the empty list.",
+      "assistant": "Added a docstring and test_empty_list, which expects a ValueError."
+    }
+  ],
+  "planted": {
+    "Problem Solving": [
+      [
+        1,
+        "P3a"
+      ]
+    ],
+    "Verification": [
+      [
+        2,
+        "V5a"
+      ],
+      [
+        3,
+        "V4b"
+      ]
+    ],
+    "Workflow Design": [],
+    "Delegation": [
+      [
+        4,
+        "D2a"
+      ]
+    ],
+    "Strategic Thinking": []
+  },
+  "expected": {
+    "bands": {
+      "Problem Solving": [
+        3,
+        4
+      ],
+      "Verification": [
+        4,
+        5
+      ],
+      "Workflow Design": [
+        "not shown"
+      ],
+      "Delegation": [
+        "not shown",
+        2
+      ],
+      "Strategic Thinking": [
+        "not shown"
+      ]
+    },
+    "overall": [
+      "Practitioner",
+      "not enough shown"
+    ],
+    "reasons": {
+      "Problem Solving": "The code and the failing case are given (P3a, 3); a run may read the code as the data to work from (P4b), but nothing backs a 4.",
+      "Verification": "Acceptance checks are set before use (V5a, 2) and run independently with the outcome reported (V4b, 3): 5; 4 if a run reads message 2 as asking for checks after the work.",
+      "Workflow Design": "One fix, no stages.",
+      "Delegation": "A one-line request with no output format or review point (D2a, 2); a run may see no delegation in it at all.",
+      "Strategic Thinking": "No goal beyond the function.",
+      "overall": "With Delegation at 2, 3 capabilities reach Level 2 and only 2 reach Level 3: Practitioner. With Delegation not shown, only 2 have a level: not enough shown."
+    },
+    "review": "proposal: Angelina to review the bands"
+  }
+}

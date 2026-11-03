@@ -9,6 +9,7 @@ table here matches the rubric's.
     derive(seen, user_messages)   one run, one capability -> (level, confidence)
     combine(runs)                 3 or 5 runs of one capability -> final result
     coverage(levels)              the coverage line for a result, or None
+    overall(levels)               the overall AI fluency level and title, from 5 levels
     assess(data)                  all runs of a chat -> every level, as JSON
 
 Command line (the ChatGPT version runs this in its code tool, so the levels come
@@ -129,9 +130,51 @@ def coverage(levels):
             "Assess 2–3 more chats with different kinds of work to see the rest.")
 
 
+# The overall AI fluency level. Maintainer note: decided 2026-11-03, flag for
+# review (Angelina, Johnny). Source: "AI Fluency Levels" (Modo, Johnny,
+# 2026-11-02): "A person's level is where most of their skills sit" and "Score
+# a level when the signals hold for 30 days across at least three of the four
+# skills". Rule: the highest L in 1..4 such that at least 3 of the 5
+# capabilities have a level of L or higher ("not shown" and "runs disagreed"
+# do not reach any level). Fewer than 3 capabilities with a level: no overall
+# level. Level 5 (Multiplier) is never given from chats: its signals
+# ("Adoption by others", "Outcomes and accountability") need cross-user and
+# outcome data a chat doesn't hold. The title is not stored in the record;
+# it is derived from the capability levels wherever it is shown.
+LADDER = {1: "Explorer", 2: "Practitioner", 3: "Delegator", 4: "Orchestrator", 5: "Multiplier"}
+OVERALL_MIN_CAPABILITIES = 3
+OVERALL_TOP_FROM_CHATS = 4
+MULTIPLIER_NOTE = ("Level 5 (Multiplier) is never given from chats: it needs evidence a chat doesn't hold, "
+                   "such as assets or agents your colleagues adopt and tracked time saved.")
+
+
+def overall(levels):
+    """The overall AI fluency level from five capability levels.
+
+    levels: the five levels (a list, or a mapping of capability -> level);
+    each is 1-5 or a word ("not shown", "not_shown", "runs disagreed").
+    Returns {"level": 1-4 or None, "title": ladder name or None,
+    "line": the Overall line, "note": the Multiplier note or None}.
+    """
+    values = list(levels.values()) if isinstance(levels, dict) else list(levels)
+    shown = [v for v in values if isinstance(v, int) and not isinstance(v, bool) and 1 <= v <= 5]
+    level = max((n for n in range(1, OVERALL_TOP_FROM_CHATS + 1)
+                 if sum(1 for v in shown if v >= n) >= OVERALL_MIN_CAPABILITIES), default=None)
+    if level is None:
+        has = "has" if len(shown) == 1 else "have"
+        return {"level": None, "title": None, "note": None,
+                "line": (f"Overall: not enough shown (only {len(shown)} of your 5 capabilities {has} a level; "
+                         f"an overall level needs at least {OVERALL_MIN_CAPABILITIES}).")}
+    return {"level": level, "title": LADDER[level],
+            "line": (f"Overall: {LADDER[level]} (Level {level} of {OVERALL_TOP_FROM_CHATS} on Modo's AI fluency "
+                     f"ladder from chats; at least {OVERALL_MIN_CAPABILITIES} of your 5 capabilities are at "
+                     f"Level {level} or higher)."),
+            "note": MULTIPLIER_NOTE if level == OVERALL_TOP_FROM_CHATS else None}
+
+
 CAPABILITIES = {"Problem Solving": "P", "Verification": "V", "Workflow Design": "W",
                 "Delegation": "D", "Strategic Thinking": "S"}
-SCRIPT_VERSION = "rubric-v1.1-levels-2"
+SCRIPT_VERSION = "rubric-v1.1-levels-3"
 
 
 class RunsError(ValueError):
@@ -210,6 +253,7 @@ def assess(data):
         runs_line = f"Scored {len(used)} times ({where}); the runs agreed on {agree} of 5 capabilities."
     return {"script_version": SCRIPT_VERSION, "self_check": self_check(),
             "capabilities": result, "coverage": coverage(shown_for_coverage),
+            "overall": overall([result[c]["level"] for c in CAPABILITIES]),
             "runs_used": len(used), "runs_line": runs_line,
             "needs_more_runs": len(used) == 3 and agree < 5,
             "dropped": dropped}
@@ -227,6 +271,9 @@ def self_check():
          {"level": 3, "confidence": "medium", "agreement": "2 of 3 runs"}),
         (combine([(1, "low"), (4, "high"), (2, "low")]),
          {"level": DISAGREED, "confidence": None, "agreement": DISAGREED}),
+        (overall([4, 4, 3, 2, NOT_SHOWN])["level"], 3),
+        (overall([5, 5, 5, 5, 5])["level"], 4),                     # Level 5 is never given from chats
+        (overall([2, NOT_SHOWN, DISAGREED, NOT_SHOWN, 1])["level"], None),
     ]
     bad = [i for i, (got, want) in enumerate(cases, 1) if got != want]
     if bad:

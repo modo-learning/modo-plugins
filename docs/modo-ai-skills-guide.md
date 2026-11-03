@@ -1,6 +1,6 @@
 # Modo AI Skills: guide
 
-One page for using, demoing and maintaining Modo AI Skills 0.3.0. The plugin's
+One page for using, demoing and maintaining Modo AI Skills 0.4.0. The plugin's
 [README](../plugins/modo-ai-skills/README.md) has the full detail on each part;
 this guide puts the whole flow in order.
 
@@ -28,13 +28,13 @@ Claude Code has no chat tools, and ChatGPT plugins cannot open past chats.
 
 ### claude.ai, the desktop app and Cowork
 
-Easiest: download `modo-ai-skills-0.3.0-claude.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases) and upload it (below). Or add the marketplace (Customize → Plugins → Add marketplace →
+Easiest: download `modo-ai-skills-0.4.0-claude.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases) and upload it (below). Or add the marketplace (Customize → Plugins → Add marketplace →
 `https://github.com/modo-learning/modo-plugins`, then install Modo AI Skills),
 or upload a zip:
 
 ```sh
 git clone https://github.com/modo-learning/modo-plugins.git && cd modo-plugins
-git archive --format=zip -o modo-ai-skills.zip HEAD:plugins/modo-ai-skills -- . ':!evals'
+git archive --format=zip -o modo-ai-skills.zip HEAD:plugins/modo-ai-skills -- . ':!evals' ':!evals-stability'
 ```
 
 Then Customize → Plugins → Add → Upload plugin, choose the zip. If an older
@@ -52,7 +52,7 @@ claude plugin install modo-ai-skills@modo-plugins
 ### ChatGPT
 
 The ChatGPT build is generated in `openai/plugins/modo-ai-skills` (never edit
-it by hand; see section 8). Download `modo-ai-skills-0.3.0-chatgpt.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases), or make the zip:
+it by hand; see section 8). Download `modo-ai-skills-0.4.0-chatgpt.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases), or make the zip:
 
 ```sh
 git archive --format=zip -o modo-ai-skills-chatgpt.zip HEAD:openai/plugins/modo-ai-skills
@@ -81,6 +81,19 @@ You get, strongest first, for each capability: "Level N of 5" or "not shown",
 a confidence label, how far 3 to 5 scoring runs agreed, a quote from your own
 messages, why that level, and what the next level looks like. Then two
 improvements with a prompt to try, and in claude.ai a card.
+
+**Overall level.** Near the top, one line gives an overall level on Modo's AI
+fluency ladder ("AI Fluency Levels", Modo, 2026-11-02): 1 Explorer, 2
+Practitioner, 3 Delegator, 4 Orchestrator, 5 Multiplier. It is the highest
+level L from 1 to 4 that at least 3 of the 5 capabilities reach ("not shown"
+reaches none). Fewer than 3 with a level: "not enough shown". Level 5 is never
+given from chats, because it needs evidence chats don't hold (assets and
+agents colleagues adopt, tracked time saved). Example: 4, 4, 3, 2, not shown
+gives Delegator. For several chats it uses the combined levels. It is worked
+out from the levels and is not stored in the record. The rule is in
+`scripts/derive_levels.py` (`overall`) and
+`plugins/modo-ai-skills/docs/framework-crosswalk.md`; decided 2026-11-03, flag
+for review (Angelina, Johnny).
 
 ## 4. Assess several chats at once (claude.ai only)
 
@@ -175,6 +188,7 @@ it. Use real-work chats; test chats come back too short.
 | `openai/plugins/modo-ai-skills/` | Generated ChatGPT/Codex build: never edit by hand |
 | `scripts/` | Level rule (`derive_levels.py`), aggregation (`aggregate_chats.py`), validators, checks, build, tests |
 | `plugins/modo-ai-skills/evals/` | `claude plugin eval` cases |
+| `plugins/modo-ai-skills/evals-stability/` | Stability cases, generated from `scripts/fixtures/stability/` before a run; git-ignored, never shipped |
 
 ### After any change
 
@@ -206,17 +220,48 @@ server for `recent_chats` and `read_conversation`, made by
 `scripts/gen_multi_chat_evals.py`. The mock returns each chat as one page, so
 paging is covered only by live tests.
 
+**Stability (same chat, same result).** The golden chats in
+`scripts/fixtures/stability/` (see its README) become the `stab-*` cases in
+their own eval dir, so a normal eval run never starts them. They are
+generated before each run and not committed (they would ship with a
+marketplace install and push the plugin over the 512-file store limit). Each run is a
+full paid assessment; keep the output outside the repo:
+
+```sh
+python3 -I scripts/gen_stability_evals.py           # writes the cases (git-ignored)
+# smoke pass: 4 chats x 5 runs (ticket 33 estimates about $20)
+for c in strong-verifier weak-delegator all-level-1 mixed; do
+  claude plugin eval plugins/modo-ai-skills --eval-dir evals-stability --case "stab-$c" \
+    --runs 5 --model opus --ablation none --no-publish --output-dir "../stability-runs/<date>/$c"
+done
+python3 scripts/stability_report.py --model=opus ../stability-runs/<date>/*/aggregate-result.json \
+  > docs/stability/<date>.md
+```
+
+Full pass: every `stab-*` chat case with `--runs 10`, and `stab-multi-set`
+with `--runs 5`.
+
+The report exits 1 if any metric misses the pass bar (ticket 33, a proposal
+until Angelina and Keith confirm it).
+
 ### Release
 
 1. Raise `version` in `plugins/modo-ai-skills/.claude-plugin/plugin.json` and
    in `.claude-plugin/marketplace.json`, then rebuild (the ChatGPT build takes
    the same version).
 2. Run every check above.
-3. PR to `main`. No AI attribution in commits or the PR body.
+3. Stability: run the stability cases and keep the report in
+   `docs/stability/<date>.md` (smoke pass, 4 chats × 5 runs, before every
+   release and after any change to the rubric, the chat-agent brief or the
+   assess skills; the full pass before a minor or major version). It must
+   pass.
+4. PR to `main`. No AI attribution in commits or the PR body.
 
 ### Open items (2026-11-03)
 
 - Modo server (modo-mcp, separate repo): serve rubric v1.1 and accept
   `scope: "multi_chat"`; until then multi-chat saves are not possible.
 - Design sign-off: the aggregation rules and the multi-chat card and report.
+- Review the overall level rule and its title on the card and report
+  (Angelina, Johnny); decided 2026-11-03.
 - Codex install and ChatGPT save-to-passport: not built or tested yet.

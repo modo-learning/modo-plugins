@@ -29,6 +29,10 @@ Per capability, over the scored chats where it was shown (level 1 to 5):
 
 Coverage: how many of the five capabilities were shown in at least one chat.
 
+Overall: the overall AI fluency level and title from the combined levels, by
+derive_levels.overall() (decided 2026-11-03, flag for review: Angelina,
+Johnny). It is derived here for display only; the record does not store it.
+
 Usage:
     python3 -I scripts/aggregate_chats.py results.json   # a JSON list, one entry per chat
 """
@@ -40,6 +44,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from rubric_common import CAPABILITIES, LEVEL_NOT_SHOWN  # noqa: E402
 from validate_chat_result import validate  # noqa: E402
+from derive_levels import overall  # noqa: E402
 
 
 # The thresholds. The skill text (assess-my-chats/SKILL.md, step 4), RECORD.md
@@ -112,6 +117,9 @@ def combine(chats):
 def aggregate(results):
     """Combine the ChatResults of the confirmed chats, failed reads included.
 
+    The output also holds "overall" (derive_levels.overall of the combined
+    levels), which is not a record field.
+
     The counts use the multi-chat record's names (RECORD.md, chats_assessed):
     count = every confirmed chat; scored = valid and not too short;
     too_short = too_short true; could_not_be_read = failed(result);
@@ -125,6 +133,7 @@ def aggregate(results):
                               "from": dates[0] if dates else None, "to": dates[-1] if dates else None}}
     out.update(combine([(r["updated_at"], {cap: r["capabilities"][cap]["level"] for cap in CAPABILITIES})
                         for r in scored]))
+    out["overall"] = overall([out["capabilities"][cap]["level"] for cap in CAPABILITIES])
     return out
 
 

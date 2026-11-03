@@ -90,6 +90,14 @@ body {
 }
 h1 { font-size: 21px; line-height: 1.2; letter-spacing: -0.014em; margin: 0 0 6px; font-weight: 650; text-wrap: balance; }
 .sub { color: var(--nav-text-muted); margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+/* Overall AI fluency level (Modo's ladder), worked out below from the five levels. */
+.fluency { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 10px; }
+.fluency-title {
+  display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 9999px;
+  background: var(--accent-primary); color: #1A1A2E; font-weight: 700; font-size: 13px;
+}
+.fluency[data-overall="none"] .fluency-title { background: transparent; color: var(--nav-text); border: 1px solid var(--nav-text-muted); font-weight: 600; }
+.fluency-why { color: var(--nav-text-muted); font-size: 12px; }
 .body { padding: 20px 24px 24px; }
 .coverage {
   margin: 0 0 4px; font-size: 13px; padding: 10px 12px; border-radius: 8px;
@@ -154,6 +162,7 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
 <main class="card" aria-labelledby="t">
   <header class="head">
     <div class="brand"><span class="mark" aria-hidden="true">M</span><p class="kicker">Modo · AI capability card</p></div>
+    <p class="fluency" id="fluency" hidden><span class="fluency-title" id="fluency-title"></span><span class="fluency-why" id="fluency-why"></span></p>
     <h1 id="t">Your AI capabilities in this chat</h1>
     <p class="sub" id="chat"></p>
   </header>
@@ -222,6 +231,25 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
     document.getElementById("t").textContent = (multi ? "Strongest across these chats: " : "Strongest in this chat: ") + joined;
   } else if (multi) {
     document.getElementById("t").textContent = "Your AI capabilities across these chats";
+  }
+  /* Overall AI fluency level, the same rule as derive_levels.overall() (decided 2026-11-03,
+     flag for review: Angelina, Johnny): the highest L in 1..4 that at least 3 of the 5
+     capabilities reach; fewer than 3 with a level gives none. Level 5 (Multiplier) is never
+     given from chats. Not stored in the record. */
+  var LADDER = ["", "Explorer", "Practitioner", "Delegator", "Orchestrator"];
+  if (ordered.length === 5) {
+    var overall = 0;
+    for (var L = 1; L <= 4; L++) {
+      if (ordered.filter(function (c) { return shown(c) && c.level >= L; }).length >= 3) overall = L;
+    }
+    var fl = document.getElementById("fluency");
+    fl.hidden = false;
+    fl.setAttribute("data-overall", overall ? String(overall) : "none");
+    document.getElementById("fluency-title").textContent = overall
+      ? LADDER[overall] + " \u00b7 Level " + overall : "Overall: not enough shown";
+    document.getElementById("fluency-why").textContent = overall
+      ? "Overall AI fluency from " + (multi ? "these chats" : "this chat") + ": at least 3 of 5 capabilities at Level " + overall + " or higher"
+      : "An overall level needs at least 3 of 5 capabilities with a level";
   }
   var sessions = data.sessions || 1;
   if (multi) {

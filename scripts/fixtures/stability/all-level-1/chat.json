@@ -1,0 +1,46 @@
+{
+  "id": "all-level-1",
+  "title": "Quarterly sales report",
+  "updated_at": "2026-10-22T16:30:00Z",
+  "source": "synthetic: written for ticket 33 with planted behaviours; every name and figure is invented",
+  "turns": [
+    {"user": "write a sales report",
+     "assistant": "Q3 Sales Report. Revenue reached $2.4M, up 12% on Q2. The North region led with $900k. Recommendation: expand the North team."},
+    {"user": "write it again",
+     "assistant": "Q3 Sales Report (revised). Revenue was $2.4M, a 12% rise on Q2, led by the North region at $900k."},
+    {"user": "ok the numbers look fine, I'll send it to my manager as is",
+     "assistant": "Sounds good."},
+    {"user": "now make a slide deck about our sales this quarter, whatever you think is best",
+     "assistant": "Slide 1: Q3 at a glance ($2.4M, +12%). Slide 2: Regions. Slide 3: Recommendation."},
+    {"user": "do the speaker notes too",
+     "assistant": "Speaker notes for each of the three slides are below."},
+    {"user": "thanks, done",
+     "assistant": "You're welcome."}
+  ],
+  "planted": {
+    "Problem Solving": [[1, "P1"], [2, "P1"]],
+    "Verification": [[3, "V1"]],
+    "Workflow Design": [[4, "W1"]],
+    "Delegation": [[1, "D1u"], [4, "D1u"], [5, "D1u"]],
+    "Strategic Thinking": [[4, "S1"]]
+  },
+  "expected": {
+    "bands": {
+      "Problem Solving": [1],
+      "Verification": [1],
+      "Workflow Design": [1, 2, "not shown"],
+      "Delegation": [1],
+      "Strategic Thinking": [1, "not shown"]
+    },
+    "overall": ["Explorer"],
+    "reasons": {
+      "Problem Solving": "A bare request, then the same request repeated unchanged (P1 twice); no goal or context anywhere.",
+      "Verification": "Figures Claude made up are accepted and sent on at once (V1).",
+      "Workflow Design": "Message 4 restates the topic as if new (W1); a run may read it as building on the report (W2a, 2) or see no workflow at all.",
+      "Delegation": "Report, deck and notes are handed over with no brief and never reviewed (D1u three times).",
+      "Strategic Thinking": "Direction left to Claude with no goal (S1, message 4); a run may find too little to score.",
+      "overall": "Problem Solving, Verification and Delegation are 1 in every reading, so at most 2 capabilities can reach Level 2: Explorer."
+    },
+    "review": "proposal: Angelina to review the bands"
+  }
+}

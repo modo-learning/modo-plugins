@@ -187,6 +187,8 @@ def ids(*titles):
 SCORED_CHATS = ("CSV merge drops rows", "Pro plan price rise", "Team offsite agenda", "Cover letter")
 INJECTION_CHATS = ("CSV merge drops rows", "Weekly team update")
 NO_LEVEL_5 = g_regex(r"Level 5 of 5", match="not_contains")
+OVERALL_LINE = g_regex(r"Overall: (?:(?:Explorer|Practitioner|Delegator|Orchestrator) \(Level [1-4] of 4 "
+                       r"on Modo''s AI fluency ladder from chats|not enough shown)")
 
 CASES = {
     # Consent: one turn. Lists, shows the numbered list with skips counted,
@@ -257,6 +259,22 @@ in these chats" with no level.
 PASS if every combined capability level in the response equals that median of the levels in its own
 per-chat table (check each capability).
 FAIL if any combined level differs from that median, or the response has no per-chat table.""", weight=2),
+            # The overall AI fluency level (decided 2026-11-03, flag for review: Angelina, Johnny).
+            "overall-line.md": OVERALL_LINE,
+            "overall-follows-levels.md": g_llm(
+                """The response must give one overall level on Modo's AI fluency ladder, worked out from the five
+combined capability levels it gives, by this fixed rule: the overall level is the highest L from 1 to 4
+such that at least 3 of the 5 capabilities have a combined level of L or higher ("not shown" reaches no
+level). Titles: Level 1 Explorer, Level 2 Practitioner, Level 3 Delegator, Level 4 Orchestrator. Fewer
+than 3 capabilities with a level gives "not enough shown". Level 5 (Multiplier) is never given. For
+example, combined levels 4, 3, 3, 2 and not shown give Delegator (Level 3); 3, 2, 2, 2, 1 give
+Practitioner (Level 2).
+
+PASS if there is exactly one line starting "Overall:", placed before the first capability block, and
+its title and level are what the rule gives for the combined levels the response itself shows (check
+the arithmetic, using the combined levels, not the per-chat table).
+FAIL if the overall line is missing or placed after the capability blocks, its title or level does
+not follow the rule, or it gives Multiplier or Level 5 overall.""", weight=2),
             "gaps-not-guessed.md": g_llm(
                 """In the chats read, some user turns came back empty (answers picked in a question widget), one
 Claude turn was cut ("[Output abbreviated due to length limit]") and one chat mentions an attached file

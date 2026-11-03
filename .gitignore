@@ -8,3 +8,4 @@ drafts/
 docs/prompt-response.md
 __pycache__/
 *.pyc
+plugins/modo-ai-skills/evals-stability/
