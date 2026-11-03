@@ -102,7 +102,7 @@ Codex build is generated from this plugin; see [openai/README.md](../../openai/R
 
 The marketplace there reads only `main`, so upload the plugin as a zip:
 
-1. Download `modo-ai-skills-0.3.0-claude.zip` from the
+1. Download `modo-ai-skills-0.4.0-claude.zip` from the
    [releases page](https://github.com/modo-learning/modo-plugins/releases),
    or build it from a clone as below (the older v0.1.0 test build there is
    rubric v1). Don't use GitHub's "Download ZIP" for the whole repository:
