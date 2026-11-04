@@ -9,7 +9,7 @@ table here matches the rubric's.
     derive(seen, user_messages)   one run, one capability -> (level, confidence)
     combine(runs)                 3 or 5 runs of one capability -> final result
     coverage(levels)              the coverage line for a result, or None
-    overall(levels)               the overall AI fluency level and title, from 5 levels
+    overall(levels, agent_session)  the title for one chat, from 5 levels and whether it was an agent session
     assess(data)                  all runs of a chat -> every level, as JSON
 
 Command line (the ChatGPT version runs this in its code tool, so the levels come
@@ -24,6 +24,9 @@ where each RUN maps a capability name to the behaviours noted in that run, as
 A capability with nothing noted may be left out or given []. Without
 "messages", [message, id] pairs are accepted and quotes are not checked.
 Optional "run_kind": "subagents" when each run was a separate sub-task.
+Optional "agent_session": [true, false, true], each run's answer to whether the
+user directed an agent or tools in this chat, one per run; most runs decide,
+and without it the answer is no (no evidence = no).
 """
 
 import json
@@ -130,51 +133,78 @@ def coverage(levels):
             "Assess 2–3 more chats with different kinds of work to see the rest.")
 
 
-# The overall AI fluency level. Maintainer note: decided 2026-11-03, flag for
-# review (Angelina, Johnny). Source: "AI Fluency Levels" (Modo, Johnny,
-# 2026-11-02): "A person's level is where most of their skills sit" and "Score
-# a level when the signals hold for 30 days across at least three of the four
-# skills". Rule: the highest L in 1..4 such that at least 3 of the 5
-# capabilities have a level of L or higher ("not shown" and "runs disagreed"
-# do not reach any level). Fewer than 3 capabilities with a level: no overall
-# level. Level 5 (Multiplier) is never given from chats: its signals
-# ("Adoption by others", "Outcomes and accountability") need cross-user and
-# outcome data a chat doesn't hold. The title is not stored in the record;
-# it is derived from the capability levels wherever it is shown.
+# The title for one chat. Source: Johnny's scoring rules v1, 2026-11-04
+# ("AI Fluency Levels: scoring rules v1", section 1), which replaced the rule
+# from 2026-11-03. Give the highest title whose rule is met:
+#   Orchestrator, Level 4: 3 of 5 capabilities at 4+, including Delegation, and
+#       an agent session (the user directing an agent or tools).
+#   Delegator, Level 3: 3 of 5 at 3+, including Delegation.
+#   Practitioner, Level 2: 3 of 5 at 2+.
+#   Explorer, Level 1: 3 of 5 shown at any level.
+#   No title yet: fewer than 3 shown.
+# "not shown" and "runs disagreed" reach no level. Scores that reach Orchestrator
+# with no agent session give Delegator with a note (ticket 35, D9). Multiplier
+# comes later: it needs Modo sharing data, and a claim in a chat is not evidence.
+# The title is not stored in the record.
 LADDER = {1: "Explorer", 2: "Practitioner", 3: "Delegator", 4: "Orchestrator", 5: "Multiplier"}
+NO_TITLE = "No title yet"
 OVERALL_MIN_CAPABILITIES = 3
 OVERALL_TOP_FROM_CHATS = 4
-MULTIPLIER_NOTE = ("Level 5 (Multiplier) is never given from chats: it needs evidence a chat doesn't hold, "
-                   "such as assets or agents your colleagues adopt and tracked time saved.")
+DELEGATION_FROM_LEVEL = 3
+MULTIPLIER_NOTE = ("Level 5 (Multiplier) comes later: it needs Modo sharing data that a chat doesn't hold, "
+                   "and a claim in a chat is not evidence.")
+NO_AGENT_NOTE = "The title stops at Delegator: no agent work visible in this chat."
 
 
-def overall(levels):
-    """The overall AI fluency level from five capability levels.
+def _is_level(v):
+    return isinstance(v, int) and not isinstance(v, bool) and 1 <= v <= 5
 
-    levels: the five levels (a list, or a mapping of capability -> level);
-    each is 1-5 or a word ("not shown", "not_shown", "runs disagreed").
-    Returns {"level": 1-4 or None, "title": ladder name or None,
-    "line": the Overall line, "note": the Multiplier note or None}.
+
+def overall(levels, agent_session=False):
+    """The title for one chat from its five capability levels.
+
+    levels: the five levels in rubric order, or a mapping of capability name or
+    key -> level; each is 1-5 or a word ("not shown", "not_shown", "runs
+    disagreed"). agent_session: the user directed an agent or tools in this chat.
+    Returns {"level": 1-4 or None, "title": the ladder name or None, "line": the
+    title line, "note": one more line, or None}.
     """
-    values = list(levels.values()) if isinstance(levels, dict) else list(levels)
-    shown = [v for v in values if isinstance(v, int) and not isinstance(v, bool) and 1 <= v <= 5]
-    level = max((n for n in range(1, OVERALL_TOP_FROM_CHATS + 1)
-                 if sum(1 for v in shown if v >= n) >= OVERALL_MIN_CAPABILITIES), default=None)
+    if isinstance(levels, dict):
+        values = list(levels.values())
+        delegation = levels.get("Delegation", levels.get("delegation"))
+    else:
+        values = list(levels)
+        delegation = values[3]
+    shown = [v for v in values if _is_level(v)]
+
+    def met(n):
+        return sum(1 for v in shown if v >= n) >= OVERALL_MIN_CAPABILITIES and (
+            n < DELEGATION_FROM_LEVEL or (_is_level(delegation) and delegation >= n))
+
+    level = max((n for n in range(1, OVERALL_TOP_FROM_CHATS + 1) if met(n)), default=None)
     if level is None:
-        has = "has" if len(shown) == 1 else "have"
         return {"level": None, "title": None, "note": None,
-                "line": (f"Overall: not enough shown (only {len(shown)} of your 5 capabilities {has} a level; "
-                         f"an overall level needs at least {OVERALL_MIN_CAPABILITIES}).")}
-    return {"level": level, "title": LADDER[level],
-            "line": (f"Overall: {LADDER[level]} (Level {level} of {OVERALL_TOP_FROM_CHATS} on Modo's AI fluency "
-                     f"ladder from chats; at least {OVERALL_MIN_CAPABILITIES} of your 5 capabilities are at "
-                     f"Level {level} or higher)."),
-            "note": MULTIPLIER_NOTE if level == OVERALL_TOP_FROM_CHATS else None}
+                "line": (f"This chat: {NO_TITLE} (only {len(shown)} of 5 capabilities shown; "
+                         f"a title needs at least {OVERALL_MIN_CAPABILITIES}).")}
+    note = None
+    if level == OVERALL_TOP_FROM_CHATS:
+        if agent_session:
+            note = MULTIPLIER_NOTE
+        else:
+            level, note = OVERALL_TOP_FROM_CHATS - 1, NO_AGENT_NOTE
+    why = f"at least {OVERALL_MIN_CAPABILITIES} of 5 capabilities " + (
+        f"at Level {level} or higher" if level > 1 else "shown")
+    if level >= DELEGATION_FROM_LEVEL:
+        why += ", including Delegation"
+    if level == OVERALL_TOP_FROM_CHATS:
+        why += ", with agent work shown"
+    return {"level": level, "title": LADDER[level], "note": note,
+            "line": f"This chat: {LADDER[level]} \u00b7 Level {level} ({why})."}
 
 
 CAPABILITIES = {"Problem Solving": "P", "Verification": "V", "Workflow Design": "W",
                 "Delegation": "D", "Strategic Thinking": "S"}
-SCRIPT_VERSION = "rubric-v1.1-levels-3"
+SCRIPT_VERSION = "rubric-v1.1-levels-4"
 
 
 class RunsError(ValueError):
@@ -187,8 +217,9 @@ def _norm(text):
 
 def _runs_seen(data):
     if not isinstance(data, dict) or not {"user_messages", "runs"} <= set(data) or \
-            set(data) - {"user_messages", "runs", "messages", "run_kind"}:
-        raise RunsError('expected {"user_messages": N, "runs": [...]} with optional "messages", "run_kind"')
+            set(data) - {"user_messages", "runs", "messages", "run_kind", "agent_session"}:
+        raise RunsError('expected {"user_messages": N, "runs": [...]} with optional "messages", "run_kind", '
+                        '"agent_session"')
     n, runs, messages = data["user_messages"], data["runs"], data.get("messages")
     if not isinstance(n, int) or isinstance(n, bool) or n < 1:
         raise RunsError("user_messages must be a positive integer")
@@ -197,6 +228,10 @@ def _runs_seen(data):
         raise RunsError("messages must be the list of the user's N messages, in order")
     if not isinstance(runs, list) or len(runs) not in (3, 5):
         raise RunsError("runs must be a list of 3 or 5 runs")
+    votes = data.get("agent_session", [])
+    if "agent_session" in data and not (isinstance(votes, list) and len(votes) == len(runs)
+                                        and all(isinstance(v, bool) for v in votes)):
+        raise RunsError("agent_session must be a list of true or false, one per run")
     texts = [_norm(m) for m in messages] if messages is not None else None
     out, dropped = [], []
     for i, run in enumerate(runs, 1):
@@ -243,6 +278,8 @@ def assess(data):
         final["runs"] = [lvl for lvl, _ in derived]
         result[cap] = final
         levels[cap] = NOT_SHOWN if final["level"] == DISAGREED else final["level"]
+    votes = data.get("agent_session", [])
+    agent_session = sum(votes) > len(votes) / 2
     shown_for_coverage = {c: (lvl if result[c]["level"] != DISAGREED else 1) for c, lvl in levels.items()}
     agree = sum(1 for c in CAPABILITIES if len(set(result[c]["runs"])) == 1)
     where = "as separate sub-tasks" if data.get("run_kind") == "subagents" else "in this one response"
@@ -253,7 +290,8 @@ def assess(data):
         runs_line = f"Scored {len(used)} times ({where}); the runs agreed on {agree} of 5 capabilities."
     return {"script_version": SCRIPT_VERSION, "self_check": self_check(),
             "capabilities": result, "coverage": coverage(shown_for_coverage),
-            "overall": overall([result[c]["level"] for c in CAPABILITIES]),
+            "agent_session": agent_session,
+            "overall": overall([result[c]["level"] for c in CAPABILITIES], agent_session),
             "runs_used": len(used), "runs_line": runs_line,
             "needs_more_runs": len(used) == 3 and agree < 5,
             "dropped": dropped}
@@ -271,8 +309,9 @@ def self_check():
          {"level": 3, "confidence": "medium", "agreement": "2 of 3 runs"}),
         (combine([(1, "low"), (4, "high"), (2, "low")]),
          {"level": DISAGREED, "confidence": None, "agreement": DISAGREED}),
-        (overall([4, 4, 3, 2, NOT_SHOWN])["level"], 3),
-        (overall([5, 5, 5, 5, 5])["level"], 4),                     # Level 5 is never given from chats
+        (overall([3, 4, 5, 4, 2])["level"], 3),                     # Orchestrator scores, no agent
+        (overall([5, 5, 5, 5, 5], True)["level"], 4),               # Level 5 is never given from chats
+        (overall([3, 3, 3, 2, 3], True)["level"], 2),               # Level 3 needs Delegation
         (overall([2, NOT_SHOWN, DISAGREED, NOT_SHOWN, 1])["level"], None),
     ]
     bad = [i for i, (got, want) in enumerate(cases, 1) if got != want]

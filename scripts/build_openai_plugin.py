@@ -12,6 +12,8 @@ What changes for ChatGPT:
 - Each openai/overlays/<skill>/<file>.patch holds FIND/REPLACE blocks. Every
   FIND must appear exactly once in the source file, so a change to the Claude
   skill that touches patched text fails the build instead of drifting.
+- ChatGPT reads one chat, so it has no person title (ticket 35, D6): everything
+  between MODO-PERSON markers (in SKILL.md and the HTML templates) is left out.
 - The label line reads "by ChatGPT" in skill text and templates. The rubric,
   RECORD.md and the record schema are copied byte for byte (they are shared
   with the Claude plugin and the modo-mcp server).
@@ -46,6 +48,9 @@ LABEL_FROM = "Self-assessment by Claude using Modo rubric"
 LABEL_TO = "Self-assessment by ChatGPT using Modo rubric"
 LABEL_FILES = re.compile(r"^(SKILL\.md|.*\.html)$")
 
+# Claude multi-chat only: the person title, Proven level and the export of a multi-chat result.
+PERSON_ONLY = re.compile(r"^[ \t]*(?:<!--|/\*) MODO-PERSON(-USE|)-START (?:-->|\*/)\n"
+                         r".*?^[ \t]*(?:<!--|/\*) MODO-PERSON\1-END (?:-->|\*/)\n", re.S | re.M)
 BLOCK = re.compile(r"<<<<<<< FIND\n(.*?)\n=======\n(.*?)\n?>>>>>>> REPLACE", re.S)
 
 
@@ -81,7 +86,7 @@ def transform(rel: pathlib.PurePosixPath, data: bytes) -> bytes:
     if patch.exists():
         text = apply_patch(text, parse_patch(patch.read_text()), str(rel))
     if LABEL_FILES.match(rel.name):
-        text = text.replace(LABEL_FROM, LABEL_TO)
+        text = PERSON_ONLY.sub("", text).replace(LABEL_FROM, LABEL_TO)
     return text.encode("utf-8")
 
 

@@ -23,6 +23,28 @@ class CommittedBuild(unittest.TestCase):
     def test_committed_output_is_up_to_date(self):
         self.assertEqual(build.check(), [])
 
+    def test_chatgpt_has_no_person_title_and_no_assess_my_chats(self):
+        # Ticket 35, D6 and D16. RECORD.md is byte-shared with the Claude plugin, so it stays out of this.
+        for path in SKILL_TEXT:
+            body = path.read_text()
+            with self.subTest(path=str(path.relative_to(OUT))):
+                for word in ("assess-my-chats", "Your title", "to your title", "MODO-PERSON", "Multi-chat result"):
+                    self.assertNotIn(word, body)
+
+    def test_chatgpt_has_its_own_thin_sample_note_and_the_one_chat_rule(self):
+        body = re.sub(r"\s+", " ", (OUT / "skills" / "assess-my-ai-work" / "SKILL.md").read_text())
+        self.assertIn("One chat is a thin sample, so assess a few more chats with different kinds of work.", body)
+        self.assertIn("**Delegator · Level 3**", body)
+        self.assertIn("at least 2 tool-driven steps", body)
+        self.assertIn('"agent_session": [<each run\'s answer, true or false>]', body)
+
+    def test_stripping_leaves_the_one_chat_rule_in_the_templates(self):
+        for rel in ("skills/assess-my-ai-work/passport-card.html", "skills/export-assessment/report-template.html"):
+            body = (OUT / rel).read_text()
+            self.assertIn("function chatTitle", body)
+            self.assertNotIn("personLine", body)
+            self.assertNotIn("reachedIn", body)
+
     def test_only_the_v1_skills_ship(self):
         shipped = sorted(p.name for p in (OUT / "skills").iterdir())
         self.assertEqual(shipped, sorted(build.SKILLS))
