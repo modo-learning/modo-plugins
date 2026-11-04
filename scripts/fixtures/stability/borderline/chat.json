@@ -52,7 +52,16 @@
         "W3b"
       ]
     ],
-    "Delegation": [],
+    "Delegation": [
+      [
+        1,
+        "D2a"
+      ],
+      [
+        2,
+        "D2a"
+      ]
+    ],
     "Strategic Thinking": [
       [
         1,
@@ -74,7 +83,7 @@
         3
       ],
       "Delegation": [
-        "not shown"
+        2
       ],
       "Strategic Thinking": [
         2,
@@ -88,9 +97,9 @@
       "Problem Solving": "Context (people, dates, approval) and a format are given (P3a twice); no constraints or criteria at tier 4.",
       "Verification": "The borderline on purpose: message 3 doubts the dates and names where to check, but checks nothing. Generic doubt (V2a, 2) or flagging missing context (V3c, 3) are both defensible.",
       "Workflow Design": "Message 4 adds to the table (W2a); message 5 feeds the total into the finance note (W3b, 3) or is just a next step (2).",
-      "Delegation": "Small scoped requests inside one task; no handoff of a piece of work.",
+      "Delegation": "Rubric v1.2: a clear brief for one draft and a format request are a minimal brief (D2a, 2), not a scoped handoff.",
       "Strategic Thinking": "Finance approval on Friday is the goal (S3a, 3); a run may read it as purpose in passing (S2a, 2).",
-      "overall": "Delegation is not shown, so the chat can't reach Delegator under Johnny's rule, whatever the other levels: Practitioner. Before his rule this chat sat on the Practitioner/Delegator line."
+      "overall": "Delegation is 2, so the chat can't reach Delegator under Johnny's rule, whatever the other levels: Practitioner. Before his rule this chat sat on the Practitioner/Delegator line."
     },
     "review": "proposal: Angelina to review the bands",
     "agent_session": false

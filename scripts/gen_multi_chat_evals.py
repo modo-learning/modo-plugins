@@ -264,7 +264,10 @@ FAIL if any combined level differs from that median, or the response has no per-
             # Johnny's scoring rules v1 (ticket 35): 3 scored chats, so no person title yet.
             "person-line.md": PERSON_LINE,
             "no-person-title-under-10.md": NO_PERSON_TITLE,
-            "range-and-reuse.md": g_regex(r"Task range: [1-3] of 8 types\W+Reused saved work: [0-3] of 3 chats"),
+            # The pricing chat's "same format as the August memo" is the one reuse in these chats.
+            "range-and-reuse.md": g_regex(r"Task range: [1-3] of 8 types\W+Reused saved work: 1 of 3 chats"),
+            # The pricing chat runs a tool Claude picked itself: no agent session, so no Orchestrator.
+            "no-agent-session.md": g_regex(r"\| Orchestrator \|", match="not_contains"),
             "no-best-shown.md": NO_BEST_SHOWN,
             "chat-titles.md": g_llm(
                 """The per-chat table must have a Title column. Each scored chat's title follows from that chat's own

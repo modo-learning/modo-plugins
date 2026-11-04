@@ -18,8 +18,8 @@ published rule.
 | weak-delegator | synthetic | 6 | Delegation 2 (unchecked handoffs); Practitioner |
 | all-level-1 | synthetic | 6 | every capability 1; Explorer |
 | mixed | synthetic | 7 | Workflow 5, Problem Solving 5, Verification 1; no agent, so Delegator |
-| borderline | edge case | 5 | Delegation not shown, so Practitioner under Johnny's rule (it sat on the Practitioner/Delegator line before) |
-| thin | edge case | 4 | few messages; Practitioner or No title yet |
+| borderline | edge case | 5 | Delegation 2 (a minimal brief, rubric v1.2), so Practitioner under Johnny's rule (it sat on the Practitioner/Delegator line before) |
+| thin | edge case | 4 | few messages; Workflow Design 2 under rubric v1.2, so Practitioner |
 | johnny-e1, -e2 | Johnny's example | 4 | Explorer |
 | johnny-p1, -p2 | Johnny's example | 4 | Practitioner |
 | johnny-d1, -d2 | Johnny's example | 5 | Delegator (D1 reaches Orchestrator scores with no agent) |
