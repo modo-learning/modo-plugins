@@ -1,6 +1,6 @@
 ---
 name: assess-my-chats
-description: Assess how well the user works with AI across several of their past claude.ai chats at once (default the last 30 days, up to 10 chats, at most 25), after they confirm the list of chats to read. Each chat is read and scored by its own agent against Modo's public rubric on five capabilities, then combined into one level per capability with confidence, best level shown, trend and a per-chat table. Use when the user runs /assess-my-chats, or asks to assess all their chats, their recent chats, chats over a period, or for an overall picture of their AI skills across chats.
+description: Assess how well the user works with AI across several of their past claude.ai chats at once (default the last 30 days, up to 15 chats, at most 25), after they confirm the list of chats to read. Each chat is read and scored by its own agent against Modo's public rubric on five capabilities, then combined into one level per capability with confidence, Proven level and trend, a title for each chat, a person title from 10 scored chats, task range, reuse and a per-chat table. Use when the user runs /assess-my-chats, or asks to assess all their chats, their recent chats, chats over a period, or for an overall picture of their AI skills across chats.
 ---
 
 <!--
@@ -39,6 +39,14 @@ Decided 2026-11-02, flag for review:
     the question or progress updates (live test 2026-11-02, defect 1).
 11. The fallback (no agents) says so in line 2 of the answer; confirmed
     chats beyond the 3 it reads count as could not be read.
+
+Johnny's scoring rules v1, 2026-11-04 ("AI Fluency Levels: scoring rules v1",
+sections 1 to 3) set the titles, Proven level, task range and reuse. Readings
+pending his answer: an agent session is at least 2 tool-driven steps; "reached
+in 3 chats" counts higher chats toward lower levels, for titles and Proven
+level alike; Proven level replaces Best shown for people, and the median stays
+the main level. The score sheet is worked out inside one run and stored
+nowhere. Best shown stays in the record, which is unchanged.
 -->
 
 # Assess my chats
@@ -101,7 +109,7 @@ Then, in either case:
 ## 1. Scope and list
 
 **Scope.** Unless the user said otherwise, use the last 30 days and at most
-10 chats, newest first. The user can choose another date range and up to 25
+15 chats, newest first. The user can choose another date range and up to 25
 chats. Asked for more than 25, use 25 and say that 25 is the most.
 
 **List.** Call `recent_chats`. To go further back, call it again with
@@ -129,7 +137,7 @@ offer the change here.
 
 Show one numbered list, newest first: `<n>. <title> (<date>)`. Above it say
 the date range and the number of chats used (for example "the last 30 days,
-up to 10 chats"). Below it say:
+up to 15 chats"). Below it say:
 
 - how many chats were skipped and why (current chat, untitled, flagged), if
   any;
@@ -176,6 +184,10 @@ valid").
 - otherwise `runs` 3 or 5;
 - a capability with a level has 1 to 3 behaviour ids of that capability from
   the rubric and 1 to 3 quotes; a capability not shown has none;
+- `agent_session` is `{"value", "quote", "tools"}` with a quote or tool names
+  for true and neither for false; `reuse` is `{"value", "quote"}` with a quote
+  for true and none for false; `task_type` is one of the brief's 8 types, or
+  `null` exactly when the chat is too short, and then both values are false;
 - each quote is `{"message": m, "text": "…"}` with m from 1 to
   `user_messages`, and text at most 240 characters, not blank, with no
   ellipsis.
@@ -202,8 +214,9 @@ by feel:
 
 - **Level**: the median of those levels. With an even number, the lower of
   the two middle ones.
-- **Best shown**: the highest level reached in at least 2 chats. None if no
-  level was reached twice.
+- **Proven level**: the highest level reached in at least 3 chats, counting
+  chats at a higher level too (levels 4, 4, 5 give 4). None if no level was
+  reached in 3 chats.
 - **Confidence**: high when shown in 3 or more chats with a spread (highest
   minus lowest) of at most 1; medium when shown in 2 chats with a spread of
   at most 1, or in 3 or more chats with a spread of 2; low otherwise.
@@ -211,26 +224,53 @@ by feel:
   Take the median (lower middle) of the earlier half and of the later half;
   with an odd number, leave out the middle chat. Up if the later is higher,
   down if lower, else flat.
-- **Not shown in any scored chat**: not shown, confidence low, no best, no
-  trend.
+- **Not shown in any scored chat**: not shown, confidence low, no Proven
+  level, no trend.
+- **Best shown** (for the record only): the highest level reached in at least
+  2 chats. None if no level was reached twice. Never show it to the user: the
+  answer and the card show the Proven level. export-assessment works it out
+  from the per-chat table when it builds the record.
 
 **Coverage**: how many of the five capabilities were shown in at least one
 scored chat.
 
-<!-- Maintainer: overall level rule decided 2026-11-03, flag for review
-(Angelina, Johnny). Source: "AI Fluency Levels" (Modo, Johnny, 2026-11-02).
-The plugin's framework crosswalk doc states the same rule and its
-worked examples; keep them in step. -->
+**The title for each scored chat**, from that chat's five levels and its
+`agent_session`, as arithmetic:
 
-**Overall level**, from the five combined levels, also as arithmetic: the
-highest level L from 1 to 4 such that at least 3 of the 5 capabilities have a
-combined level of L or higher (not shown reaches no level). Fewer than 3 with
-a level: no overall level, "not enough shown". Level 5 is never given from
-chats: Multiplier needs evidence chats don't hold (assets and agents
-colleagues adopt, tracked time saved). The title is the name of that level on
-Modo's AI fluency ladder: Level 1 Explorer, Level 2 Practitioner, Level 3
-Delegator, Level 4 Orchestrator. Example: combined levels 4, 4, 3, 2, not
-shown give Delegator; 5, 5, 5, 5, 5 give Orchestrator.
+- **Orchestrator · Level 4**: at least 3 of the 5 capabilities at Level 4 or
+  higher, including Delegation, and an agent session.
+- **Delegator · Level 3**: at least 3 of the 5 at Level 3 or higher, including
+  Delegation.
+- **Practitioner · Level 2**: at least 3 of the 5 at Level 2 or higher.
+- **Explorer · Level 1**: at least 3 of the 5 shown, at any level.
+- **No title yet**: fewer than 3 shown.
+
+Give the highest title whose rule is met. A capability not shown (or withheld
+because the runs disagreed) reaches no level. Scores that reach Orchestrator
+with no agent session give Delegator, with the note "The title stops at
+Delegator: no agent work visible in this chat." Multiplier comes later: a
+chat is never given Level 5, and a claim in a chat is not evidence.
+
+Worked examples (levels as Problem Solving, Verification, Workflow Design,
+Delegation, Strategic Thinking; – is not shown): 3, 2, 3, 2, 3 gives
+Practitioner, because Delegation is below 3; 3, 4, 2, 3, 4 gives Delegator;
+3, 4, 5, 4, 2 with no agent session gives Delegator with the note; 5, 5, 4, 5,
+3 with an agent session gives Orchestrator; 1, –, 2, 1, – gives Explorer; –, 5,
+–, –, 3 gives No title yet.
+
+**Your title**, from the chat titles. A scored chat counts toward the 10 even
+if it has no title, but it adds no title toward the 3 chats.
+
+- Under 10 scored chats: no title. Show "<s> of 10 chats to your title".
+- 10 or more: the highest chat title reached in at least 3 chats, counting
+  chats with a higher title too. Example after 12 chats: Delegator in 3 chats,
+  Practitioner in 6, Explorer in 3 gives Delegator; 2 Orchestrator chats and 1
+  Delegator chat count as Delegator in 3 chats. No title reached in 3 chats:
+  No title yet.
+
+**Task range**: how many different `task_type` values the scored chats have.
+**Reused saved work**: how many scored chats have `reuse` true. Show counts
+only: never a task list, a saved prompt's name or a reuse quote.
 
 ## 5. Write the answer
 
@@ -246,19 +286,20 @@ Assessment across <s> of your chats (<first date> to <last date>), against Modo 
 Each chat was read and scored by its own agent, 3 or 5 times in one response.
 Chats: <c> confirmed, <s> scored, <t> too short (fewer than 4 typed user messages), <f> could not be read; <k> skipped before the list.
 <coverage line>
-<overall line>
+<title line>
+Task range: <n> of 8 types. Reused saved work: <r> of <s> chats.
 
-Verification: Level 3 of 5 (confidence: medium; shown in 2 of <s> chats; best shown: Level 3; trend: up)
+Verification: Level 3 of 5 (confidence: medium; shown in 2 of <s> chats; proven level: Level 3; trend: up)
   Evidence ("<chat title>", <date>, message 2): "<exact quote>"
   Why this level: median of the chat levels <levels, oldest first>.
   Next level: <one line>
 
 ...
 
-| # | Chat | Date | Typed messages | Result | P | V | W | D | S |
-| 1 | <title> | <date> | 7 | scored (5 runs) | 3 | 4 | 4 | 4 | 4 |
-| 2 | <title> | <date> | 3 | too short | – | – | – | – | – |
-| 3 | <title> | <date> | – | could not be read (tool error) | – | – | – | – | – |
+| # | Chat | Date | Typed messages | Result | Title | P | V | W | D | S |
+| 1 | <title> | <date> | 7 | scored (5 runs) | Delegator | 3 | 4 | 4 | 4 | 4 |
+| 2 | <title> | <date> | 3 | too short | – | – | – | – | – | – |
+| 3 | <title> | <date> | – | could not be read (tool error) | – | – | – | – | – | – |
 
 Next step: <one line>
 <export line>
@@ -269,20 +310,20 @@ Next step: <one line>
 - **Strengths first**: capabilities with a level from highest to lowest (tie:
   higher confidence, then rubric order). Not shown ones last, in rubric
   order, as "Not shown in these chats", never with a level or a zero.
-- Leave out "best shown" when there is none and "trend" when there is none.
+- Leave out "proven level" when there is none and "trend" when there is none.
+- **Per-chat table**: the Title column holds that chat's title by name, or "No
+  title yet"; – for a chat that was not scored.
 - **Evidence**: one or two quotes per capability, copied exactly from a chat
   whose level equals the combined level, newest chat first. Name the chat by
   title and date.
 - **Next level**: a behaviour of the next tier up in the rubric, in its
   terms.
-- **Overall line**, right after the coverage line (or after the chats line
-  when there is no coverage line): "Overall: <title> (Level <L> of 4 on
-  Modo's AI fluency ladder from chats; at least 3 of your 5 capabilities are
-  at Level <L> or higher)." or "Overall: not enough shown (only <n> of your 5
-  capabilities have a level; an overall level needs at least 3)." (with n of
-  1, "has a level"). When the overall level is 4, add: "Level 5 (Multiplier)
-  is never given from chats: it needs evidence a chat doesn't hold, such as
-  assets or agents your colleagues adopt and tracked time saved."
+- **Title line**, right after the coverage line (or after the chats line when
+  there is no coverage line), one of: "<s> of 10 chats to your title"; "Your
+  title: <title> · Level <L> (reached in at least 3 chats)."; "Your title: No
+  title yet (no title reached in 3 chats)." With an Orchestrator title, add:
+  "Level 5 (Multiplier) comes later: it needs Modo sharing data that a chat
+  doesn't hold, and a claim in a chat is not evidence."
 - **Coverage line** (rubric "Coverage", for several chats): 4 of 5: "These
   chats show 4 of 5 capabilities. A chat with different work could show <the
   missing one>." 3 or fewer: "These chats show only N of 5 capabilities, so
@@ -316,19 +357,21 @@ never say a card exists.
    `<!-- MODO-DATA-END -->`; change nothing else. The JSON holds exactly:
    `{"scope": "multi_chat", "sessions": <s, the scored chats>,
    "date_range": ["<first date>", "<last date>"],
+   "chat_titles": [one number per scored chat, its title level 1 to 4, or 0
+   for no title], "task_types": <n>, "reused": <r>,
    "capabilities": [five objects in rubric order, each {"name": "<capability
    name>", "level": 1-5 or "not_shown", "confidence": "low|medium|high",
-   "best_shown": 1-5 or null, "trend": "up|flat|down" or null,
+   "proven": 1-5 or null, "trend": "up|flat|down" or null,
    "chats_shown": <n>} (omit confidence for not_shown)],
    "evidence": [one or two objects {"capability": "<name>", "quote": "<exact
    quote>", "source": "<chat title as in the answer>, <date>"}, from the
    strongest capabilities],
    "growth": null,
    "next_action": "<the Next step line>"}`.
-3. Copy everything from the answer: the same levels, confidences, best
-   shown, trends, counts and quotes. The card orders the capabilities itself
-   and draws the trend arrows. It works out the overall title itself from
-   the levels, with the same rule as step 4. Its headline names the strongest capability;
+3. Copy everything from the answer: the same levels, confidences, Proven
+   levels, trends, counts and quotes. The card orders the capabilities itself
+   and draws the trend arrows. It works out your title itself from
+   `chat_titles`, with the same rule as step 4. Its headline names the strongest capability;
    when several tie on level and confidence it names them all, in rubric
    order ("Strongest across these chats: Problem Solving and Delegation").
 4. Escape the JSON properly and write `\u003c` for any `<` inside a quote.

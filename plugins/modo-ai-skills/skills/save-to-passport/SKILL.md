@@ -178,7 +178,8 @@ shape is a proposal (decided 2026-11-02, flag for review).
   export of it was approved here, start from that): quotes only from the
   result, each with its chat number; chats named `"Chat 1"`, `"Chat 2"`, …
   unless the user says "with titles"; title "Assessment across <s> chats";
-  date the newest scored chat's date; every number copied as it stands.
+  date the newest scored chat's date; every number copied as it stands, with
+  `best_shown` worked out as that section says.
 - Don't open any chat: the agents checked the quotes; the user's yes in step
   4 is the check here.
 - Step 3 shows the chat list too, as the record names it, then the record.

@@ -6,12 +6,13 @@ his file, not worked out with our rule. Capabilities he gave no score for are
 "not shown" here. D1 to O2 are his chat names, not behaviour ids.
 """
 
-import sys
 import pathlib
+import re
+import sys
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from derive_levels import NO_AGENT_NOTE, overall  # noqa: E402
+from derive_levels import MULTIPLIER_NOTE, NO_AGENT_NOTE, overall  # noqa: E402
 
 NS = "not_shown"
 # name -> (Problem Solving, Verification, Workflow Design, Delegation,
@@ -96,6 +97,55 @@ class JohnnysExamples(unittest.TestCase):
                          "This chat: No title yet (only 2 of 5 capabilities shown; a title needs at least 3).")
         self.assertEqual(overall([NS, 5, NS, NS, NS])["line"],
                          "This chat: No title yet (only 1 of 5 capabilities shown; a title needs at least 3).")
+
+
+class StatedInTheSkills(unittest.TestCase):
+    """claude.ai runs no script: the skills state the rule in words, the same as the code."""
+
+    SKILLS = pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills" / "skills"
+
+    def body(self, name):
+        return re.sub(r"\s+", " ", (self.SKILLS / name / "SKILL.md").read_text())
+
+    def test_both_assess_skills_state_the_same_rule(self):
+        for name in ("assess-my-ai-work", "assess-my-chats"):
+            with self.subTest(name):
+                body = self.body(name)
+                for phrase in ("**Orchestrator · Level 4**: at least 3 of the 5 capabilities at Level 4 or higher, "
+                               "including Delegation, and an agent session.",
+                               "**Delegator · Level 3**: at least 3 of the 5 at Level 3 or higher, including Delegation.",
+                               "**Practitioner · Level 2**: at least 3 of the 5 at Level 2 or higher.",
+                               "**Explorer · Level 1**: at least 3 of the 5 shown, at any level.",
+                               NO_AGENT_NOTE, MULTIPLIER_NOTE):
+                    self.assertIn(phrase, body)
+
+    def test_the_one_chat_lines_are_the_codes(self):
+        body = self.body("assess-my-ai-work")
+        for levels, agent in ((EXAMPLES["D2"][0], False), (EXAMPLES["O1"][0], True), (EXAMPLES["P1"][0], False),
+                              (EXAMPLES["E1"][0], False)):
+            self.assertIn(overall(list(levels), agent)["line"], body)
+        self.assertIn(overall([NS, 5, NS, NS, 3])["line"].replace("only 2", "only <n>"), body)
+
+    def test_the_thin_sample_note_is_d16(self):
+        self.assertIn("One chat is a thin sample: your title comes from 10 scored chats. "
+                      "Run /assess-my-chats in claude.ai", self.body("assess-my-ai-work"))
+
+    def test_person_lines_are_the_codes(self):
+        import aggregate_chats
+        body = self.body("assess-my-chats")
+        self.assertIn(aggregate_chats.person_title([3] * 12)["line"].replace("Delegator", "<title>")
+                      .replace("Level 3", "Level <L>"), body)
+        self.assertIn(aggregate_chats.person_title([None] * 12)["line"], body)
+
+    def test_agent_session_is_the_same_rule_in_both_places(self):
+        brief = re.sub(r"\s+", " ", (self.SKILLS / "assess-my-chats" / "chat-agent-brief.md").read_text())
+        single = self.body("assess-my-ai-work")
+        for phrase in ("at least 2 tool-driven steps", "One web search doesn't count", "No evidence means no",
+                       "A claim doesn't count", "Most runs decide", 'There is no "Other"',
+                       "Writing and editing · Research and summarizing · Data analysis · Coding · "
+                       "Planning and decisions · Brainstorming · Learning · Operations and admin"):
+            self.assertIn(phrase, brief)
+            self.assertIn(phrase, single)
 
 
 if __name__ == "__main__":

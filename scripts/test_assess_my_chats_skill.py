@@ -98,12 +98,13 @@ class ScopeAndConsent(unittest.TestCase):
     def test_defaults(self):
         body = text()
         self.assertIn("last 30 days", body)
-        self.assertIn("at most 10 chats", body)
+        self.assertIn("at most 15 chats", body)
+        self.assertIn("up to 15 chats, at most 25", body)
         self.assertIn("up to 25", body)
 
     def test_minimum_length_is_the_validators(self):
         self.assertIn(f"fewer than {MIN_USER_MESSAGES} typed user messages", text())
-        self.assertNotIn("fewer than 3", text())
+        self.assertNotIn("fewer than 3 typed", text())
 
     def test_consent_before_any_read(self):
         body = text()
@@ -191,9 +192,29 @@ class Aggregation(unittest.TestCase):
 
     def test_report_notes_in_export_match_the_script(self):
         body = folded(EXPORT)
-        self.assertIn(f'"Best shown" is the highest level reached in at least {aggregate_chats.BEST_MIN_CHATS} chats',
-                      body)
+        self.assertIn(f'"Proven level" is the highest level reached in at least {aggregate_chats.PROVEN_MIN_CHATS} '
+                      "chats", body)
+        self.assertNotIn('"Best shown"', body)
         self.assertIn(f"needs {aggregate_chats.TREND_MIN_CHATS} or more", body)
+
+    def test_score_sheet_rules_in_the_skill_match_the_script(self):
+        body = text()
+        a = aggregate_chats
+        self.assertIn(f"highest level reached in at least {a.PROVEN_MIN_CHATS} chats, counting chats at a higher "
+                      "level too", body)
+        self.assertIn(f"Under {a.TITLE_MIN_CHATS} scored chats: no title", body)
+        self.assertIn(f"the highest chat title reached in at least {a.PROVEN_MIN_CHATS} chats, counting chats with "
+                      "a higher title too", body)
+        self.assertIn("counts toward the 10 even if it has no title", body)
+        self.assertIn("Task range: <n> of 8 types", body)
+        self.assertIn("Reused saved work: <r> of <s> chats", body)
+        self.assertIn('"<s> of 10 chats to your title"', body)
+        self.assertIn("| Result | Title | P | V | W | D | S |", body)
+
+    def test_people_never_see_best_shown(self):
+        body = text()
+        self.assertIn("(for the record only)", body)
+        self.assertNotIn("best shown: Level", body)
 
     def test_constants_drive_the_arithmetic(self):
         a = aggregate_chats
