@@ -267,7 +267,7 @@ until Angelina and Keith confirm it).
 - Modo server (modo-mcp, separate repo): serve rubric v1.2 and accept
   `scope: "multi_chat"`; until then multi-chat saves are not possible.
 - Design sign-off: the aggregation rules and the multi-chat card and report.
-- Johnny's answer on three readings: what an agent session is, whether "reached
-  in 3 chats" is cumulative, and Proven level replacing Best shown.
+- Johnny's answer on two readings: whether "reached in 3 chats" is cumulative,
+  and Proven level replacing Best shown.
 - Stored score sheet: needs the backend. Multiplier: needs Modo sharing data.
 - Codex install and ChatGPT save-to-passport: not built or tested yet.

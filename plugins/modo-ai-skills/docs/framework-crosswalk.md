@@ -117,15 +117,21 @@ record.
   or named saved prompt or template, a project with saved instructions, or "use
   my usual format". Counts only, with no saved-prompt names.
 
+### Agent session (confirmed by Johnny, 2026-11-04)
+
+His "directing an agent or tools" means the user directs the process in their
+own words: asks for a plan before the work runs, limits or pauses the steps,
+sets a check for the agent to run, or gives instructions for a multi-step run
+across tools or systems. It needs at least 2 tool-driven steps and one exact
+quote from the user. Tool use alone doesn't count: the assistant often uses
+tools by itself, for example to make a slide deck, and reviewing the finished
+result is not directing the process. One web search doesn't count. No evidence
+means no.
+
 ### Readings pending Johnny's answer
 
 Johnny's file leaves these open. Modo reads them this way until he answers:
 
-- **Agent session** (his "directing an agent or tools"): at least 2 tool-driven
-  steps with the user directing or reviewing them, on any surface. One web
-  search doesn't count. A tool the assistant picked itself doesn't count unless
-  the user directs or reviews those steps. Evidence is tool names or the user's
-  own messages. No evidence means no.
 - **Most runs decide:** agent session, task type and reuse each take the answer
   of most of the 3 to 5 scoring runs. His file doesn't say how to decide them
   when runs differ.

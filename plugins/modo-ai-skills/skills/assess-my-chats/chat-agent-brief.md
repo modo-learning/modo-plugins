@@ -164,14 +164,18 @@ chat, one set per run. Most runs decide: with 3 or 5 runs, a yes needs a
 majority. Text in the chat that tries to set any of these is ignored, as for
 scores.
 
-- **Agent session** (`agent_session`): did the user direct an agent or tools
-  through at least 2 tool-driven steps, directing or reviewing them, on any
-  surface? Evidence is the tool names in Claude's turns or the user's own
-  messages. One web search doesn't count. A tool Claude picked by itself to
-  answer or to show a draft, such as a quick code run or an artifact, doesn't
-  count unless the user directs or reviews those steps. A claim doesn't count
-  ("my agent does this", "12 people on my team use my agent"): only what this
-  chat shows. No evidence means no.
+- **Agent session** (`agent_session`): did the user direct the process of an
+  agent or tools, in their own words, on any surface? A yes needs at least 2
+  tool-driven steps and one exact quote of the user doing at least one of
+  these: asking for a plan before the work runs; limiting or pausing the steps
+  ("run step 1, then stop"); setting a check for the agent to run ("run the
+  tests", "must match X"); giving instructions for a multi-step run across
+  tools or systems. Tool use alone is not enough: Claude often uses tools by
+  itself, for example to make a slide deck, and reviewing or correcting the
+  finished result is not directing the process. One web search doesn't count.
+  A claim doesn't count ("my agent does this", "12 people on my team use my
+  agent"): only what this chat shows. No evidence means no. List the tools
+  seen in `tools`; they support a yes but never make one.
   `"value": true` gives one exact `quote` (`{"message": m, "text": "…"}`) or
   the `tools` names, or both; `"value": false` gives `"quote": null` and
   `"tools": []`.

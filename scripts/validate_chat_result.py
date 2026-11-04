@@ -23,7 +23,7 @@ Shape (design: Modo workspace doc docs/ai-skills/DESIGN-multi-chat-assessment.md
   "agent_session": {                    the user directed an agent or tools; most runs decide
     "value": true,
     "quote": null,                      {"message": n, "text": "exact words"}, or null
-    "tools": ["Bash", "Edit"]           tool names; a yes has a quote or tool names, a no has neither
+    "tools": ["Bash", "Edit"]           tool names seen; a yes needs the user's quote, a no has no quote
   },
   "task_type": "Coding",                one of the 8 in TASK_TYPES; null when too short
   "reuse": {                            saved work was used; most runs decide
@@ -154,10 +154,10 @@ def _signals(result, too_short, users, messages):
             if not (isinstance(tools, list) and all(isinstance(t, str) and t.strip() for t in tools)):
                 errors.append("agent_session.tools: must be a list of tool names")
                 tools = []
-            if agent["value"] and not (quote or tools):
-                errors.append("agent_session: yes needs one exact quote or the tool names")
-            if not agent["value"] and (quote or tools):
-                errors.append("agent_session: no carries no quote or tools")
+            if agent["value"] and not quote:
+                errors.append("agent_session: yes needs one exact quote of the user directing the work")
+            if not agent["value"] and quote:
+                errors.append("agent_session: no carries no quote")
             if agent["value"] and too_short is True:
                 errors.append("agent_session: must be no for a chat that is too short")
             if quote is not None:

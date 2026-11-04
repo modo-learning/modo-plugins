@@ -432,9 +432,10 @@ title whose rule is met:
 | No title yet | fewer than 3 shown |
 
 Scores that reach Orchestrator with no agent session give Delegator, with the
-note "no agent work visible in this chat". An agent session is at least 2
-tool-driven steps that you direct or review, on any surface; one web search
-doesn't count. Multiplier, Level 5, comes later: it needs Modo sharing data, and
+note "no agent work visible in this chat". An agent session means you direct the
+process in your own words: you ask for a plan, limit the steps or set checks,
+across at least 2 tool-driven steps. Claude using tools by itself doesn't count,
+for example to make a slide deck you then review. Multiplier, Level 5, comes later: it needs Modo sharing data, and
 a claim in a chat is not evidence.
 
 **Your title** is the highest chat title you reached in at least 3 chats, shown

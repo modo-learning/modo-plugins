@@ -149,18 +149,22 @@ class PerChatSignals(unittest.TestCase):
         mutate(r)
         self.assertEqual(validate(r, MESSAGES), [])
 
-    def test_agent_session_yes_with_tool_names_or_a_quote(self):
-        self.valid(lambda r: r.update(agent_session={"value": True, "quote": None, "tools": ["Bash", "Edit"]}))
-        self.valid(lambda r: r.update(agent_session={"value": True, "tools": [],
+    def test_agent_session_yes_with_the_users_quote(self):
+        self.valid(lambda r: r.update(agent_session={"value": True, "tools": ["Bash"],
                                                      "quote": {"message": 3, "text": "Now do the same"}}))
 
-    def test_agent_session_yes_needs_evidence(self):
-        self.check(lambda r: r.update(agent_session={"value": True, "quote": None, "tools": []}),
-                   "agent_session: yes needs one exact quote or the tool names")
+    def test_tool_names_alone_are_not_a_yes(self):
+        self.check(lambda r: r.update(agent_session={"value": True, "quote": None, "tools": ["Bash", "Edit"]}),
+                   "agent_session: yes needs one exact quote of the user directing the work")
 
-    def test_agent_session_no_carries_no_evidence(self):
-        self.check(lambda r: r.update(agent_session={"value": False, "quote": None, "tools": ["Bash"]}),
-                   "agent_session: no carries no quote or tools")
+    def test_a_no_can_list_tools_the_assistant_used_by_itself(self):
+        self.valid(lambda r: r.update(agent_session={"value": False, "quote": None,
+                                                     "tools": ["bash_tool", "create_file"]}))
+
+    def test_agent_session_no_carries_no_quote(self):
+        self.check(lambda r: r.update(agent_session={"value": False, "tools": [],
+                                                     "quote": {"message": 3, "text": "Now do the same"}}),
+                   "agent_session: no carries no quote")
 
     def test_agent_quote_must_be_the_users_words(self):
         self.check(lambda r: r.update(agent_session={"value": True, "tools": [],

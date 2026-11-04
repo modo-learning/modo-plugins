@@ -42,7 +42,7 @@ Decided 2026-11-02, flag for review:
 
 Johnny's scoring rules v1, 2026-11-04 ("AI Fluency Levels: scoring rules v1",
 sections 1 to 3) set the titles, Proven level, task range and reuse. Readings
-pending his answer: an agent session is at least 2 tool-driven steps; "reached
+pending his answer: "reached
 in 3 chats" counts higher chats toward lower levels, for titles and Proven
 level alike; Proven level replaces Best shown for people, and the median stays
 the main level. The score sheet is worked out inside one run and stored
@@ -184,8 +184,8 @@ valid").
 - otherwise `runs` 3 or 5;
 - a capability with a level has 1 to 3 behaviour ids of that capability from
   the rubric and 1 to 3 quotes; a capability not shown has none;
-- `agent_session` is `{"value", "quote", "tools"}` with a quote or tool names
-  for true and neither for false; `reuse` is `{"value", "quote"}` with a quote
+- `agent_session` is `{"value", "quote", "tools"}` with a quote for true and
+  no quote for false; `reuse` is `{"value", "quote"}` with a quote
   for true and none for false; `task_type` is one of the brief's 8 types, or
   `null` exactly when the chat is too short, and then both values are false;
 - each quote is `{"message": m, "text": "…"}` with m from 1 to

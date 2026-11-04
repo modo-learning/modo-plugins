@@ -28,7 +28,11 @@
         "value": { "type": "boolean" },
         "quote": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/quote" }] },
         "tools": { "type": "array", "items": { "type": "string", "minLength": 1, "pattern": "\\S" } }
-      }
+      },
+      "oneOf": [
+        { "properties": { "value": { "const": true }, "quote": { "$ref": "#/$defs/quote" } } },
+        { "properties": { "value": { "const": false }, "quote": { "type": "null" } } }
+      ]
     },
     "task_type": {
       "enum": ["Writing and editing", "Research and summarizing", "Data analysis", "Coding",
