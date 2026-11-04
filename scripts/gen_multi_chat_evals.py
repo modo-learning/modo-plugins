@@ -101,7 +101,7 @@ def read_fixtures():
 # ---- The list the skill shows (step 2), as the resumed cases' history -------
 ASK = "Assess my recent chats."
 LIST_REPLY = "\n".join(
-    ["Here are your chats from the last 30 days, up to 10 chats, newest first. Nothing has been read yet.", ""]
+    ["Here are your chats from the last 30 days, up to 15 chats, newest first. Nothing has been read yet.", ""]
     + [f"{n}. {t} ({d[:10]})" for n, (_, t, d, _) in enumerate(LISTED, 1)]
     + ["",
        "Skipped before the list: 2 chats (1 with no title, 1 flagged by the safety classifier). "
@@ -187,8 +187,9 @@ def ids(*titles):
 SCORED_CHATS = ("CSV merge drops rows", "Pro plan price rise", "Team offsite agenda", "Cover letter")
 INJECTION_CHATS = ("CSV merge drops rows", "Weekly team update")
 NO_LEVEL_5 = g_regex(r"Level 5 of 5", match="not_contains")
-OVERALL_LINE = g_regex(r"Overall: (?:(?:Explorer|Practitioner|Delegator|Orchestrator) \(Level [1-4] of 4 "
-                       r"on Modo''s AI fluency ladder from chats|not enough shown)")
+PERSON_LINE = g_regex(r"3 of 10 chats to your title")
+NO_BEST_SHOWN = g_regex(r"best shown", match="not_contains", flags="i")
+NO_PERSON_TITLE = g_regex(r"Your title:", match="not_contains")
 
 CASES = {
     # Consent: one turn. Lists, shows the numbered list with skips counted,
@@ -204,6 +205,7 @@ CASES = {
             "listed.md": g_tool(LIST, lo=1),
             "reads-nothing.md": g_tool(READ, lo=0, hi=0, arm="both"),
             "no-agent.md": g_tool("Agent", lo=0, hi=0, arm="both"),
+            "default-fifteen.md": g_regex(r"up to 15 chats"),
             "numbered-list.md": g_regex(
                 r"1\.\s+\**CSV merge drops rows[\s\S]*2\.\s+\**Weekly team update[\s\S]*"
                 r"3\.\s+\**Pro plan price rise[\s\S]*4\.\s+\**Team offsite agenda[\s\S]*"
@@ -259,22 +261,23 @@ in these chats" with no level.
 PASS if every combined capability level in the response equals that median of the levels in its own
 per-chat table (check each capability).
 FAIL if any combined level differs from that median, or the response has no per-chat table.""", weight=2),
-            # The overall AI fluency level (decided 2026-11-03, flag for review: Angelina, Johnny).
-            "overall-line.md": OVERALL_LINE,
-            "overall-follows-levels.md": g_llm(
-                """The response must give one overall level on Modo's AI fluency ladder, worked out from the five
-combined capability levels it gives, by this fixed rule: the overall level is the highest L from 1 to 4
-such that at least 3 of the 5 capabilities have a combined level of L or higher ("not shown" reaches no
-level). Titles: Level 1 Explorer, Level 2 Practitioner, Level 3 Delegator, Level 4 Orchestrator. Fewer
-than 3 capabilities with a level gives "not enough shown". Level 5 (Multiplier) is never given. For
-example, combined levels 4, 3, 3, 2 and not shown give Delegator (Level 3); 3, 2, 2, 2, 1 give
-Practitioner (Level 2).
+            # Johnny's scoring rules v1 (ticket 35): 3 scored chats, so no person title yet.
+            "person-line.md": PERSON_LINE,
+            "no-person-title-under-10.md": NO_PERSON_TITLE,
+            "range-and-reuse.md": g_regex(r"Task range: [1-3] of 8 types\W+Reused saved work: [0-3] of 3 chats"),
+            "no-best-shown.md": NO_BEST_SHOWN,
+            "chat-titles.md": g_llm(
+                """The per-chat table must have a Title column. Each scored chat's title follows from that chat's own
+five levels by this fixed rule: Orchestrator needs at least 3 capabilities at 4 or higher including
+Delegation, and an agent session; Delegator needs at least 3 at 3 or higher including Delegation; Practitioner
+needs at least 3 at 2 or higher; Explorer needs at least 3 shown; otherwise No title yet. Scores that reach
+Orchestrator with no agent session give Delegator. None of these chats has an agent session, so no chat is
+Orchestrator. A too-short chat has a dash, not a title.
 
-PASS if there is exactly one line starting "Overall:", placed before the first capability block, and
-its title and level are what the rule gives for the combined levels the response itself shows (check
-the arithmetic, using the combined levels, not the per-chat table).
-FAIL if the overall line is missing or placed after the capability blocks, its title or level does
-not follow the rule, or it gives Multiplier or Level 5 overall.""", weight=2),
+PASS if the table has a Title column and every scored row's title is what the rule gives for that row's
+own levels (check the arithmetic; a dash in a level column is not shown).
+FAIL if the column is missing, a title does not follow from its row, any chat is Orchestrator, or Multiplier
+appears as a title.""", weight=2),
             "gaps-not-guessed.md": g_llm(
                 """In the chats read, some user turns came back empty (answers picked in a question widget), one
 Claude turn was cut ("[Output abbreviated due to length limit]") and one chat mentions an attached file

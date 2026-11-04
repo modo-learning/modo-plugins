@@ -1,5 +1,5 @@
 ---
 type: regex
-pattern: 'Overall: (?:(?:Explorer|Practitioner|Delegator|Orchestrator) \(Level [1-4] of 4 on Modo''s AI fluency ladder from chats|not enough shown)'
+pattern: 'This chat: (?:(?:Explorer|Practitioner|Delegator|Orchestrator) · Level [1-4] \(|No title yet \()'
 target: last_message
 ---
