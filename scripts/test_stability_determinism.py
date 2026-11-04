@@ -27,12 +27,10 @@ ALL = [list(c) for c in itertools.product(VALUES, repeat=5)]
 NODE = shutil.which("node")
 
 
-def js_rule(html):
-    """The overall loop from a template: `for (var L = 1; L <= 4; L++) { ... }`."""
-    m = re.search(r"for \(var L = 1; L <= 4; L\+\+\) \{.*?\n\s*\}", html, re.S)
-    if not m:
-        raise AssertionError("no overall loop found")
-    return m.group(0)
+def block(html, name):
+    """A marked block of a template's script; "" when it has none."""
+    m = re.search(rf"/\* MODO-{name}-START \*/.*?/\* MODO-{name}-END \*/", html, re.S)
+    return m.group(0) if m else ""
 
 
 class SameInputSameOutput(unittest.TestCase):
@@ -57,25 +55,72 @@ class SameInputSameOutput(unittest.TestCase):
             rnd.shuffle(shuffled)
             self.assertEqual(aggregate_chats.combine(chats), aggregate_chats.combine(shuffled))
 
-    def test_title_does_not_depend_on_capability_order(self):
+    def test_title_does_not_depend_on_the_order_of_the_other_capabilities(self):
         for levels in ALL[::7]:
-            self.assertEqual(overall(levels), overall(list(reversed(levels))))
+            others = levels[:3] + levels[4:]
+            shuffled = others[::-1]
+            self.assertEqual(overall(levels, True), overall(shuffled[:3] + [levels[3]] + shuffled[3:], True))
+
+    def test_person_title_does_not_depend_on_chat_order(self):
+        import aggregate_chats
+        rnd = random.Random(35)
+        for _ in range(300):
+            chats = [rnd.choice([None, 1, 2, 3, 4]) for _ in range(rnd.randint(0, 25))]
+            shuffled = chats[:]
+            rnd.shuffle(shuffled)
+            self.assertEqual(aggregate_chats.person_title(chats), aggregate_chats.person_title(shuffled))
 
 
 @unittest.skipUnless(NODE, "node not found")
 class PythonAndJsAgree(unittest.TestCase):
+    def run_js(self, source):
+        out = subprocess.run([NODE, "-e", source], capture_output=True, text=True, timeout=60)
+        self.assertEqual(out.returncode, 0, out.stderr)
+        return json.loads(out.stdout)
+
     def test_every_template_gives_the_python_title_for_every_level_set(self):
-        want = [overall([v if isinstance(v, int) else "not shown" for v in c])["level"] or 0 for c in ALL]
         self.assertTrue(TEMPLATES)
+        for agent in (False, True):
+            want = [overall([v if isinstance(v, int) else "not shown" for v in c], agent)["level"] or 0 for c in ALL]
+            for t in TEMPLATES:
+                with self.subTest(template=str(t.relative_to(ROOT)), agent=agent):
+                    rule = block(t.read_text(), "RULE")
+                    self.assertTrue(rule)
+                    got = self.run_js("const ALL = %s;\n%s\nconsole.log(JSON.stringify(ALL.map(function (levels) {\n"
+                                      "  return chatTitle(levels, levels[3], %s); })));"
+                                      % (json.dumps(ALL), rule, json.dumps(agent)))
+                    self.assertEqual(got, want)
+
+    def test_the_rule_blocks_are_the_same_text_in_card_and_report(self):
+        sources = [t for t in TEMPLATES if t.is_relative_to(ROOT / "plugins")]
+        self.assertGreaterEqual(len(sources), 3)
+        for name in ("RULE", "PERSON"):
+            self.assertEqual(len({block(t.read_text(), name) for t in sources}), 1, name)
+
+    def test_templates_agree_with_python_on_person_title_and_proven_level(self):
+        import aggregate_chats as a
+        rnd = random.Random(36)
+        sheets = [[rnd.choice([1, 2, 3, 4]) for _ in range(rnd.randint(0, 25))] for _ in range(500)]
+        titles = [a.reached_in(s) or 0 for s in sheets]
+        for t in TEMPLATES:
+            person = block(t.read_text(), "PERSON")
+            if not person:
+                continue
+            with self.subTest(template=str(t.relative_to(ROOT))):
+                got = self.run_js("const S = %s;\nvar LADDER = [];\n%s\nconsole.log(JSON.stringify(S.map(reachedIn)));"
+                                  % (json.dumps(sheets), person))
+                self.assertEqual(got, titles)
+
+    def test_johnnys_examples_in_every_template(self):
+        from test_johnny_rules import EDGE, EXAMPLES
+        cases = [v for v in {**EXAMPLES, **EDGE}.values()]
+        want = [c[3] or 0 for c in cases]
         for t in TEMPLATES:
             with self.subTest(template=str(t.relative_to(ROOT))):
-                script = ("const ALL = %s; function shown(c) { return [1,2,3,4,5].indexOf(c.level) >= 0; }\n"
-                          "console.log(JSON.stringify(ALL.map(function (levels) {\n"
-                          "  var ordered = levels.map(function (v) { return {level: v}; });\n"
-                          "  var overall = 0;\n  %s\n  return overall; })));" % (json.dumps(ALL), js_rule(t.read_text())))
-                out = subprocess.run([NODE, "-e", script], capture_output=True, text=True, timeout=60)
-                self.assertEqual(out.returncode, 0, out.stderr)
-                self.assertEqual(json.loads(out.stdout), want)
+                got = self.run_js("const C = %s;\n%s\nconsole.log(JSON.stringify(C.map(function (c) {\n"
+                                  "  return chatTitle(c[0], c[0][3], c[1]); })));"
+                                  % (json.dumps([[list(c[0]), c[1]] for c in cases]), block(t.read_text(), "RULE")))
+                self.assertEqual(got, want)
 
 
 if __name__ == "__main__":

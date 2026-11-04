@@ -20,6 +20,7 @@ TEMPLATE = (pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-a
 SAMPLE = {
     "chat": "this chat",
     "sessions": 1,
+    "agent_session": False,
     "capabilities": [
         {"name": "Problem Solving", "level": 4, "confidence": "medium", "agreement": "3 of 3 runs"},
         {"name": "Verification", "level": 5, "confidence": "high", "agreement": "3 of 3 runs"},
@@ -46,12 +47,15 @@ MULTI_SAMPLE = {
     "scope": "multi_chat",
     "sessions": 4,
     "date_range": ["2026-10-06", "2026-10-30"],
+    "chat_titles": [2, 3, 2, 2],
+    "task_types": 3,
+    "reused": 1,
     "capabilities": [
-        {"name": "Problem Solving", "level": 2, "confidence": "high", "best_shown": 3, "trend": "up", "chats_shown": 4},
-        {"name": "Verification", "level": 3, "confidence": "high", "best_shown": 4, "trend": "up", "chats_shown": 4},
-        {"name": "Workflow Design", "level": 2, "confidence": "medium", "best_shown": 2, "trend": None, "chats_shown": 3},
-        {"name": "Delegation", "level": 3, "confidence": "medium", "best_shown": None, "trend": None, "chats_shown": 3},
-        {"name": "Strategic Thinking", "level": "not_shown", "best_shown": None, "trend": None, "chats_shown": 0},
+        {"name": "Problem Solving", "level": 2, "confidence": "high", "proven": 2, "trend": "up", "chats_shown": 4},
+        {"name": "Verification", "level": 3, "confidence": "high", "proven": 3, "trend": "up", "chats_shown": 4},
+        {"name": "Workflow Design", "level": 2, "confidence": "medium", "proven": 2, "trend": None, "chats_shown": 3},
+        {"name": "Delegation", "level": 3, "confidence": "medium", "proven": 2, "trend": None, "chats_shown": 3},
+        {"name": "Strategic Thinking", "level": "not_shown", "proven": None, "trend": None, "chats_shown": 0},
     ],
     "evidence": [
         {"capability": "Verification", "source": "Chat 4, 2026-10-14",
@@ -61,6 +65,8 @@ MULTI_SAMPLE = {
     "next_action": "Run /help-me-improve for Verification.",
 }
 
+SUMMARY_START = "<!-- MODO-SUMMARY-START -->"
+SUMMARY_END = "<!-- MODO-SUMMARY-END -->"
 START = "<!-- MODO-DATA-START -->"
 END = "<!-- MODO-DATA-END -->"
 
@@ -75,6 +81,18 @@ def fill(template: str, data: dict) -> str:
                      lambda _: new, template, flags=re.S)
     if n != 1:
         raise ValueError("data markers not found exactly once")
+    return out
+
+
+def fill_summary(template: str, summary: dict) -> str:
+    """Replace the report's summary block (the report template only)."""
+    block = json.dumps(summary, ensure_ascii=False).replace("<", "\\u003c")
+    new = (f'{SUMMARY_START}\n<script type="application/json" id="report-summary">\n'
+           f"{block}\n</script>\n{SUMMARY_END}")
+    out, n = re.subn(re.escape(SUMMARY_START) + ".*?" + re.escape(SUMMARY_END),
+                     lambda _: new, template, flags=re.S)
+    if n != 1:
+        raise ValueError("summary markers not found exactly once")
     return out
 
 
