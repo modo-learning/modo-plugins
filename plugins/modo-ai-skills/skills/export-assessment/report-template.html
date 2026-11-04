@@ -3,10 +3,10 @@
 <style>
 /* Modo AI Skills assessment report, for the PDF export. Style: the
    modo-design skill (Modo tokens, card layout). Same content and order as the
-   Markdown report in SKILL.md step 4: title, date line, label, capability
-   table in rubric order, notes, approved evidence, the record block last.
-   A multi-chat record ("scope": "multi_chat") adds best shown, trend and
-   chats shown to the table and a "Chats assessed" table before the evidence
+   Markdown report in SKILL.md step 4: title, date line, label, title line,
+   capability table in rubric order, notes, approved evidence, the record block
+   last. A multi-chat record ("scope": "multi_chat") adds more columns to the
+   table and a "Chats assessed" table before the evidence
    (proposal, decided 2026-11-02, flag for review: Angelina). */
 /* MODO-TOKENS-START */
 /* Modo design tokens, taken from modo-frontend src/styles/tokens.css (Modo v2:
@@ -82,14 +82,15 @@ body {
 .kicker { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--nav-text-muted); }
 h1 { font-size: 21px; line-height: 1.2; letter-spacing: -0.014em; margin: 0 0 6px; font-weight: 650; overflow-wrap: anywhere; }
 .sub { color: var(--nav-text-muted); margin: 0; font-size: 13px; }
-/* Overall AI fluency level (Modo's ladder), worked out below from the capability levels. */
-.fluency { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 10px; }
+/* The title, worked out below (Johnny's scoring rules v1, 2026-11-04). */
+.fluency { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 12px 0 0; }
 .fluency-title {
   display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 9999px;
   background: var(--accent-primary); color: #1A1A2E; font-weight: 700; font-size: 13px;
 }
-.fluency[data-overall="none"] .fluency-title { background: transparent; color: var(--nav-text); border: 1px solid var(--nav-text-muted); font-weight: 600; }
-.fluency-why { color: var(--nav-text-muted); font-size: 12px; }
+.fluency[data-overall="none"] .fluency-title, .fluency[data-overall="unfilled"] .fluency-title { background: transparent; color: var(--text-primary); border: 1px solid var(--text-muted); font-weight: 600; }
+.fluency[data-overall="pending"] .fluency-title { background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); font-weight: 500; }
+.fluency-why { color: var(--text-muted); font-size: 12px; }
 .body { padding: 20px 28px 28px; }
 .label { margin: 0 0 4px; font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 h2 { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin: 22px 0 10px; font-weight: 600; }
@@ -125,16 +126,16 @@ pre {
 }
 </style>
 
-<!-- Skill: replace ONLY the JSON between the two MODO-DATA markers with the assessment record. Do not edit anything else. -->
+<!-- Skill: replace ONLY the JSON between the two MODO-DATA markers with the assessment record, and the JSON between the two MODO-SUMMARY markers with the summary (SKILL.md, step 6). Do not edit anything else. -->
 <main class="card" aria-labelledby="t">
   <header class="head">
     <div class="brand"><span class="mark" aria-hidden="true">M</span><p class="kicker">Modo · AI skills assessment</p></div>
-    <p class="fluency" id="fluency" hidden><span class="fluency-title" id="fluency-title"></span><span class="fluency-why" id="fluency-why"></span></p>
     <h1 id="t">Modo AI Skills assessment</h1>
     <p class="sub" id="date"></p>
   </header>
   <div class="body">
-    <p class="label">Self-assessment by Claude using Modo rubric v1.1 — not verified.</p>
+    <p class="label">Self-assessment by Claude using Modo rubric v1.2 — not verified.</p>
+    <p class="fluency" id="fluency" hidden><span class="fluency-title" id="fluency-title"></span><span class="fluency-why" id="fluency-why"></span></p>
     <h2>Capabilities</h2>
     <table>
       <thead><tr id="head-row"><th>Capability</th><th>Level</th><th>Confidence</th></tr></thead>
@@ -142,18 +143,25 @@ pre {
     </table>
     <div class="notes">
       <p id="notes-single">Levels run from 1 to 5. "Not shown" means nothing in the chat bears on that capability. Confidence is low, medium or high, as defined in the rubric. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
-      <p id="notes-multi" hidden>Levels run from 1 to 5. Each level combines the scored chats that show the capability: the middle of their levels, the lower one on a tie. "Best shown" is the highest level reached in at least 2 chats. The trend compares earlier and later chats and needs 4 or more. "Not shown" means no scored chat bears on that capability. Confidence is low, medium or high, by how many chats show the capability and how close their levels are. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
-      <p id="overall-note">The overall level uses Modo's AI fluency ladder (Explorer, Practitioner, Delegator, Orchestrator, Multiplier): the highest level that at least 3 of the 5 capabilities reach. Chats give at most Level 4, Orchestrator; Level 5, Multiplier, needs evidence a chat doesn't hold, such as assets or agents colleagues adopt and tracked time saved. It is worked out from the levels above. It is not part of the record.</p>
+      <!-- MODO-PERSON-START -->
+      <p id="notes-multi" hidden>Levels run from 1 to 5. Each level combines the scored chats that show the capability: the middle of their levels, the lower one on a tie. "Proven level" is the highest level reached in at least 3 chats. The trend compares earlier and later chats and needs 4 or more. "Not shown" means no scored chat bears on that capability. Confidence is low, medium or high, by how many chats show the capability and how close their levels are. The table is in rubric order. This is for your own development, not for hiring or other employment decisions.</p>
+      <!-- MODO-PERSON-END -->
+      <p id="title-note">The title comes from the levels above and whether agent work is visible in the chat. Orchestrator: at least 3 of 5 capabilities at Level 4 or higher, including Delegation, with agent work. Delegator: at least 3 at Level 3 or higher, including Delegation. Practitioner: at least 3 at Level 2 or higher. Explorer: at least 3 shown. Multiplier comes later: it needs Modo sharing data that a chat doesn't hold. The title is not part of the record.</p>
+      <!-- MODO-PERSON-START -->
+      <p id="title-note-multi" hidden>Each chat gets its own title. Orchestrator: at least 3 of 5 capabilities at Level 4 or higher, including Delegation, with agent work. Delegator: at least 3 at Level 3 or higher, including Delegation. Practitioner: at least 3 at Level 2 or higher. Explorer: at least 3 shown. Your title is the highest chat title reached in at least 3 chats, shown once 10 chats are scored; a higher chat title also counts toward lower ones. Task range counts the 8 task types. Multiplier comes later: it needs Modo sharing data that a chat doesn't hold. These are not part of the record.</p>
+      <!-- MODO-PERSON-END -->
       <p id="ns-note" hidden>Note: for a capability that is not shown, the record gives confidence "low", because no moment in the chat supports a level.</p>
     </div>
+    <!-- MODO-PERSON-START -->
     <div id="chats-wrap" hidden>
       <h2>Chats assessed</h2>
       <table>
-        <thead><tr><th class="num">#</th><th>Chat</th><th>Date</th><th>Result</th><th class="num">P</th><th class="num">V</th><th class="num">W</th><th class="num">D</th><th class="num">S</th></tr></thead>
+        <thead><tr><th class="num">#</th><th>Chat</th><th>Date</th><th>Result</th><th>Title</th><th class="num">P</th><th class="num">V</th><th class="num">W</th><th class="num">D</th><th class="num">S</th></tr></thead>
         <tbody id="chats"></tbody>
       </table>
       <div class="notes"><p>Newest first. P, V, W, D, S: Problem Solving, Verification, Workflow Design, Delegation, Strategic Thinking. A dash means not shown in that chat, or the chat was not scored.</p></div>
     </div>
+    <!-- MODO-PERSON-END -->
     <h2>Evidence you approved</h2>
     <div id="evidence"></div>
     <h2>Assessment record (machine-readable)</h2>
@@ -163,9 +171,15 @@ pre {
 
 <!-- MODO-DATA-START -->
 <script type="application/json" id="passport-data">
-{"rubric_version": "v1.1", "capabilities": {}, "evidence": [], "session_title": "", "session_date": ""}
+{"rubric_version": "v1.2", "capabilities": {}, "evidence": [], "session_title": "", "session_date": ""}
 </script>
 <!-- MODO-DATA-END -->
+
+<!-- MODO-SUMMARY-START -->
+<script type="application/json" id="report-summary">
+{}
+</script>
+<!-- MODO-SUMMARY-END -->
 
 <script>
 (function () {
@@ -175,6 +189,7 @@ pre {
   var NAMES = {};
   ORDER.forEach(function (o) { NAMES[o[0]] = o[1]; });
   var rec = JSON.parse(document.getElementById("passport-data").textContent);
+  var summary = JSON.parse(document.getElementById("report-summary").textContent);
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -193,38 +208,101 @@ pre {
   var RESULT = { scored: "scored", too_short: "too short", could_not_be_read: "could not be read" };
   var chats = rec.chats || [];
   var sum = rec.chats_assessed || {};
+  /* MODO-PERSON-USE-START */
   if (multi) {
     document.getElementById("date").textContent = "Chats: " + (sum.from === sum.to ? sum.from : sum.from + " to " + sum.to) +
-      ". Rubric: v1.1. Based on " + sum.scored + (sum.scored === 1 ? " chat." : " chats.");
+      ". Rubric: v1.2. Based on " + sum.scored + (sum.scored === 1 ? " chat." : " chats.");
     var head = document.getElementById("head-row");
-    ["Best shown", "Trend", "Shown in"].forEach(function (h) { head.appendChild(el("th", null, h)); });
+    ["Proven level", "Trend", "Shown in"].forEach(function (h) { head.appendChild(el("th", null, h)); });
     document.getElementById("notes-single").hidden = true;
     document.getElementById("notes-multi").hidden = false;
     document.getElementById("ns-note").textContent =
       'Note: for a capability that is not shown, the record gives confidence "low", because no scored chat supports a level.';
-  } else {
+  } else
+  /* MODO-PERSON-USE-END */
+  {
     document.getElementById("date").textContent =
-      "Chat date: " + (rec.session_date || "") + ". Rubric: v1.1. Based on 1 chat.";
+      "Chat date: " + (rec.session_date || "") + ". Rubric: v1.2. Based on 1 chat.";
   }
 
-  /* Overall AI fluency level, the same rule as derive_levels.overall() (decided 2026-11-03,
-     flag for review: Angelina, Johnny): the highest L in 1..4 that at least 3 of the 5
-     capabilities reach; fewer than 3 with a level gives none. Level 5 (Multiplier) is never
-     given from chats. Not stored in the record. */
+  /* MODO-RULE-START */
+  /* The title for one chat, the same rule as derive_levels.overall() (Johnny's scoring rules
+     v1, 2026-11-04). 0 means no title. Multiplier comes later. Not stored in the record. */
   var LADDER = ["", "Explorer", "Practitioner", "Delegator", "Orchestrator"];
-  var levels = ORDER.map(function (o) { var c = (rec.capabilities || {})[o[0]]; return c ? c.level : null; });
-  var overall = 0;
-  for (var L = 1; L <= 4; L++) {
-    if (levels.filter(function (v) { return [1, 2, 3, 4, 5].indexOf(v) >= 0 && v >= L; }).length >= 3) overall = L;
+  function isLevel(v) { return [1, 2, 3, 4, 5].indexOf(v) >= 0; }
+  function chatTitle(levels, delegation, agent) {
+    var title = 0;
+    for (var L = 1; L <= 4; L++) {
+      var at = levels.filter(function (v) { return isLevel(v) && v >= L; }).length;
+      if (at >= 3 && (L < 3 || (isLevel(delegation) && delegation >= L))) title = L;
+    }
+    return title === 4 && !agent ? 3 : title;
   }
+  function chatTitleWhy(title, capped) {
+    if (capped) return "The title stops at Delegator: no agent work visible in this chat.";
+    if (!title) return "A title needs at least 3 of 5 capabilities shown";
+    return "At least 3 of 5 capabilities " + (title > 1 ? "at Level " + title + " or higher" : "shown") +
+      (title >= 3 ? ", including Delegation" : "") + (title === 4 ? ", with agent work shown" : "");
+  }
+  /* MODO-RULE-END */
+  /* MODO-PERSON-START */
+  /* The person title and Proven level, the same rules as assess-my-chats step 4 (Johnny's
+     scoring rules v1, section 2): reached in at least 3 chats, higher chats counting toward lower
+     levels; the title shows from 10 scored chats. */
+  function reachedIn(values) {
+    var best = 0;
+    for (var L = 1; L <= 5; L++) {
+      if (values.filter(function (v) { return v >= L; }).length >= 3) best = L;
+    }
+    return best;
+  }
+  function personLine(fl, scored, chatLevels, task, reused) {
+    var title = document.getElementById("fluency-title");
+    if (scored < 10) {
+      fl.setAttribute("data-overall", "pending");
+      title.textContent = scored + " of 10 chats to your title";
+    } else {
+      var person = reachedIn(chatLevels);
+      fl.setAttribute("data-overall", person ? String(person) : "none");
+      title.textContent = "Your title: " + (person ? LADDER[person] + " \u00b7 Level " + person : "No title yet");
+    }
+    var parts = [];
+    if (typeof task === "number") parts.push("Task range: " + task + " of 8 types");
+    if (typeof reused === "number") parts.push("Reused saved work: " + reused + " of " + scored + " chats");
+    document.getElementById("fluency-why").textContent = parts.join(" \u00b7 ");
+  }
+  /* MODO-PERSON-END */
   var fl = document.getElementById("fluency");
   fl.hidden = false;
-  fl.setAttribute("data-overall", overall ? String(overall) : "none");
-  document.getElementById("fluency-title").textContent = overall
-    ? LADDER[overall] + " \u00b7 Level " + overall : "Overall: not enough shown";
-  document.getElementById("fluency-why").textContent = overall
-    ? "Overall AI fluency from " + (multi ? "these chats" : "this chat") + ": at least 3 of 5 capabilities at Level " + overall + " or higher"
-    : "An overall level needs at least 3 of 5 capabilities with a level";
+  /* The summary block is filled by the skill. Left empty, the report says so
+     instead of showing a title worked out from a guess. */
+  function unfilled() {
+    fl.setAttribute("data-overall", "unfilled");
+    document.getElementById("fluency-title").textContent = "Title not filled in";
+  }
+  /* MODO-PERSON-USE-START */
+  if (multi) {
+    document.getElementById("title-note").hidden = true;
+    document.getElementById("title-note-multi").hidden = false;
+    if (Array.isArray(summary.chat_titles)) {
+      personLine(fl, sum.scored, summary.chat_titles.filter(Boolean), summary.task_types, summary.reused);
+    } else {
+      unfilled();
+    }
+  } else
+  /* MODO-PERSON-USE-END */
+  if (typeof summary.agent_session !== "boolean") {
+    unfilled();
+  } else {
+    var levels = ORDER.map(function (o) { var c = (rec.capabilities || {})[o[0]]; return c ? c.level : null; });
+    var agent = summary.agent_session;
+    var title = chatTitle(levels, levels[3], agent);
+    fl.setAttribute("data-overall", title ? String(title) : "none");
+    document.getElementById("fluency-title").textContent =
+      "This chat: " + (title ? LADDER[title] + " \u00b7 Level " + title : "No title yet");
+    document.getElementById("fluency-why").textContent =
+      chatTitleWhy(title, !agent && chatTitle(levels, levels[3], true) === 4);
+  }
 
   var rows = document.getElementById("rows");
   var anyNotShown = false;
@@ -249,15 +327,20 @@ pre {
       tr.appendChild(lv);
       tr.appendChild(el("td", null, c.confidence + " (see note)"));
     }
+    /* MODO-PERSON-USE-START */
     if (multi) {
-      tr.appendChild(el("td", null, c.best_shown ? "Level " + c.best_shown : DASH));
+      var proven = reachedIn(chats.filter(function (ch) { return ch.levels; }).map(function (ch) { return ch.levels[o[0]]; })
+        .filter(isLevel));
+      tr.appendChild(el("td", null, proven ? "Level " + proven : DASH));
       tr.appendChild(el("td", "trend", ARROW[c.trend] ? ARROW[c.trend] + " " + c.trend : DASH));
       tr.appendChild(el("td", null, c.chats_shown + " of " + sum.scored));
     }
+    /* MODO-PERSON-USE-END */
     rows.appendChild(tr);
   });
   document.getElementById("ns-note").hidden = !anyNotShown;
 
+  /* MODO-PERSON-USE-START */
   if (multi) {
     document.getElementById("chats-wrap").hidden = false;
     var tbody = document.getElementById("chats");
@@ -268,6 +351,11 @@ pre {
       tr.appendChild(el("td", null, ch.title));
       tr.appendChild(el("td", null, ch.date));
       tr.appendChild(el("td", null, RESULT[ch.result] || ch.result));
+      var ct = (summary.chat_titles || [])[i];
+      var inRow = ORDER.map(function (o) { return ch.levels ? ch.levels[o[0]] : null; });
+      var capped = ct === 3 && chatTitle(inRow, inRow[3], true) === 4;
+      tr.appendChild(el("td", null, typeof ct !== "number" ? DASH : ct ? LADDER[ct] : "No title yet"));
+      if (capped) tr.lastChild.textContent += " (no agent work visible in this chat)";
       ORDER.forEach(function (o) {
         var lv = ch.levels ? ch.levels[o[0]] : null;
         tr.appendChild(el("td", "num", typeof lv === "number" ? String(lv) : DASH));
@@ -275,6 +363,7 @@ pre {
       tbody.appendChild(tr);
     });
   }
+  /* MODO-PERSON-USE-END */
 
   var box = document.getElementById("evidence");
   if (rec.evidence && rec.evidence.length) {
@@ -282,7 +371,7 @@ pre {
     rec.evidence.forEach(function (e) {
       var li = el("li", null, "“" + e.quote + "”");
       var name = NAMES[e.capability] || e.capability;
-      var ch = multi && typeof e.chat === "number" ? chats[e.chat - 1] : null;
+      var ch = typeof e.chat === "number" ? chats[e.chat - 1] : null;
       li.appendChild(el("span", null, ch ? name + " \u00b7 " + ch.title + ", " + ch.date : name));
       ul.appendChild(li);
     });

@@ -13,17 +13,17 @@ import sys
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from fill_passport_card import fill  # noqa: E402
+from fill_passport_card import fill, fill_summary  # noqa: E402
 from test_passport_card import CHROME, text_of  # noqa: E402
 from test_validate_assessment_record import MULTI  # noqa: E402
 from validate_assessment_record import validate  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "plugins" / "modo-ai-skills" / "skills" / "export-assessment" / "report-template.html"
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 RECORD = {
-    "rubric_version": "v1.1",
+    "rubric_version": "v1.2",
     "capabilities": {
         "problem_solving": {"level": 4, "confidence": "medium"},
         "verification": {"level": 5, "confidence": "high"},
@@ -38,10 +38,12 @@ RECORD = {
 }
 
 
-def render(record):
+def render(record, summary=None):
     import subprocess
     import tempfile
     html = fill(TEMPLATE.read_text(), record)
+    if summary is not None:
+        html = fill_summary(html, summary)
     with tempfile.TemporaryDirectory() as t:
         f = pathlib.Path(t) / "report.html"
         f.write_text(html)
@@ -71,6 +73,17 @@ class Template(unittest.TestCase):
 
 
 @unittest.skipUnless(CHROME, "no Chrome found")
+class Order(unittest.TestCase):
+    """The same order as export-assessment/SKILL.md step 4."""
+
+    def test_the_title_line_follows_the_label_and_comes_before_the_table(self):
+        text = TEMPLATE.read_text()
+        body = text[text.index("<main"):]
+        self.assertLess(body.index('class="label"'), body.index('id="fluency"'))
+        self.assertLess(body.index('id="fluency"'), body.index('id="rows"'))
+        self.assertLess(body.index('id="date"'), body.index('class="label"'))
+
+
 class Rendered(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -79,7 +92,7 @@ class Rendered(unittest.TestCase):
 
     def test_title_and_date_line(self):
         self.assertIn("Modo AI Skills assessment: Q3 pricing analysis and board deck", self.text)
-        self.assertIn("Chat date: 2026-10-29. Rubric: v1.1. Based on 1 chat.", self.text)
+        self.assertIn("Chat date: 2026-10-29. Rubric: v1.2. Based on 1 chat.", self.text)
         self.assertIn(LABEL, self.text)
 
     def test_rows_in_rubric_order(self):
@@ -127,42 +140,54 @@ def with_levels(levels):
 
 @unittest.skipUnless(CHROME, "no Chrome found")
 class RenderedOverall(unittest.TestCase):
-    """The overall AI fluency title, worked out in the report from the capability
-    levels (decided 2026-11-03, flag for review: Angelina, Johnny). The record is unchanged."""
+    """The title, worked out in the report from the capability levels and the agent
+    session (Johnny's scoring rules v1, 2026-11-04). The record is unchanged."""
 
     def test_single_chat_record_is_delegator(self):
-        # Levels 4, 5, 3, 3, not shown: four at 3 or higher, two at 4 or higher.
-        dom = render(RECORD)
+        # Levels 4, 5, 3, 3, not shown: four at 3 or higher, including Delegation.
+        dom = render(RECORD, {"agent_session": False})
         level, text = overall_of(dom)
         self.assertEqual(level, "3")
-        self.assertIn("Delegator \u00b7 Level 3", text)
-        self.assertIn("at least 3 of 5 capabilities at Level 3 or higher", text)
-        self.assertIn("It is not part of the record.", text_of(dom))
+        self.assertIn("This chat: Delegator \u00b7 Level 3", text)
+        self.assertIn("least 3 of 5 capabilities at Level 3 or higher, including Delegation", text)
+        self.assertIn("The title is not part of the record.", text_of(dom))
 
-    def test_multi_chat_record_uses_the_combined_levels(self):
-        level, text = overall_of(render(MULTI))
-        self.assertEqual(level, "2")
-        self.assertIn("Practitioner \u00b7 Level 2", text)
+    def test_orchestrator_needs_the_agent_session_from_the_summary(self):
+        rec = with_levels([5, 5, 5, 5, 5])
+        self.assertEqual(overall_of(render(rec, {"agent_session": True}))[0], "4")
+        level, text = overall_of(render(rec, {"agent_session": False}))
+        self.assertEqual(level, "3")
+        self.assertIn("no agent work visible in this chat", text)
 
-    def test_not_enough_shown(self):
-        level, text = overall_of(render(with_levels([2, "not_shown", "not_shown", "not_shown", 1])))
+    def test_no_title_yet(self):
+        level, text = overall_of(render(with_levels([2, "not_shown", "not_shown", "not_shown", 1]),
+                                         {"agent_session": False}))
         self.assertEqual(level, "none")
-        self.assertIn("Overall: not enough shown", text)
+        self.assertIn("This chat: No title yet", text)
 
-    def test_the_record_block_has_no_overall_field(self):
-        block = re.search(r'<pre id="record">(.*?)</pre>', render(RECORD), re.S).group(1)
+    def test_an_unfilled_summary_shows_instead_of_capping_the_title(self):
+        level, text = overall_of(render(with_levels([4, 5, 4, 4, 3])))
+        self.assertEqual(level, "unfilled")
+        self.assertIn("Title not filled in", text)
+        self.assertNotIn("stops at Delegator", text)
+
+    def test_the_record_block_has_no_title_and_no_summary_field(self):
+        block = re.search(r'<pre id="record">(.*?)</pre>', render(RECORD, {"agent_session": True}), re.S).group(1)
         self.assertNotIn("overall", block.lower())
         self.assertNotIn("Delegator", block)
+        self.assertNotIn("agent_session", block)
 
-    def test_the_report_and_the_python_rule_agree_on_the_worked_examples(self):
-        from test_derive_levels import OVERALL_WORKED
+    def test_the_report_and_the_python_rule_agree_on_johnnys_examples(self):
+        from test_johnny_rules import EDGE, EXAMPLES
         from derive_levels import overall
-        for levels, _ in OVERALL_WORKED:
-            with self.subTest(levels=levels):
-                rec = with_levels(levels)
+        for name, (levels, agent, _, _) in {**EXAMPLES, **EDGE}.items():
+            with self.subTest(name):
+                rec = with_levels(list(levels))
                 self.assertEqual(validate(rec), [])
-                want = overall(levels)["level"]
-                self.assertEqual(overall_of(render(rec))[0], "none" if want is None else str(want))
+                want = overall(list(levels), agent)
+                got, text = overall_of(render(rec, {"agent_session": agent}))
+                self.assertEqual(got, "none" if want["level"] is None else str(want["level"]))
+                self.assertIn(want["title"] or "No title yet", text)
 
 
 @unittest.skipUnless(CHROME, "no Chrome found")
@@ -172,13 +197,13 @@ class RenderedMultiChat(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         assert validate(MULTI) == []
-        cls.dom = render(MULTI)
+        cls.dom = render(MULTI, {"chat_titles": [2, 3, None, 2, 2], "task_types": 3, "reused": 1})
         cls.text = text_of(cls.dom)
 
     def test_title_and_chats_line(self):
         self.assertIn("Modo AI Skills assessment: Assessment across 4 chats", self.text)
         date_line = re.search(r'<p class="sub" id="date">(.*?)</p>', self.dom).group(1)
-        self.assertEqual(date_line, "Chats: 2026-10-06 to 2026-10-30. Rubric: v1.1. Based on 4 chats.")
+        self.assertEqual(date_line, "Chats: 2026-10-06 to 2026-10-30. Rubric: v1.2. Based on 4 chats.")
 
     def test_multi_chat_notes_replace_the_single_chat_notes(self):
         self.assertRegex(self.dom, r'<p id="notes-single" hidden="">')
@@ -187,12 +212,30 @@ class RenderedMultiChat(unittest.TestCase):
         self.assertIn("no scored chat supports a level", note)
         self.assertIn(LABEL, self.text)
 
-    def test_capability_rows_show_best_trend_and_chats_shown(self):
+    def test_under_10_chats_shows_the_count_and_the_signals(self):
+        level, text = overall_of(self.dom)
+        self.assertEqual(level, "pending")
+        self.assertIn("4 of 10 chats to your title", text)
+        self.assertIn("Task range: 3 of 8 types", text)
+        self.assertIn("Reused saved work: 1 of 4 chats", text)
+
+    def test_ten_scored_chats_show_the_title(self):
+        rec = copy.deepcopy(MULTI)
+        rec["chats_assessed"]["scored"] = 10
+        level, text = overall_of(render(rec, {"chat_titles": [3, 3, 3] + [1] * 7}))
+        self.assertEqual(level, "3")
+        self.assertIn("Your title: Delegator \u00b7 Level 3", text)
+
+    def test_capability_rows_show_proven_trend_and_chats_shown(self):
         rows = dict(re.findall(r'<tr data-capability="([a-z_]+)"[^>]*>(.*?)</tr>', self.dom, re.S))
         self.assertEqual(list(rows), list(MULTI["capabilities"]))
         v = text_of(rows["verification"])
-        for part in ("3 of 5", "high", "Level 4", "\u2191 up", "4 of 4"):
+        # Verification 4, 4, 3, 3: Level 3 reached in 4 chats, Level 4 in 2. best_shown is 4 in the record.
+        for part in ("3 of 5", "high", "Level 3", "\u2191 up", "4 of 4"):
             self.assertIn(part, v)
+        self.assertNotIn("Level 4", v)
+        self.assertRegex(self.dom, r"<th>Proven level</th>")
+        self.assertNotIn("<th>Best shown</th>", self.dom)
         d = text_of(rows["delegation"])
         self.assertIn("3 of 4", d)
         self.assertNotIn("\u2191", d)
@@ -208,10 +251,33 @@ class RenderedMultiChat(unittest.TestCase):
         self.assertIn("2026-10-30", first)
         self.assertIn("scored", first)
         self.assertIn("too short", text_of(rows[2][1]))
+        self.assertIn("Practitioner", first)
+        self.assertIn("Delegator", text_of(rows[1][1]))
         self.assertEqual(re.findall(r"<td[^>]*>([^<]*)</td>", rows[3][1])[-5:], ["2", "3", "2", "3", "\u2013"])
+
+    def test_a_title_capped_for_lack_of_agent_work_says_so_in_its_row(self):
+        rec = copy.deepcopy(MULTI)
+        rec["chats"][0]["levels"] = {"problem_solving": 4, "verification": 4, "workflow_design": 4, "delegation": 4,
+                                     "strategic_thinking": 2}
+        dom = render(rec, {"chat_titles": [3, 3, None, 2, 2], "task_types": 3, "reused": 1})
+        rows = re.findall(r'<tr data-chat="(\d+)"[^>]*>(.*?)</tr>', dom, re.S)
+        self.assertIn("Delegator (no agent work visible in this chat)", text_of(rows[0][1]))
+        self.assertNotIn("no agent work", text_of(rows[3][1]))
+
+    def test_an_unfilled_summary_shows_instead_of_a_title(self):
+        rec = copy.deepcopy(MULTI)
+        level, text = overall_of(render(rec))
+        self.assertEqual(level, "unfilled")
+        self.assertIn("Title not filled in", text)
 
     def test_evidence_names_its_chat(self):
         self.assertIn("Verification \u00b7 Chat 4, 2026-10-14", self.text)
+
+    def test_the_record_block_stays_the_record(self):
+        block = re.search(r'<pre id="record">(.*?)</pre>', self.dom, re.S).group(1)
+        self.assertIn("best_shown", block)
+        for word in ("proven", "chat_titles", "task_types", "reused"):
+            self.assertNotIn(word, block)
 
     def test_record_block_is_last_and_matches(self):
         block = re.search(r'<pre id="record">(.*?)</pre>', self.dom, re.S).group(1)

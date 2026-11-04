@@ -10,6 +10,9 @@
   "too_short": false,
   "runs": 3,
   "run_kind": "one_response",
+  "agent_session": {"value": false, "quote": null, "tools": []},
+  "task_type": "Planning and decisions",
+  "reuse": {"value": false, "quote": null},
   "capabilities": {
     "problem_solving": {
       "level": 1,

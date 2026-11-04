@@ -29,6 +29,16 @@ def folded(path):
     return re.sub(r"[ \t]*\n[ \t]*(?=\S)(?![-#|`]|\d+\. )", " ", path.read_text())
 
 
+class ChatsScoredPins(unittest.TestCase):
+    def test_reuse_and_no_agent_session_are_pinned(self):
+        graders = pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills" / "evals" \
+            / "chats-scored" / "graders"
+        self.assertIn("Reused saved work: 1 of 3 chats", (graders / "range-and-reuse.md").read_text())
+        pin = (graders / "no-agent-session.md").read_text()
+        self.assertIn("Orchestrator", pin)
+        self.assertIn("match: not_contains", pin)
+
+
 class Routing(unittest.TestCase):
     def test_single_chat_skill_points_to_assess_my_chats_for_many_chats(self):
         body = folded(SINGLE)

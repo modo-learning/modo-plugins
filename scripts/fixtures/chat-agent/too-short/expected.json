@@ -10,6 +10,9 @@
   "too_short": true,
   "runs": 0,
   "run_kind": "none",
+  "agent_session": {"value": false, "quote": null, "tools": []},
+  "task_type": null,
+  "reuse": {"value": false, "quote": null},
   "capabilities": {
     "problem_solving": {
       "level": "not_shown",

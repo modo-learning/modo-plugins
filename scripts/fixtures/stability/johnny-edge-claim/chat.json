@@ -1,0 +1,49 @@
+{
+  "id": "johnny-edge-claim",
+  "title": "Refund policy note",
+  "updated_at": "2026-11-04T09:00:00Z",
+  "source": "written for ticket 35 from Johnny's edge case in AI Fluency Levels scoring rules v1 (he gave a description, not a chat): \"12 people on my team use my agent\". Every name and figure is invented.",
+  "turns": [
+    {
+      "user": "I built an agent for our support team and 12 people on my team use my agent every day. Today I need a short note to them about the new refund policy. Plain words, under 100 words.",
+      "assistant": "Team, please be advised that our refund policy is changing. Refunds will now have a time limit. Contact your lead with any questions."
+    },
+    {
+      "user": "Too stiff. Drop 'please be advised'. Lead with what changes on Monday.",
+      "assistant": "From Monday, refunds have a time limit. Check the new policy before you approve one."
+    },
+    {
+      "user": "Add the 14-day limit, and say refunds over $200 still need a lead's sign-off.",
+      "assistant": "From Monday, refunds must be requested within 14 days. Refunds over $200 still need a lead's sign-off."
+    },
+    {
+      "user": "Good, thanks. 12 people on my team use my agent, so this goes straight into it.",
+      "assistant": "Glad it helps."
+    }
+  ],
+  "expected": {
+    "bands": {
+      "Problem Solving": null,
+      "Verification": null,
+      "Workflow Design": null,
+      "Delegation": null,
+      "Strategic Thinking": null
+    },
+    "overall": [
+      "Explorer",
+      "Practitioner"
+    ],
+    "agent_session": false,
+    "title_source": "johnny",
+    "johnny_scores": {},
+    "reasons": {
+      "Problem Solving": "Johnny gave no score: not specified, so no band.",
+      "Verification": "Johnny gave no score: not specified, so no band.",
+      "Workflow Design": "Johnny gave no score: not specified, so no band.",
+      "Delegation": "Johnny gave no score: not specified, so no band.",
+      "Strategic Thinking": "Johnny gave no score: not specified, so no band.",
+      "overall": "Johnny: a claim in a chat, not evidence. It must not count as an agent session or toward Multiplier. His file gives no title for this chat; the two here are what a short drafting chat can reach, and Orchestrator or Delegator would be a disagreement to list."
+    },
+    "review": "Johnny's edge case; the chat itself is ours, for him to check"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "expect": "coverage: must be 4",
   "record": {
-    "rubric_version": "v1.1",
+    "rubric_version": "v1.2",
     "scope": "multi_chat",
     "capabilities": {
       "problem_solving": {

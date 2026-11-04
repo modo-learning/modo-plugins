@@ -4,6 +4,7 @@ The worked examples below are the table to show when the rules are reviewed:
 each row is per-chat levels (oldest first) -> level, best, confidence, trend.
 """
 
+import json
 import pathlib
 import sys
 import unittest
@@ -13,7 +14,7 @@ from aggregate_chats import aggregate, lower_median  # noqa: E402
 from validate_chat_result import CAPABILITIES, validate  # noqa: E402
 
 
-def chat(day, verification="not_shown", user_messages=6):
+def chat(day, verification="not_shown", user_messages=6, agent=False, task="Coding", reused=False):
     too_short = user_messages < 4
     caps = {}
     for cap in CAPABILITIES:
@@ -27,6 +28,11 @@ def chat(day, verification="not_shown", user_messages=6):
             "turns_total": user_messages * 2, "user_messages": user_messages, "unreadable_turns": 0,
             "attachments_seen": False, "truncated_turns": [], "too_short": too_short,
             "runs": 0 if too_short else 3, "run_kind": "none" if too_short else "one_response",
+            "agent_session": {"value": bool(agent) and not too_short, "quote": None,
+                              "tools": ["Bash", "Edit"] if agent and not too_short else []},
+            "task_type": None if too_short else task,
+            "reuse": {"value": reused and not too_short,
+                      "quote": {"message": 1, "text": "use my usual format"} if reused and not too_short else None},
             "capabilities": caps}
 
 
@@ -62,9 +68,13 @@ class WorkedExamples(unittest.TestCase):
         self.assertEqual(aggregate(results)["capabilities"]["verification"]["trend"], "up")
 
 
-def chat_levels(day, levels):
+def person_title(out):
+    return out["person"]["title"]
+
+
+def chat_levels(day, levels, agent=False):
     """A scored chat with the five levels given in rubric order."""
-    r = chat(day, levels[1])
+    r = chat(day, levels[1], agent=agent)
     for cap, level in zip(CAPABILITIES, levels):
         shown = level != "not_shown"
         letter = cap[0].upper()
@@ -75,23 +85,114 @@ def chat_levels(day, levels):
     return r
 
 
-class Overall(unittest.TestCase):
-    """The overall AI fluency level comes from the combined levels (derive_levels.overall).
-    It is a derived value in this output only; the record does not store it."""
+D = [3, 3, 3, 3, 2]      # Delegator
+P = [2, 2, 2, 2, 1]      # Practitioner
+E = [1, 1, 1, 1, 1]      # Explorer
+O = [5, 5, 5, 5, 3]      # Orchestrator scores
+NONE = ["not_shown"] * 5  # shown nothing: scored, no title
 
-    def test_overall_from_the_combined_levels(self):
-        # Combined: P 4, V 3, W 3, D 2, S not shown -> 3 capabilities at 3 or higher.
-        results = [chat_levels(1, [4, 3, 3, 2, "not_shown"]), chat_levels(2, [4, 4, 3, 2, "not_shown"]),
-                   chat_levels(3, [5, 3, 2, 2, "not_shown"])]
-        for r in results:
-            self.assertEqual(validate(r), [])
+
+def sheet(*levels, agent=False):
+    """A scored chat per entry, one day apart."""
+    return [chat_levels(i + 1, lv, agent=agent) for i, lv in enumerate(levels)]
+
+
+class ChatTitles(unittest.TestCase):
+    """Each chat's title comes from that chat alone (derive_levels.overall)."""
+
+    def test_each_scored_chat_gets_its_title_and_others_none(self):
+        results = sheet(D, P) + [chat(3, 4, user_messages=2), {"chat_id": "c9", "error": "tool error"}]
         out = aggregate(results)
-        self.assertEqual([out["capabilities"][c]["level"] for c in CAPABILITIES], [4, 3, 3, 2, "not_shown"])
-        self.assertEqual((out["overall"]["level"], out["overall"]["title"]), (3, "Delegator"))
+        self.assertEqual([t and t["title"] for t in out["title_per_chat"]], ["Delegator", "Practitioner", None, None])
 
-    def test_no_overall_when_fewer_than_3_are_shown(self):
-        out = aggregate([chat(1, 4), chat(2, 4)])
-        self.assertEqual((out["overall"]["level"], out["overall"]["title"]), (None, None))
+    def test_orchestrator_needs_that_chats_agent_session(self):
+        out = aggregate([chat_levels(1, O, agent=False), chat_levels(2, O, agent=True)])
+        self.assertEqual([t["title"] for t in out["title_per_chat"]], ["Delegator", "Orchestrator"])
+        self.assertIn("no agent work visible", out["title_per_chat"][0]["note"])
+
+    def test_a_scored_chat_with_no_title_is_still_listed(self):
+        out = aggregate(sheet(NONE))
+        self.assertEqual(out["title_per_chat"][0]["title"], None)
+        self.assertEqual(out["title_per_chat"][0]["level"], None)
+
+
+class PersonTitle(unittest.TestCase):
+    """Johnny's rules, section 2, with D3 (cumulative), D4 (10 scored chats) and D10."""
+
+    def test_johnnys_example_after_12_chats(self):
+        # "Delegator in 3 chats, Practitioner in 6, Explorer in 3. Person title: Delegator."
+        out = aggregate(sheet(*[D] * 3, *[P] * 6, *[E] * 3))
+        self.assertEqual((out["person"]["level"], out["person"]["title"]), (3, "Delegator"))
+        self.assertEqual(out["person"]["line"], "Your title: Delegator \u00b7 Level 3 (reached in at least 3 chats).")
+
+    def test_a_higher_chat_title_counts_toward_lower_ones(self):
+        # D3: 2 Orchestrator + 1 Delegator is Delegator in 3 chats.
+        results = sheet(*[E] * 7, D) + [chat_levels(20, O, agent=True), chat_levels(21, O, agent=True)]
+        self.assertEqual(person_title(aggregate(results)), "Delegator")
+
+    def test_three_orchestrator_chats(self):
+        results = sheet(*[P] * 7) + [chat_levels(20 + i, O, agent=True) for i in range(3)]
+        self.assertEqual(person_title(aggregate(results)), "Orchestrator")
+
+    def test_under_10_scored_chats_there_is_no_title(self):
+        out = aggregate(sheet(*[D] * 8))
+        self.assertEqual((out["person"]["level"], out["person"]["title"]), (None, None))
+        self.assertEqual(out["person"]["line"], "8 of 10 chats to your title")
+
+    def test_too_short_and_unread_chats_do_not_count_toward_the_10(self):
+        results = sheet(*[D] * 9) + [chat(20, 3, user_messages=2), {"chat_id": "c9", "error": "tool error"}]
+        self.assertEqual(aggregate(results)["person"]["line"], "9 of 10 chats to your title")
+
+    def test_a_chat_with_no_title_counts_toward_the_10_but_adds_no_title(self):
+        # D10: 8 chats that show nothing and 2 Delegator: 10 scored, no title in 3 chats.
+        out = aggregate(sheet(*[NONE] * 8, D, D))
+        self.assertEqual((out["person"]["title"], out["person"]["level"]), (None, None))
+        self.assertEqual(out["person"]["line"], "Your title: No title yet (no title reached in 3 chats).")
+
+    def test_exactly_10_scored_chats_show_the_title(self):
+        self.assertEqual(person_title(aggregate(sheet(*[D] * 3, *[E] * 7))), "Delegator")
+
+    def test_orchestrator_adds_the_multiplier_note(self):
+        results = sheet(*[P] * 7) + [chat_levels(20 + i, O, agent=True) for i in range(3)]
+        self.assertIn("Multiplier", aggregate(results)["person"]["note"])
+        self.assertIsNone(aggregate(sheet(*[D] * 10))["person"]["note"])
+
+
+class ProvenLevel(unittest.TestCase):
+    """The highest level reached in at least 3 chats, cumulative (D3, D5)."""
+
+    def test_a_higher_chat_counts_toward_a_lower_level(self):
+        self.assertEqual(aggregate([chat(1, 4), chat(2, 4), chat(3, 5)])["proven"]["verification"], 4)
+
+    def test_needs_3_chats(self):
+        self.assertIsNone(aggregate([chat(1, 4), chat(2, 4)])["proven"]["verification"])
+        self.assertIsNone(aggregate([chat(1), chat(2), chat(3)])["proven"]["verification"])
+
+    def test_not_a_peak(self):
+        self.assertEqual(aggregate([chat(1, 2), chat(2, 2), chat(3, 2), chat(4, 5)])["proven"]["verification"], 2)
+
+    def test_the_median_stays_the_main_level(self):
+        out = aggregate([chat(1, 1), chat(2, 3), chat(3, 3), chat(4, 3), chat(5, 3)])
+        self.assertEqual((out["capabilities"]["verification"]["level"], out["proven"]["verification"]), (3, 3))
+
+    def test_proven_shows_with_under_10_chats(self):
+        self.assertEqual(aggregate([chat(1, 3), chat(2, 3), chat(3, 3)])["proven"]["verification"], 3)
+
+
+class RangeAndReuse(unittest.TestCase):
+    def test_counts_distinct_task_types_over_scored_chats(self):
+        out = aggregate([chat(1, 3, task="Coding"), chat(2, 3, task="Coding"), chat(3, 3, task="Learning"),
+                         chat(4, 3, user_messages=2)])
+        self.assertEqual(out["task_range"], {"types": 2, "line": "Task range: 2 of 8 types"})
+
+    def test_counts_chats_with_reuse_over_scored_chats(self):
+        out = aggregate([chat(1, 3, reused=True), chat(2, 3), chat(3, 3, reused=True), chat(4, 3, user_messages=2)])
+        self.assertEqual(out["reuse"], {"chats": 2, "line": "Reused saved work: 2 of 3 chats"})
+
+    def test_no_saved_prompt_names_or_quotes_in_the_output(self):
+        r = chat(1, 3)
+        r["reuse"] = {"value": True, "quote": {"message": 1, "text": "ran the weekly-crm-update prompt"}}
+        self.assertNotIn("weekly-crm-update", json.dumps(aggregate([r])))
 
 
 class Counting(unittest.TestCase):

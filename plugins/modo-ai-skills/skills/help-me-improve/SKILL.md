@@ -8,7 +8,7 @@ description: Help the user get better at ONE named AI-work capability (Problem S
 Give practical help with one capability, grounded in Modo's public rubric.
 This skill does not assess anyone and does not need a prior assessment.
 
-The rubric is the file [rubric-v1.1.md](rubric-v1.1.md) in this skill's folder
+The rubric is the file [rubric-v1.2.md](rubric-v1.2.md) in this skill's folder
 (an identical copy of the one used by the assess-my-ai-work skill). **Read it
 in full before answering.** Every technique must be traceable to a behaviour in
 that capability's behaviour table (its id and tier). No generic tips ("double-check everything",

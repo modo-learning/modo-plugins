@@ -26,7 +26,7 @@ from aggregate_chats import combine  # noqa: E402
 from rubric_common import (CAPABILITIES, CONFIDENCE, LEVEL_NOT_SHOWN, MAX_QUOTE,  # noqa: E402
                            is_date as _is_date, is_int as _is_int, is_level as _is_level)
 
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 MAX_EVIDENCE = 5
 MAX_TITLE = 120
@@ -76,7 +76,7 @@ def validate(record, convention=True):
 
     v = record.get("rubric_version")
     if "rubric_version" in record and not (_is_str(v) and VERSION.match(v)):
-        errors.append("rubric_version: must be a string like 'v1' or 'v1.1'")
+        errors.append("rubric_version: must be a string like 'v1' or 'v1.2'")
 
     caps = record.get("capabilities")
     shown = {}

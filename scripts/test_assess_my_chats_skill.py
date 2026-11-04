@@ -98,12 +98,23 @@ class ScopeAndConsent(unittest.TestCase):
     def test_defaults(self):
         body = text()
         self.assertIn("last 30 days", body)
-        self.assertIn("at most 10 chats", body)
+        self.assertIn("at most 15 chats", body)
+        self.assertIn("up to 15 chats, at most 25", body)
         self.assertIn("up to 25", body)
+
+    def test_the_default_is_15_and_the_maximum_25_everywhere_it_is_stated(self):
+        root = PLUGIN.parent.parent
+        readme = re.sub(r"\s+", " ", (PLUGIN / "README.md").read_text())
+        guide = re.sub(r"\s+", " ", (root / "docs" / "modo-ai-skills-guide.md").read_text())
+        self.assertIn("up to 25 of your past claude.ai chats (by default the 15 newest", readme)
+        self.assertIn("up to 15 of your newest chats", guide)
+        self.assertIn("at most 25", guide)
+        for body in (text(), readme, guide):
+            self.assertNotRegex(body, r"(?:up to|at most) 10 (?:of your )?(?:newest )?chats|the 10 newest")
 
     def test_minimum_length_is_the_validators(self):
         self.assertIn(f"fewer than {MIN_USER_MESSAGES} typed user messages", text())
-        self.assertNotIn("fewer than 3", text())
+        self.assertNotIn("fewer than 3 typed", text())
 
     def test_consent_before_any_read(self):
         body = text()
@@ -191,9 +202,29 @@ class Aggregation(unittest.TestCase):
 
     def test_report_notes_in_export_match_the_script(self):
         body = folded(EXPORT)
-        self.assertIn(f'"Best shown" is the highest level reached in at least {aggregate_chats.BEST_MIN_CHATS} chats',
-                      body)
+        self.assertIn(f'"Proven level" is the highest level reached in at least {aggregate_chats.PROVEN_MIN_CHATS} '
+                      "chats", body)
+        self.assertNotIn('"Best shown"', body)
         self.assertIn(f"needs {aggregate_chats.TREND_MIN_CHATS} or more", body)
+
+    def test_score_sheet_rules_in_the_skill_match_the_script(self):
+        body = text()
+        a = aggregate_chats
+        self.assertIn(f"highest level reached in at least {a.PROVEN_MIN_CHATS} chats, counting chats at a higher "
+                      "level too", body)
+        self.assertIn(f"Under {a.TITLE_MIN_CHATS} scored chats: no title", body)
+        self.assertIn(f"the highest chat title reached in at least {a.PROVEN_MIN_CHATS} chats, counting chats with "
+                      "a higher title too", body)
+        self.assertIn("counts toward the 10 even if it has no title", body)
+        self.assertIn("Task range: <n> of 8 types", body)
+        self.assertIn("Reused saved work: <r> of <s> chats", body)
+        self.assertIn('"<s> of 10 chats to your title"', body)
+        self.assertIn("| Result | Title | P | V | W | D | S |", body)
+
+    def test_people_never_see_best_shown(self):
+        body = text()
+        self.assertIn("(for the record only)", body)
+        self.assertNotIn("best shown: Level", body)
 
     def test_constants_drive_the_arithmetic(self):
         a = aggregate_chats
@@ -242,7 +273,19 @@ def section(body, start, end):
     return body[body.index(start):body.index(end)]
 
 
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
+
+
+class WordingFromTheReview(unittest.TestCase):
+    def test_a_capped_title_shows_in_the_per_chat_table(self):
+        self.assertIn('"Delegator (no agent work visible in this chat)"', folded(SKILL))
+
+    def test_the_export_ground_rule_lists_the_task_range_and_reuse_line(self):
+        self.assertIn("its task range and reuse line (a multi-chat result, counts only)", folded(EXPORT))
+
+    def test_chat_titles_mean_the_same_in_the_card_and_the_report(self):
+        for path in (SKILL, EXPORT):
+            self.assertIn("null for a chat not scored", folded(path))
 
 
 class Answer(unittest.TestCase):
@@ -320,7 +363,7 @@ class ExportAndSave(unittest.TestCase):
         self.assertIn('"Chat 1"', body)
         self.assertIn('"with titles"', body)
         # Same header line as report-template.html renders.
-        self.assertIn("Chats: <from> to <to>. Rubric: v1.1. Based on <scored> chats.", body)
+        self.assertIn("Chats: <from> to <to>. Rubric: v1.2. Based on <scored> chats.", body)
 
     def test_save_skill_accepts_a_multi_chat_result_but_checks_the_server(self):
         body = folded(SAVE)

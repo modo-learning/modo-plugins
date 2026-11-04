@@ -3,11 +3,16 @@
 import json
 import pathlib
 import re
+import subprocess
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import build_openai_plugin as build  # noqa: E402
+from fill_passport_card import fill, fill_summary  # noqa: E402
+from test_passport_card import CHROME  # noqa: E402
+from test_report_template import RECORD  # noqa: E402
 
 OUT = build.OUT
 SKILL_TEXT = [p for p in OUT.rglob("*") if p.is_file() and build.LABEL_FILES.match(p.name)]
@@ -22,6 +27,65 @@ NOTE = re.compile(r'first written for Claude|says "Claude"|^"Claude", read')
 class CommittedBuild(unittest.TestCase):
     def test_committed_output_is_up_to_date(self):
         self.assertEqual(build.check(), [])
+
+    def test_chatgpt_has_no_person_title_and_no_assess_my_chats(self):
+        # Ticket 35, D6 and D16. RECORD.md is byte-shared with the Claude plugin, so it stays out of this.
+        for path in SKILL_TEXT:
+            body = path.read_text()
+            with self.subTest(path=str(path.relative_to(OUT))):
+                for word in ("assess-my-chats", "Your title", "to your title", "MODO-PERSON", "Multi-chat result"):
+                    self.assertNotIn(word, body)
+
+    def test_chatgpt_has_its_own_thin_sample_note_and_the_one_chat_rule(self):
+        body = re.sub(r"\s+", " ", (OUT / "skills" / "assess-my-ai-work" / "SKILL.md").read_text())
+        self.assertIn("One chat is a thin sample, so assess a few more chats with different kinds of work.", body)
+        self.assertIn("**Delegator · Level 3**", body)
+        self.assertIn("at least 2 tool-driven steps", body)
+        self.assertIn('"agent_session": [<each run\'s answer, true or false>]', body)
+
+    def test_no_proven_level_and_no_empty_branch_in_the_templates(self):
+        for rel in ("skills/assess-my-ai-work/passport-card.html", "skills/export-assessment/report-template.html"):
+            body = (OUT / rel).read_text()
+            with self.subTest(rel):
+                self.assertNotIn("Proven", body)
+                self.assertNotIn("proven", body)
+                self.assertNotRegex(body, r"if \(multi\) \{\s*\}")
+        report = (OUT / "skills" / "export-assessment" / "report-template.html").read_text()
+        self.assertNotIn("notes-multi", report)
+        self.assertNotIn("chats-wrap", report)
+
+    @unittest.skipUnless(CHROME, "no Chrome found")
+    def test_the_built_report_runs_and_its_columns_line_up(self):
+        template = (OUT / "skills" / "export-assessment" / "report-template.html").read_text()
+        html = fill_summary(fill(template, RECORD), {"agent_session": False})
+        with tempfile.TemporaryDirectory() as t:
+            f = pathlib.Path(t) / "report.html"
+            f.write_text(html)
+            dom = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--no-sandbox",
+                                  "--virtual-time-budget=2000", "--dump-dom", f.as_uri()],
+                                 capture_output=True, text=True, timeout=60).stdout
+        head = re.search(r'<tr id="head-row">(.*?)</tr>', dom, re.S).group(1)
+        row = re.search(r'<tr data-capability="problem_solving">(.*?)</tr>', dom, re.S).group(1)
+        self.assertEqual(len(re.findall(r"<th", head)), 3)
+        self.assertEqual(len(re.findall(r"<td", row)), 3)
+        self.assertIn("This chat: Delegator", dom)
+
+    def test_no_internal_decision_codes_in_shipped_files(self):
+        code = re.compile(r"[Tt]icket \d+|\bD(?:[2356789]|1[0-8])\b(?![a-z])")
+        shipped = [p for root in (build.SOURCE / "skills", OUT / "skills") for p in root.rglob("*")
+                   if p.is_file() and p.suffix in (".md", ".html", ".py", ".json")]
+        shipped += [build.SOURCE / "README.md", build.SOURCE / "docs" / "framework-crosswalk.md",
+                    build.ROOT / "scripts" / "derive_levels.py"]
+        for path in shipped:
+            with self.subTest(path=str(path)):
+                self.assertEqual(code.findall(path.read_text()), [])
+
+    def test_stripping_leaves_the_one_chat_rule_in_the_templates(self):
+        for rel in ("skills/assess-my-ai-work/passport-card.html", "skills/export-assessment/report-template.html"):
+            body = (OUT / rel).read_text()
+            self.assertIn("function chatTitle", body)
+            self.assertNotIn("personLine", body)
+            self.assertNotIn("reachedIn", body)
 
     def test_only_the_v1_skills_ship(self):
         shipped = sorted(p.name for p in (OUT / "skills").iterdir())

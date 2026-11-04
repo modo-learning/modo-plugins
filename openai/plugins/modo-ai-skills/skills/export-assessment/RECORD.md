@@ -1,6 +1,6 @@
 # Modo AI Skills assessment record
 
-**Record version: matches rubric v1.1**
+**Record version: matches rubric v1.2**
 
 The record is the only data that may leave Claude when a user exports an
 assessment or saves it to their Modo passport (it is the whole input of the
@@ -26,7 +26,7 @@ value exists.
 
 | Field | Type | Rule |
 |---|---|---|
-| `rubric_version` | string | `v` followed by digits, with an optional `.` and more digits, such as `v1` or `v1.1`. Must be a rubric version the receiver knows. |
+| `rubric_version` | string | `v` followed by digits, with an optional `.` and more digits, such as `v1` or `v1.2`. Must be a rubric version the receiver knows. |
 | `capabilities` | object | Exactly the five keys below, each present. |
 | `capabilities.<key>.level` | integer or string | An integer 1 to 5 written without a decimal point (`4`, never `4.0`), or the string `"not_shown"`. |
 | `capabilities.<key>.confidence` | string | `"low"`, `"medium"` or `"high"`. Always present, also for `not_shown`. |
@@ -43,7 +43,7 @@ The five capability keys, in rubric order: `problem_solving`, `verification`,
 
 ```json
 {
-  "rubric_version": "v1.1",
+  "rubric_version": "v1.2",
   "capabilities": {
     "problem_solving": { "level": 4, "confidence": "medium" },
     "verification": { "level": 4, "confidence": "high" },
@@ -82,7 +82,7 @@ server acceptance: Keith). The Modo connector
 does not accept this shape yet: save works only once modo-mcp accepts it.
 
 A multi-chat record has every single-chat field, with these changes, and the
-fields below. `rubric_version` stays `"v1.1"`.
+fields below. `rubric_version` stays `"v1.2"`.
 
 | Field | Type | Rule |
 |---|---|---|
@@ -143,7 +143,7 @@ over the scored chats where it was shown (level 1 to 5):
 
 ```json
 {
-  "rubric_version": "v1.1",
+  "rubric_version": "v1.2",
   "scope": "multi_chat",
   "capabilities": {
     "problem_solving": { "level": 2, "confidence": "high", "best_shown": 3, "trend": "up", "chats_shown": 4 },

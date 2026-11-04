@@ -1,0 +1,56 @@
+{
+  "id": "johnny-edge-plain-chat",
+  "title": "Monthly budget variance summary",
+  "updated_at": "2026-11-04T09:00:00Z",
+  "source": "written for ticket 35 from Johnny's edge case in AI Fluency Levels scoring rules v1 (he gave a description, not a chat): \"A great plain chat with no agent\". Every name and figure is invented.",
+  "turns": [
+    {
+      "user": "Every month I turn our six department budget reports into one variance summary for the CFO. Output one table: department, budget, actual, variance %, one-line reason. Use only what the reports say. If a reason isn't stated, write 'not stated' and I'll chase it. Don't round.",
+      "assistant": "Understood. Send the reports and I'll build the table with those rules."
+    },
+    {
+      "user": "March reports: [six reports pasted]",
+      "assistant": "Here is the table for all six departments. Marketing: budget 50,000, actual 52,100, variance 3.8%, reason not stated. Sales: budget 80,000, actual 86,000, variance 7.5%, reason seasonal demand."
+    },
+    {
+      "user": "Two checks. Marketing's variance is 4.2%, not 3.8%: 52,100 against 50,000. And 'seasonal demand' for Sales isn't in their report. Mark it not stated, and list every reason you inferred rather than read.",
+      "assistant": "Corrected: Marketing 4.2%, Sales reason not stated. I inferred two reasons: Sales and Facilities. Facilities is now not stated too."
+    },
+    {
+      "user": "Good. Before April, list what in this format would break if a department changes its cost codes, and what you would check first.",
+      "assistant": "Three things would break: the budget line match, the year-to-date totals and the department mapping. I would check the mapping first."
+    },
+    {
+      "user": "Use the mapping check and the totals check from that list on every run. Same rules on April: [six reports pasted]",
+      "assistant": "Checks passed on five departments. Legal's total doesn't match its report by 300, so I have left it out and flagged it. Here is the table."
+    },
+    {
+      "user": "Keep these rules as the template I paste in each month. I decide which variances go to the CFO, so stop at the table.",
+      "assistant": "Here is the template with the rules and the two checks."
+    }
+  ],
+  "expected": {
+    "bands": {
+      "Problem Solving": null,
+      "Verification": null,
+      "Workflow Design": null,
+      "Delegation": null,
+      "Strategic Thinking": null
+    },
+    "overall": [
+      "Delegator"
+    ],
+    "agent_session": false,
+    "title_source": "johnny",
+    "johnny_scores": {},
+    "reasons": {
+      "Problem Solving": "Johnny gave no score: not specified, so no band.",
+      "Verification": "Johnny gave no score: not specified, so no band.",
+      "Workflow Design": "Johnny gave no score: not specified, so no band.",
+      "Delegation": "Johnny gave no score: not specified, so no band.",
+      "Strategic Thinking": "Johnny gave no score: not specified, so no band.",
+      "overall": "Johnny: capped at Delegator. No agent or tools in this chat, so it can't be Orchestrator, however high the scores."
+    },
+    "review": "Johnny's edge case; the chat itself is ours, for him to check"
+  }
+}

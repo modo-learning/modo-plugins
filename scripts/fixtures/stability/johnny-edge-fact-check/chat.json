@@ -1,0 +1,48 @@
+{
+  "id": "johnny-edge-fact-check",
+  "title": "Emotion recognition sentence",
+  "updated_at": "2026-11-04T09:00:00Z",
+  "source": "written for ticket 35 from Johnny's edge case in AI Fluency Levels scoring rules v1 (he gave a description, not a chat): \"A strong fact-check that shows only 2 capabilities\". Every name is invented; the article and recital are the EU AI Act.",
+  "turns": [
+    {
+      "user": "Is this sentence right for a client memo? 'The EU AI Act bans all emotion recognition in the workplace.'",
+      "assistant": "Yes, that is right: the AI Act bans emotion recognition in the workplace."
+    },
+    {
+      "user": "Which article says that? Quote it.",
+      "assistant": "Article 5(1)(f) prohibits AI systems that infer the emotions of a person in the workplace and in education institutions."
+    },
+    {
+      "user": "You cut the end of it. Article 5(1)(f) has an exception for medical or safety reasons, so 'all' is wrong. Did you read the text or go from memory?",
+      "assistant": "From memory. You are right: the article excepts use for medical or safety reasons."
+    },
+    {
+      "user": "I checked the Official Journal text myself and recital 44 says the same. Give me the corrected sentence.",
+      "assistant": "'The EU AI Act bans emotion recognition in the workplace, except for medical or safety reasons.'"
+    }
+  ],
+  "expected": {
+    "bands": {
+      "Problem Solving": null,
+      "Verification": null,
+      "Workflow Design": null,
+      "Delegation": null,
+      "Strategic Thinking": null
+    },
+    "overall": [
+      "No title yet"
+    ],
+    "agent_session": false,
+    "title_source": "johnny",
+    "johnny_scores": {},
+    "reasons": {
+      "Problem Solving": "Johnny gave no score: not specified, so no band.",
+      "Verification": "Johnny gave no score: not specified, so no band.",
+      "Workflow Design": "Johnny gave no score: not specified, so no band.",
+      "Delegation": "Johnny gave no score: not specified, so no band.",
+      "Strategic Thinking": "Johnny gave no score: not specified, so no band.",
+      "overall": "Johnny: No title yet, not Explorer. Not enough was shown to judge. The chat is written so only Verification and one other capability show; a third is a disagreement to list."
+    },
+    "review": "Johnny's edge case; the chat itself is ours, for him to check"
+  }
+}

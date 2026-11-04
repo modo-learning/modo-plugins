@@ -76,3 +76,29 @@ don't describe a tool you don't have, and give the Markdown report as the
 export. In that same line, say they can still get a PDF by copying the report
 into a document and using Print, then Save as PDF.
 >>>>>>> REPLACE
+
+<<<<<<< FIND
+- Export only an assessment that was given earlier in this conversation by the
+  assess-my-ai-work skill, or a result across several chats given by the
+  assess-my-chats skill (then also follow [Multi-chat result](#multi-chat-result)).
+  Take the levels and confidence from it as they
+=======
+- Export only an assessment that was given earlier in this conversation by the
+  assess-my-ai-work skill. Take the levels and confidence from it as they
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+five capability blocks (in any order: v1.2 lists the strongest first), from
+assess-my-ai-work or, across several chats, from assess-my-chats. There is nothing to export when there is none, or when
+=======
+five capability blocks (in any order: v1.2 lists the strongest first), from
+assess-my-ai-work. There is nothing to export when there is none, or when
+>>>>>>> REPLACE
+
+<<<<<<< FIND
+  approved, the title, the date, the assessment's title line, its task range
+  and reuse line (a multi-chat result, counts only) or fixed explanatory text.
+=======
+  approved, the title, the date, the assessment's title line or fixed
+  explanatory text.
+>>>>>>> REPLACE

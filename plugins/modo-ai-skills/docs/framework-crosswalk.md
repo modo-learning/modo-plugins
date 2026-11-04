@@ -1,6 +1,6 @@
 # How Modo's rubric maps to the AI Fluency Framework
 
-Rubric version: v1.1. Checked: 2026-10-29. Ladder section added: 2026-11-03.
+Rubric version: v1.2. Checked: 2026-11-04.
 
 Modo scores five capabilities. This page shows how they line up with the
 **AI Fluency Framework** by Prof. Rick Dakan and Prof. Joseph Feller,
@@ -50,85 +50,107 @@ above is Modo's assignment.
   example, saying where AI was used in work you hand in), so a chat can't show
   it.
 - **Rarer behaviours say more.** Fact-checking appears in 8.7% of chats and
-  iterating in 85.7%. That is why rubric v1.1 never lets iterating back a
+  iterating in 85.7%. That is why rubric v1.2 never lets iterating back a
   higher level, and gives Verification extra weight.
 - Behaviour depends on the kind of chat: the Index found that chats where
   Claude produces an artifact show more goal-setting and formatting and less
   fact-checking and questioning. One chat is one sample, so assess a few
   chats with different kinds of work.
 
-## Modo's AI fluency ladder (overall level)
+## Titles: Modo's AI fluency levels
 
-Decided 2026-11-03, flag for review (Angelina, Johnny).
+Credit: Johnny, AI Fluency Levels scoring rules v1, 2026-11-04, an internal
+Modo document. His rules replaced the rule Modo used before, and they take
+priority over it. The five capabilities stay as they are. Rubric v1.2 tightens
+what counts for some behaviours, so that levels read closer to his example chats;
+its ids, tiers and level rule are the same as in v1.1, and the mapping above does
+not change. The lines it draws are Modo's reading, not his. Results from v1.1 and
+v1.2 are not mixed.
 
-Source: "AI Fluency Levels" (Modo, Johnny, 2026-11-02), an internal Modo
-document. It combines four public sources, named here only: BCG, "The AI
-Adoption Puzzle"; Anthropic, "AI Fluency Index"; OpenAI, "The State of
+The titles come from Modo's AI fluency ladder ("AI Fluency Levels", Modo,
+Johnny, 2026-11-02), which draws on four public sources, named here only: BCG,
+"The AI Adoption Puzzle"; Anthropic, "AI Fluency Index"; OpenAI, "The State of
 Enterprise AI"; Zapier, "AI fluency rubric".
 
-The document defines five levels, each scored on the four 4D skills:
+### The title for one chat
 
-| Ladder level | Name | In the document's words |
-|---|---|---|
-| 1 | Explorer | "Asks AI questions" |
-| 2 | Practitioner | "Uses AI on purpose" |
-| 3 | Delegator | "Hands off whole tasks" |
-| 4 | Orchestrator | "Directs agents" |
-| 5 | Multiplier | "Scales it for the team" |
+Give the highest title whose rule is met.
 
-It gives two rules for a person's level: "A person's level is where most of
-their skills sit", and "Score a level when the signals hold for 30 days
-across at least three of the four skills."
-
-### How a Modo result gets an overall level
-
-Modo reads a capability at Level N as ladder Level N. This is a numeric
-alignment. The rubric's behaviour tables were not written against the
-ladder's per-skill descriptions, so the fit is approximate (the document
-says the same of its own sources: "Alignment is approximate").
-
-The rule, applied to the five levels of a result (one chat, or the combined
-levels of several chats):
-
-- The overall level is the highest L from 1 to 4 such that at least 3 of the
-  5 capabilities have a level of L or higher. "Not shown" (and "runs
-  disagreed") reaches no level.
-- If fewer than 3 capabilities have a level, there is no overall level: "not
-  enough shown".
-- Level 5, Multiplier, is never given from chats. Its signals in the
-  document are "Adoption by others" (cross-user usage data) and "Outcomes and
-  accountability" (outcome data and manager review), which a chat does not
-  hold.
-- The title is the ladder name of that level.
-
-"At least 3 of the 5 capabilities" is Modo's reading of "at least three of
-the four skills" and "where most of their skills sit": Modo scores five
-capabilities, not the four 4D skills (Diligence is not scored, and Workflow
-Design and Strategic Thinking are Modo additions; see above), and 3 of 5 is
-a majority.
-
-The 30-day condition is not checked. One chat has no time span, so the
-single-chat answer says one chat is a thin sample and points to
-/assess-my-chats. A multi-chat result covers the chats the user confirms (by
-default from the last 30 days); whether the signals "hold" over that time is
-not tested.
-
-The overall level is not stored in the assessment record. It is worked out
-from the capability levels wherever it is shown: the text answer, the card
-and the PDF report. The code is `overall()` in `scripts/derive_levels.py`;
-the card and report templates apply the same rule, and the tests check they
-agree on the worked examples.
-
-### Worked examples
-
-| Five levels | Overall level |
+| Title | Rule |
 |---|---|
-| 4, 4, 3, 2, not shown | 3 Delegator |
-| 5, 5, 5, 5, 5 | 4 Orchestrator (Level 5 is never given from chats) |
-| 3, 3, 2, 2, 2 | 2 Practitioner |
-| 1, 1, 1, 1, 1 | 1 Explorer |
-| 5, 4, 1, 1, not shown | 1 Explorer |
-| 2, 1, not shown, not shown, not shown | none ("not enough shown") |
+| Orchestrator · Level 4 | 3 of 5 capabilities at 4+, including Delegation. The user must be directing an agent or tools. |
+| Delegator · Level 3 | 3 of 5 capabilities at 3+, including Delegation |
+| Practitioner · Level 2 | 3 of 5 capabilities at 2+ |
+| Explorer · Level 1 | 3 of 5 capabilities shown at any level |
+| No title yet | Fewer than 3 capabilities shown |
+
+Delegation is required at Levels 3 and 4 because those titles are about handing
+work to AI. Multiplier, Level 5, comes later: once people can share how they
+use AI on Modo, it means an Orchestrator whose shared workflows other people
+regularly reuse. A claim in a chat is not evidence.
+
+Scores that reach Orchestrator with no agent session give Delegator, with the
+note "no agent work visible in this chat". "Not shown" and "runs disagreed"
+reach no level.
+
+The same rule runs on every surface. The code is `overall()` in
+`scripts/derive_levels.py`; the card and report templates apply the same rule,
+and the tests check they agree on every set of levels and on Johnny's examples.
+
+### The title for a person
+
+This is Claude multi-chat only, worked out inside one /assess-my-chats run from
+the chats in that run. Nothing is stored, and nothing here is in the assessment
+record.
+
+- **Proven level per capability:** the highest level reached in at least 3
+  chats. The median stays the main level.
+- **Your title:** the highest chat title reached in at least 3 chats, shown once
+  there are 10 scored chats. Before that the result says "N of 10 chats to your
+  title". A scored chat with no title counts toward the 10 but adds no title
+  toward the 3 chats.
+- **Task range:** how many of the 8 task types the chats cover (Writing and
+  editing, Research and summarizing, Data analysis, Coding, Planning and
+  decisions, Brainstorming, Learning, Operations and admin). Each chat gets
+  exactly one, the closest match.
+- **Reuse:** how many chats used saved work: a skill or slash command, a pasted
+  or named saved prompt or template, a project with saved instructions, or "use
+  my usual format". Counts only, with no saved-prompt names.
+
+### Agent session (confirmed by Johnny, 2026-11-04)
+
+His "directing an agent or tools" means the user directs the process in their
+own words: asks for a plan before the work runs, limits or pauses the steps,
+sets a check for the agent to run, or gives instructions for a multi-step run
+across tools or systems. It needs at least 2 tool-driven steps and one exact
+quote from the user. Tool use alone doesn't count: the assistant often uses
+tools by itself, for example to make a slide deck, and reviewing the finished
+result is not directing the process. One web search doesn't count. No evidence
+means no.
+
+### Readings pending Johnny's answer
+
+Johnny's file leaves these open. Modo reads them this way until he answers:
+
+- **Most runs decide:** agent session, task type and reuse each take the answer
+  of most of the 3 to 5 scoring runs. His file doesn't say how to decide them
+  when runs differ.
+- **Task type tie:** when runs tie, the earliest run's choice among the tied
+  types. His file gives one type per chat and doesn't cover a tie.
+- **A list of 15 chats by default, 25 at most:** his title needs 10 scored chats,
+  and some listed chats come back too short. The default of 15 and the maximum
+  of 25 are Modo's, not his.
+- **"Reached in at least 3 chats" is cumulative:** a higher chat title also
+  counts toward lower ones, and the same goes for Proven level. His example
+  (Delegator in 3 chats, Practitioner in 6, Explorer in 3) reads the same either
+  way.
+- **Proven level replaces Best shown** for people, and the median stays the main
+  level. His file doesn't say which of them leads. The record keeps `best_shown`
+  unchanged.
+
+In v1 nothing expires, by his rules. A run only sees the chats in it, because
+the stored score sheet needs the backend. Not specified: how a stored sheet will
+treat chats counted twice.
 
 ## Not for employment decisions
 

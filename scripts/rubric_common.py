@@ -13,6 +13,9 @@ import re
 CAPABILITIES = ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")
 CONFIDENCE = ("low", "medium", "high")
 MAX_QUOTE = 240
+# Johnny's scoring rules v1, section 3. A chat gets exactly one, the closest match.
+TASK_TYPES = ("Writing and editing", "Research and summarizing", "Data analysis", "Coding",
+              "Planning and decisions", "Brainstorming", "Learning", "Operations and admin")
 # The JSON value for a capability with no level. Not derive_levels.NOT_SHOWN,
 # which is the display text "not shown" (with a space).
 LEVEL_NOT_SHOWN = "not_shown"

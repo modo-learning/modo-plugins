@@ -1,0 +1,78 @@
+{
+  "id": "johnny-d2",
+  "title": "Operations: vendor decision",
+  "updated_at": "2026-11-04T09:00:00Z",
+  "source": "Johnny, AI Fluency Levels scoring rules v1, 2026-11-04, example D2: his user messages word for word. Claude's replies are a placeholder: his file shows only the user's messages.",
+  "turns": [
+    {
+      "user": "I have to recommend one of three vendors to my COO by Friday. Summarize these proposals [3 PDFs] on price, SLA and exit terms in one table. I'll make the call.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Where does Vendor B's 99.95% uptime come from? I can't find it in their PDF. Quote the page or mark it unverified.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "I get $412k for A over 3 years, you have $380k. Show your line items.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "You missed the 8% yearly price increase in A for years 2 and 3. Fix it, then check B and C for the same thing.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Now give me the two biggest risks of switching from our current vendor to B.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    }
+  ],
+  "expected": {
+    "bands": {
+      "Problem Solving": [
+        2,
+        3,
+        4
+      ],
+      "Verification": [
+        3,
+        4,
+        5
+      ],
+      "Workflow Design": [
+        1,
+        2,
+        3
+      ],
+      "Delegation": [
+        2,
+        3,
+        4
+      ],
+      "Strategic Thinking": [
+        3,
+        4,
+        5
+      ]
+    },
+    "overall": [
+      "Delegator"
+    ],
+    "agent_session": false,
+    "title_source": "johnny",
+    "johnny_scores": {
+      "Verification": 4,
+      "Strategic Thinking": 4,
+      "Delegation": 3,
+      "Problem Solving": 3,
+      "Workflow Design": 2
+    },
+    "reasons": {
+      "Problem Solving": "Johnny scored 3; band is within 1 (ticket 35, D8).",
+      "Verification": "Johnny scored 4; band is within 1 (ticket 35, D8).",
+      "Workflow Design": "Johnny scored 2; band is within 1 (ticket 35, D8).",
+      "Delegation": "Johnny scored 3; band is within 1 (ticket 35, D8).",
+      "Strategic Thinking": "Johnny scored 4; band is within 1 (ticket 35, D8).",
+      "overall": "Johnny's title for this chat. It must match exactly (D8)."
+    },
+    "review": "Johnny's own scores and title"
+  }
+}

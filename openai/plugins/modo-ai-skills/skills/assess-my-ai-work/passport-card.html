@@ -7,7 +7,7 @@
    capability (five segments, strongest first, not shown last), strengths'
    evidence, one growth tip, the next action, the label last. A result across
    several chats ("scope": "multi_chat") adds the chat count and date range to
-   the header and a trend arrow, chats shown and best shown per capability
+   the header and a trend arrow and chats shown per capability
    (proposal, decided 2026-11-02, flag for review: Angelina). */
 /* MODO-TOKENS-START */
 /* Modo design tokens, taken from modo-frontend src/styles/tokens.css (Modo v2:
@@ -90,13 +90,14 @@ body {
 }
 h1 { font-size: 21px; line-height: 1.2; letter-spacing: -0.014em; margin: 0 0 6px; font-weight: 650; text-wrap: balance; }
 .sub { color: var(--nav-text-muted); margin: 0; font-size: 13px; overflow-wrap: anywhere; }
-/* Overall AI fluency level (Modo's ladder), worked out below from the five levels. */
+/* The title, worked out below (Johnny's scoring rules v1, 2026-11-04). */
 .fluency { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 10px; }
 .fluency-title {
   display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 9999px;
   background: var(--accent-primary); color: #1A1A2E; font-weight: 700; font-size: 13px;
 }
 .fluency[data-overall="none"] .fluency-title { background: transparent; color: var(--nav-text); border: 1px solid var(--nav-text-muted); font-weight: 600; }
+.fluency[data-overall="pending"] .fluency-title { background: transparent; color: var(--nav-text-muted); border: 1px solid var(--nav-text-muted); font-weight: 500; }
 .fluency-why { color: var(--nav-text-muted); font-size: 12px; }
 .body { padding: 20px 24px 24px; }
 .coverage {
@@ -183,12 +184,12 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
       <p class="next"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span id="next"></span></p>
     </div>
   </div>
-  <p class="label">Self-assessment by ChatGPT using Modo rubric v1.1 — not verified.</p>
+  <p class="label">Self-assessment by ChatGPT using Modo rubric v1.2 — not verified.</p>
 </main>
 
 <!-- MODO-DATA-START -->
 <script type="application/json" id="passport-data">
-{"chat": "", "sessions": 1, "capabilities": [], "evidence": [], "growth": null, "next_action": ""}
+{"chat": "", "sessions": 1, "agent_session": false, "capabilities": [], "evidence": [], "growth": null, "next_action": ""}
 </script>
 <!-- MODO-DATA-END -->
 
@@ -232,34 +233,51 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
   } else if (multi) {
     document.getElementById("t").textContent = "Your AI capabilities across these chats";
   }
-  /* Overall AI fluency level, the same rule as derive_levels.overall() (decided 2026-11-03,
-     flag for review: Angelina, Johnny): the highest L in 1..4 that at least 3 of the 5
-     capabilities reach; fewer than 3 with a level gives none. Level 5 (Multiplier) is never
-     given from chats. Not stored in the record. */
+  /* MODO-RULE-START */
+  /* The title for one chat, the same rule as derive_levels.overall() (Johnny's scoring rules
+     v1, 2026-11-04). 0 means no title. Multiplier comes later. Not stored in the record. */
   var LADDER = ["", "Explorer", "Practitioner", "Delegator", "Orchestrator"];
-  if (ordered.length === 5) {
-    var overall = 0;
+  function isLevel(v) { return [1, 2, 3, 4, 5].indexOf(v) >= 0; }
+  function chatTitle(levels, delegation, agent) {
+    var title = 0;
     for (var L = 1; L <= 4; L++) {
-      if (ordered.filter(function (c) { return shown(c) && c.level >= L; }).length >= 3) overall = L;
+      var at = levels.filter(function (v) { return isLevel(v) && v >= L; }).length;
+      if (at >= 3 && (L < 3 || (isLevel(delegation) && delegation >= L))) title = L;
     }
+    return title === 4 && !agent ? 3 : title;
+  }
+  function chatTitleWhy(title, capped) {
+    if (capped) return "The title stops at Delegator: no agent work visible in this chat.";
+    if (!title) return "A title needs at least 3 of 5 capabilities shown";
+    return "At least 3 of 5 capabilities " + (title > 1 ? "at Level " + title + " or higher" : "shown") +
+      (title >= 3 ? ", including Delegation" : "") + (title === 4 ? ", with agent work shown" : "");
+  }
+  /* MODO-RULE-END */
+  var sessions = data.sessions || 1;
+  if (ordered.length === 5) {
     var fl = document.getElementById("fluency");
     fl.hidden = false;
-    fl.setAttribute("data-overall", overall ? String(overall) : "none");
-    document.getElementById("fluency-title").textContent = overall
-      ? LADDER[overall] + " \u00b7 Level " + overall : "Overall: not enough shown";
-    document.getElementById("fluency-why").textContent = overall
-      ? "Overall AI fluency from " + (multi ? "these chats" : "this chat") + ": at least 3 of 5 capabilities at Level " + overall + " or higher"
-      : "An overall level needs at least 3 of 5 capabilities with a level";
+    {
+      var inOrder = data.capabilities.map(function (c) { return c.level; });
+      var delegation = data.capabilities.filter(function (c) { return c.name === "Delegation"; })[0];
+      var dLevel = delegation ? delegation.level : null;
+      var agent = data.agent_session === true;
+      var title = chatTitle(inOrder, dLevel, agent);
+      fl.setAttribute("data-overall", title ? String(title) : "none");
+      document.getElementById("fluency-title").textContent =
+        "This chat: " + (title ? LADDER[title] + " \u00b7 Level " + title : "No title yet");
+      document.getElementById("fluency-why").textContent =
+        chatTitleWhy(title, !agent && chatTitle(inOrder, dLevel, true) === 4);
+    }
   }
-  var sessions = data.sessions || 1;
   if (multi) {
     var range = data.date_range || [];
     document.getElementById("chat").textContent = "Based on " + sessions + (sessions === 1 ? " chat" : " chats") +
       (range.length === 2 ? ", " + (range[0] === range[1] ? range[0] : range[0] + " to " + range[1]) : "") +
-      ", against Modo rubric v1.1.";
+      ", against Modo rubric v1.2.";
   } else if (data.chat) {
     document.getElementById("chat").textContent = "Assessment of " + data.chat +
-      ". Based on " + sessions + (sessions === 1 ? " chat" : " chats") + ", against Modo rubric v1.1.";
+      ". Based on " + sessions + (sessions === 1 ? " chat" : " chats") + ", against Modo rubric v1.2.";
   }
   if (ordered.length === 5) {
     /* A capability withheld because the runs disagreed was shown; it is not missing. */
@@ -308,7 +326,6 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
       }
       meta.appendChild(el("span", "pill", cap(c.confidence) + " confidence"));
       if (multi && c.chats_shown) meta.appendChild(el("span", null, "Shown in " + c.chats_shown + " of " + sessions + " chats"));
-      if (multi && c.best_shown) meta.appendChild(el("span", null, "Best shown: Level " + c.best_shown));
     } else {
       li.appendChild(el("div", "level", multi ? "Not shown in these chats" : "Not shown in this chat"));
       var empty = el("div", "track-empty");

@@ -1,7 +1,7 @@
 {
   "expect": "chats_assessed.count",
   "record": {
-    "rubric_version": "v1.1",
+    "rubric_version": "v1.2",
     "scope": "multi_chat",
     "capabilities": {
       "problem_solving": {

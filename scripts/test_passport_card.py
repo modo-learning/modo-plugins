@@ -18,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / "plugins" / "modo-ai-skills"
 TEMPLATE = PLUGIN / "skills" / "assess-my-ai-work" / "passport-card.html"
 HISTORY = PLUGIN / "evals" / "strong-verify-weak-delegate" / "history.jsonl"
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from fill_passport_card import fill, MULTI_SAMPLE, SAMPLE  # noqa: E402
@@ -197,11 +197,12 @@ def overall_of(dom):
 
 @unittest.skipUnless(CHROME, "no headless Chrome found")
 class RenderOverall(unittest.TestCase):
-    """The overall AI fluency title, worked out in the card from the five levels
-    (decided 2026-11-03, flag for review: Angelina, Johnny)."""
+    """The title, worked out in the card from the five levels and the agent session
+    (Johnny's scoring rules v1, 2026-11-04)."""
 
-    def with_levels(self, levels, base=SAMPLE):
+    def with_levels(self, levels, base=SAMPLE, agent=False):
         data = json.loads(json.dumps(base))
+        data["agent_session"] = agent
         for c, lvl in zip(data["capabilities"], levels):
             c["level"] = lvl
             if lvl == "not_shown":
@@ -214,42 +215,78 @@ class RenderOverall(unittest.TestCase):
         # Sample levels 4, 5, 2, 2, not shown: four at 2 or higher, two at 3 or higher.
         level, text = overall_of(render(SAMPLE))
         self.assertEqual(level, "2")
-        self.assertIn("Practitioner \u00b7 Level 2", text)
-        self.assertIn("at least 3 of 5 capabilities at Level 2 or higher", text)
+        self.assertIn("This chat: Practitioner \u00b7 Level 2", text)
+        self.assertIn("least 3 of 5 capabilities at Level 2 or higher", text)
 
-    def test_level_5_everywhere_is_capped_at_orchestrator(self):
-        level, text = overall_of(self.with_levels([5, 5, 5, 5, 5]))
+    def test_level_5_everywhere_with_an_agent_stops_at_orchestrator(self):
+        level, text = overall_of(self.with_levels([5, 5, 5, 5, 5], agent=True))
         self.assertEqual(level, "4")
-        self.assertIn("Orchestrator \u00b7 Level 4", text)
+        self.assertIn("This chat: Orchestrator \u00b7 Level 4", text)
         self.assertNotIn("Multiplier", text)
 
-    def test_fewer_than_3_shown_is_not_enough(self):
+    def test_orchestrator_scores_with_no_agent_are_delegator_with_the_note(self):
+        level, text = overall_of(self.with_levels([5, 5, 5, 5, 5]))
+        self.assertEqual(level, "3")
+        self.assertIn("This chat: Delegator \u00b7 Level 3", text)
+        self.assertIn("no agent work visible in this chat", text)
+
+    def test_no_agent_session_field_means_no(self):
+        data = json.loads(json.dumps(SAMPLE))
+        del data["agent_session"]
+        for c in data["capabilities"]:
+            c.update(level=5, confidence="medium")
+        self.assertEqual(overall_of(render(data))[0], "3")
+
+    def test_fewer_than_3_shown_is_no_title_yet(self):
         level, text = overall_of(self.with_levels([2, "not_shown", "not_shown", "not_shown", 1]))
         self.assertEqual(level, "none")
-        self.assertIn("Overall: not enough shown", text)
+        self.assertIn("This chat: No title yet", text)
         self.assertNotRegex(text, r"Explorer|Practitioner|Delegator|Orchestrator")
 
-    def test_multi_chat_uses_the_combined_levels(self):
-        # Combined levels 2, 3, 2, 3, not shown.
-        level, text = overall_of(render(MULTI_SAMPLE))
-        self.assertEqual(level, "2")
-        self.assertIn("Practitioner \u00b7 Level 2", text)
-
-    def test_the_card_and_the_python_rule_agree_on_the_worked_examples(self):
-        from test_derive_levels import OVERALL_WORKED
+    def test_the_card_and_the_python_rule_agree_on_johnnys_examples(self):
+        from test_johnny_rules import EDGE, EXAMPLES
         from derive_levels import overall
-        for levels, _ in OVERALL_WORKED:
-            with self.subTest(levels=levels):
-                data = json.loads(json.dumps(SAMPLE))
-                for c, lvl in zip(data["capabilities"], levels):
-                    if isinstance(lvl, int):
-                        c.update(level=lvl, confidence="medium", agreement="3 of 3 runs")
-                    else:
-                        c.pop("confidence", None)
-                        c.update(level="not_shown",
-                                 agreement="runs disagreed" if lvl == "runs disagreed" else "3 of 3 runs")
-                want = overall(levels)["level"]
-                self.assertEqual(overall_of(render(data))[0], "none" if want is None else str(want))
+        for name, (levels, agent, _, _) in {**EXAMPLES, **EDGE}.items():
+            with self.subTest(name):
+                want = overall(list(levels), agent)
+                got, text = overall_of(self.with_levels(list(levels), agent=agent))
+                self.assertEqual(got, "none" if want["level"] is None else str(want["level"]))
+                self.assertIn(want["title"] or "No title yet", text)
+
+
+@unittest.skipUnless(CHROME, "no headless Chrome found")
+class RenderPerson(unittest.TestCase):
+    """The multi-chat title line: ticket 35, D4, D10, D11 and D12."""
+
+    def line(self, **changes):
+        data = json.loads(json.dumps(MULTI_SAMPLE))
+        data.update(changes)
+        return overall_of(render(data))
+
+    def test_under_10_chats_is_a_muted_count(self):
+        level, text = self.line(sessions=8, chat_titles=[3] * 8)
+        self.assertEqual(level, "pending")
+        self.assertIn("8 of 10 chats to your title", text)
+        self.assertNotIn("Your title:", text)
+        self.assertNotRegex(text, r"Explorer|Practitioner|Delegator|Orchestrator")
+
+    def test_ten_chats_show_the_title(self):
+        level, text = self.line(sessions=12, chat_titles=[3, 3, 3] + [2] * 6 + [1] * 3)
+        self.assertEqual(level, "3")
+        self.assertIn("Your title: Delegator \u00b7 Level 3", text)
+
+    def test_higher_chats_count_toward_lower_titles(self):
+        self.assertEqual(self.line(sessions=10, chat_titles=[4, 4, 3] + [1] * 7)[0], "3")
+
+    def test_no_title_reached_in_3_chats(self):
+        level, text = self.line(sessions=10, chat_titles=[3, 3] + [0] * 8)
+        self.assertEqual(level, "none")
+        self.assertIn("Your title: No title yet", text)
+
+    def test_task_range_and_reuse(self):
+        _, text = self.line(sessions=8, chat_titles=[3] * 8, task_types=5, reused=3)
+        self.assertIn("Task range: 5 of 8 types", text)
+        self.assertIn("Reused saved work: 3 of 8 chats", text)
 
 
 @unittest.skipUnless(CHROME, "no headless Chrome found")
@@ -266,7 +303,7 @@ class RenderMultiChat(unittest.TestCase):
         return next(i for i in self.items if name_of(i) == name)
 
     def test_header_names_the_chat_count_and_date_range(self):
-        self.assertIn("Based on 4 chats, 2026-10-06 to 2026-10-30, against Modo rubric v1.1.", self.text)
+        self.assertIn("Based on 4 chats, 2026-10-06 to 2026-10-30, against Modo rubric v1.2.", self.text)
         self.assertIn("Strongest across these chats: Verification", self.text)
         self.assertNotIn("this chat", self.text.lower())
 
@@ -295,13 +332,14 @@ class RenderMultiChat(unittest.TestCase):
         self.assertIn("\u2192", v)
         self.assertIn('aria-label="Trend: flat"', v)
 
-    def test_chats_shown_and_best_shown(self):
+    def test_chats_shown_and_proven_level(self):
         v = text_of(self.item("Verification"))
         self.assertIn("Level 3 of 5", v)
         self.assertIn("High confidence", v)
         self.assertIn("Shown in 4 of 4 chats", v)
-        self.assertIn("Best shown: Level 4", v)
-        self.assertNotIn("Best shown", text_of(self.item("Delegation")))
+        self.assertIn("Proven level: Level 3", v)
+        self.assertNotIn("Proven level", text_of(self.item("Strategic Thinking")))
+        self.assertNotIn("Best shown", text_of(self.dom))
 
     def test_not_shown_in_these_chats(self):
         s = self.item("Strategic Thinking")
@@ -316,7 +354,7 @@ class RenderMultiChat(unittest.TestCase):
     def test_partial_coverage(self):
         data = json.loads(json.dumps(MULTI_SAMPLE))
         for c in data["capabilities"][2:]:
-            c.update(level="not_shown", trend=None, best_shown=None, chats_shown=0)
+            c.update(level="not_shown", trend=None, proven=None, chats_shown=0)
             c.pop("confidence", None)
         self.assertIn("These chats show only 2 of 5 capabilities, so this is a partial picture.",
                       text_of(body_text(render(data))))
@@ -333,7 +371,7 @@ class RenderMultiChat(unittest.TestCase):
     def test_nothing_shown_across_chats(self):
         data = json.loads(json.dumps(MULTI_SAMPLE))
         for c in data["capabilities"]:
-            c.update(level="not_shown", trend=None, best_shown=None, chats_shown=0)
+            c.update(level="not_shown", trend=None, proven=None, chats_shown=0)
             c.pop("confidence", None)
         data["evidence"] = []
         text = text_of(body_text(render(data)))

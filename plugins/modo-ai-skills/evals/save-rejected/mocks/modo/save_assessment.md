@@ -1,7 +1,7 @@
 ---
 error: true
 expect:
-  rubric_version: v1.1
+  rubric_version: v1.2
   session_title: /^.{1,120}$/s
   session_date: /^\d{4}-\d{2}-\d{2}$/
   evidence: array

@@ -106,6 +106,7 @@
       "Strategic Thinking": "Thursday's product review is named as the purpose in passing (S2a, 2). Nothing is prioritised by it, so S3a (3) does not apply.",
       "overall": "3 capabilities are shown: Problem Solving 3 or 4, Verification 4 or 5, Strategic Thinking 2. All 3 reach Level 2, only 2 reach Level 3, so Practitioner."
     },
-    "review": "proposal: Angelina to review the bands"
+    "review": "proposal: Angelina to review the bands",
+    "agent_session": false
   }
 }

@@ -7,7 +7,8 @@ description: "Export an AI-work assessment that was already given in this conver
 
 Turn the assessment already shown in this conversation into a report the user
 can keep. The report holds scores, confidence, the quotes the user approves, a
-title and a date, and nothing else from the chat.
+title and a date, and nothing else from the chat. The title line and the other
+summary lines are for people; none of them goes in the record.
 
 The exact shape of the record is in [RECORD.md](RECORD.md) in this skill's
 folder (JSON Schema: [assessment-record.schema.json](assessment-record.schema.json)).
@@ -28,7 +29,9 @@ limits exactly.
   call external services. This skill never uploads anything; the user does
   that themselves.
 - Everything in the report is either a score, a confidence, a quote the user
-  approved, the title, the date or fixed explanatory text. **No other chat
+  approved, the title, the date, the assessment's title line, its task range
+  and reuse line (a multi-chat result, counts only) or fixed explanatory text.
+  **No other chat
   content**: no summary of what the chat said, no paraphrase, no next-level
   notes, no improvements or prompts from the assessment, nothing from Claude's
   replies.
@@ -39,7 +42,7 @@ limits exactly.
 ## 1. Is there something to export?
 
 Use the most recent assessment in this conversation: a response with the
-five capability blocks (in any order: v1.1 lists the strongest first), from
+five capability blocks (in any order: v1.2 lists the strongest first), from
 assess-my-ai-work or, across several chats, from assess-my-chats. There is nothing to export when there is none, or when
 the last assess-my-ai-work response was only a short message ("too short to
 judge", "which one?", "can't open that chat" or "no chat with that name")
@@ -109,9 +112,11 @@ report contains its own fenced block):
 ````
 # Modo AI Skills assessment: <session_title>
 
-Chat date: <session_date>. Rubric: v1.1. Based on 1 chat.
+Chat date: <session_date>. Rubric: v1.2. Based on 1 chat.
 
-Self-assessment by Claude using Modo rubric v1.1 — not verified.
+Self-assessment by Claude using Modo rubric v1.2 — not verified.
+
+<the assessment's title line, as it stands, with its extra line if it has one>
 
 | Capability | Level | Confidence |
 |---|---|---|
@@ -143,7 +148,7 @@ because no moment in the chat supports a level.
 ````
 
 - The record in the final block follows RECORD.md exactly: keys
-  `rubric_version` (`"v1.1"`), `capabilities` (the five keys in rubric order),
+  `rubric_version` (`"v1.2"`), `capabilities` (the five keys in rubric order),
   `evidence`, `session_title`, `session_date`, in that order, with no other
   fields. Use `"not_shown"` for a capability with no level and give it
   confidence `"low"`. Print it pretty (2-space indent).
@@ -193,7 +198,10 @@ Build the PDF from [report-template.html](report-template.html) so it has
 Modo's look (the modo-design skill): read the template, replace only the JSON
 between the `MODO-DATA-START` and `MODO-DATA-END` markers with the record
 (exactly the record in the report's final block; write `<` inside a string as
-`\u003c`), change nothing else, and print that page to PDF. The template lays
+`\u003c`), replace only the JSON between the `MODO-SUMMARY-START` and
+`MODO-SUMMARY-END` markers with `{"agent_session": true or false}` from the
+assessment, change nothing else, and print that page to PDF. A summary left
+empty shows "Title not filled in", so never leave it empty. The template lays
 out the same content in the same order, record last. If you can't render HTML
 to PDF here, make the PDF your usual way with the same content and order.
 
@@ -207,6 +215,7 @@ the report (so the record block stays last), don't claim that a PDF exists,
 don't describe a tool you don't have, and give the Markdown report as the
 export.
 
+<!-- MODO-PERSON-START -->
 ## Multi-chat result
 
 A result from assess-my-chats (it opens "Assessment across <s> of your
@@ -236,21 +245,26 @@ changes. This shape is a proposal (decided 2026-11-02, flag for review).
   ...
   ```
 
-- **The record**: copy every level, confidence, best shown, trend and count
-  from the result as it stands, and each chat's levels from its row. Keys in
+- **The record**: copy every level, confidence, trend and count from the
+  result as it stands, and each chat's levels from its row. The result doesn't
+  show `best_shown`: work it out per capability from those chat levels, by the
+  rule in RECORD.md. The title, Proven levels, task range and reuse are not
+  record fields. Keys in
   this order: `rubric_version`, `scope`, `capabilities`,
   `evidence`, `session_title`, `session_date`, `chats_assessed`, `chats`,
   `coverage`, with `"scope": "multi_chat"`. If the result's numbers don't follow the aggregation rules in
   RECORD.md, say so and export nothing; never fix a level yourself.
 - **The report** (step 4) has this header line instead of "Chat date: …":
-  `Chats: <from> to <to>. Rubric: v1.1. Based on <scored> chats.` The
-  capability table adds the columns Best shown, Trend (↑ up, → flat, ↓ down,
+  `Chats: <from> to <to>. Rubric: v1.2. Based on <scored> chats.` After the
+  label come the result's title line and its task range and reuse line, as they
+  stand (counts only, never a task list or a saved prompt's name). The
+  capability table adds the columns Proven level, Trend (↑ up, → flat, ↓ down,
   or –) and Shown in (`<chats_shown> of <scored>`). Its notes read:
 
   ```
   Levels run from 1 to 5. Each level combines the scored chats that show the
-  capability: the middle of their levels, the lower one on a tie. "Best shown"
-  is the highest level reached in at least 2 chats. The trend compares earlier
+  capability: the middle of their levels, the lower one on a tie. "Proven level"
+  is the highest level reached in at least 3 chats. The trend compares earlier
   and later chats and needs 4 or more. "Not shown" means no scored chat bears
   on that capability. Confidence is low, medium or high, by how many chats show
   the capability and how close their levels are. The table is in rubric order.
@@ -258,11 +272,16 @@ changes. This shape is a proposal (decided 2026-11-02, flag for review).
   decisions.
   ```
 
-  After the notes, a "Chats assessed" table: `| # | Chat | Date | Result | P | V | W | D | S |`,
-  newest first, a level or – per capability. Each evidence line ends with
+  After the notes, a "Chats assessed" table: `| # | Chat | Date | Result | Title | P | V | W | D | S |`,
+  newest first, the chat's title, its Title cell as the result shows it, a level
+  or – per capability. Each evidence line ends with
   its chat: `- Verification: "<quote>" (Chat 4, 2026-10-14)`.
 - The PDF uses the same report-template.html; it lays out a multi-chat record
-  itself.
+  itself. Its summary block holds `{"chat_titles": [one entry per row of
+  `chats`, the title level 1 to 4, 0 for no title, null for a chat not scored],
+  "task_types": <n>, "reused": <r>}`. The template adds the "no agent work
+  visible" words to a Title cell itself.
+<!-- MODO-PERSON-END -->
 
 ## 7. The label
 
@@ -270,7 +289,7 @@ Every response from this skill, including questions and refusals, ends with
 this line exactly, on its own line, after everything else (after the record
 block when a report is shown in chat):
 
-Self-assessment by Claude using Modo rubric v1.1 — not verified.
+Self-assessment by Claude using Modo rubric v1.2 — not verified.
 
 A report saved to a file ends with the record block, not the label (the label
 is already near the top of the report).
