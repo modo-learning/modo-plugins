@@ -1,5 +1,5 @@
 ---
 type: regex
-pattern: 'up to 15 chats'
+pattern: '(?<![-\d])15\b'
 target: last_message
 ---

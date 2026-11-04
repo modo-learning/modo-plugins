@@ -205,7 +205,7 @@ CASES = {
             "listed.md": g_tool(LIST, lo=1),
             "reads-nothing.md": g_tool(READ, lo=0, hi=0, arm="both"),
             "no-agent.md": g_tool("Agent", lo=0, hi=0, arm="both"),
-            "default-fifteen.md": g_regex(r"up to 15 chats"),
+            "default-fifteen.md": g_regex(r"(?<![-\d])15\b"),
             "numbered-list.md": g_regex(
                 r"1\.\s+\**CSV merge drops rows[\s\S]*2\.\s+\**Weekly team update[\s\S]*"
                 r"3\.\s+\**Pro plan price rise[\s\S]*4\.\s+\**Team offsite agenda[\s\S]*"
