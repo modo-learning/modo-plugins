@@ -1,7 +1,7 @@
-"""Reference implementation of the Modo AI Skills rubric v1.1 level rule (stdlib only).
+"""Reference implementation of the Modo AI Skills rubric v1.2 level rule (stdlib only).
 
 Claude applies the rule from the rubric text itself
-(plugins/modo-ai-skills/skills/assess-my-ai-work/rubric-v1.1.md); this file
+(plugins/modo-ai-skills/skills/assess-my-ai-work/rubric-v1.2.md); this file
 exists so the published rule can be tested. scripts/test_derive_levels.py
 replays the rubric's worked examples against it and checks that the behaviour
 table here matches the rubric's.
@@ -204,7 +204,7 @@ def overall(levels, agent_session=False):
 
 CAPABILITIES = {"Problem Solving": "P", "Verification": "V", "Workflow Design": "W",
                 "Delegation": "D", "Strategic Thinking": "S"}
-SCRIPT_VERSION = "rubric-v1.1-levels-4"
+SCRIPT_VERSION = "rubric-v1.2-levels-1"
 
 
 class RunsError(ValueError):

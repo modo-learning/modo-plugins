@@ -13,10 +13,10 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from validate_assessment_record import extract_block, last_json_block, validate  # noqa: E402
 
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 GOOD = {
-    "rubric_version": "v1.1",
+    "rubric_version": "v1.2",
     "capabilities": {
         "problem_solving": {"level": 4, "confidence": "medium"},
         "verification": {"level": 5, "confidence": "high"},
@@ -93,8 +93,9 @@ class Validate(unittest.TestCase):
         self.assertEqual(validate(variant(rubric_version="v2")), [])
 
     def test_minor_rubric_version_accepted(self):
-        self.assertEqual(validate(variant(rubric_version="v1.1")), [])
-        for bad in ("v1.", "v1.1.1", "v.1", "1.1"):
+        for known in ("v1", "v1.1", "v1.2"):
+            self.assertEqual(validate(variant(rubric_version=known)), [])
+        for bad in ("v1.", "v1.2.1", "v.1", "1.1"):
             self.assertTrue(validate(variant(rubric_version=bad)), bad)
 
     def test_evidence_count_limit(self):
@@ -165,7 +166,7 @@ def _levels(p, v, w, d, s):
 
 NS = "not_shown"
 MULTI = {
-    "rubric_version": "v1.1",
+    "rubric_version": "v1.2",
     "scope": "multi_chat",
     "capabilities": {
         "problem_solving": {"level": 2, "confidence": "high", "best_shown": 3, "trend": "up", "chats_shown": 4},
@@ -209,7 +210,7 @@ def record_from_results(results):
               "result": "too_short" if r["too_short"] else "scored",
               "levels": None if r["too_short"] else {k: c["level"] for k, c in r["capabilities"].items()}}
              for i, r in enumerate(newest, 1)]
-    return {"rubric_version": "v1.1", "scope": "multi_chat", "capabilities": out["capabilities"],
+    return {"rubric_version": "v1.2", "scope": "multi_chat", "capabilities": out["capabilities"],
             "evidence": [], "session_title": "Assessment across chats",
             "session_date": out["chats_assessed"]["to"], "chats_assessed": out["chats_assessed"],
             "chats": chats, "coverage": out["coverage"]}
@@ -452,7 +453,7 @@ class Docs(unittest.TestCase):
     def test_multi_chat_example_in_record_md_is_valid(self):
         record = self.example("### Multi-chat example")
         self.assertEqual(record["scope"], "multi_chat")
-        self.assertEqual(record["rubric_version"], "v1.1")
+        self.assertEqual(record["rubric_version"], "v1.2")
         self.assertEqual(validate(record), [])
 
     def schema(self):

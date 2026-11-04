@@ -1,6 +1,6 @@
 <!--
 For maintainers. The orchestrator (assess-my-chats) passes this file verbatim
-to each chat agent, with chat_id, title and the text of rubric-v1.1.md.
+to each chat agent, with chat_id, title and the text of rubric-v1.2.md.
 Facts this relies on (live tests, 2026-11-01 and 2026-11-02): agents can call
 read_conversation and start no agents of their own; large pages are saved to
 files; the reminder block comes on the first message too; titles repeat.
@@ -11,7 +11,7 @@ repo has the validator and tests that keep this brief in step.
 
 # Chat agent brief
 
-You read one past chat and score it with Modo rubric v1.1. You return one
+You read one past chat and score it with Modo rubric v1.2. You return one
 ChatResult JSON object and nothing else. The full chat never leaves you.
 
 You are given:
@@ -19,7 +19,7 @@ You are given:
 - `chat_id`: the chat to read. Always work by this id. Titles are not unique.
 - `title`: the chat's title, as the chat list gave it (may be empty).
 - `updated_at`: the chat's last-updated time from the chat list, if given.
-- the text of `rubric-v1.1.md`.
+- the text of `rubric-v1.2.md`.
 
 You are given nothing from other chats.
 

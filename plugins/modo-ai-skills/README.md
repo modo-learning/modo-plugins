@@ -14,12 +14,12 @@ self-assessment for your own development. It is not intended for hiring,
 promotion, performance reviews or any other employment decision about you or
 anyone else.
 
-This version (0.5.0) carries **rubric v1.1**: scoring prompt by prompt against
+This version (0.5.0) carries **rubric v1.2**: scoring prompt by prompt against
 published behaviours, a fixed level rule, 3 to 5 scoring runs with their
 agreement shown, honest coverage for thin chats, and a redesigned card. New
 in 0.5.0: [titles](#titles) by Johnny's AI Fluency Levels scoring rules v1, with
 a title for each chat and, across 10 scored chats, one for you.
-See [What changed in v1.1](#what-changed-in-v11).
+See [What changed in v1.2](#what-changed-in-v12).
 
 It's made for people who use Claude every day for real work and want honest
 feedback on how they frame problems, check Claude's work, build repeatable
@@ -30,7 +30,7 @@ concrete to keep.
 
 - **A level for each capability**, written as "Level N of 5", strongest
   first. Claude checks each of your messages for the specific behaviours
-  listed in the [rubric](skills/assess-my-ai-work/rubric-v1.1.md) (gave
+  listed in the [rubric](skills/assess-my-ai-work/rubric-v1.2.md) (gave
   context, checked a fact, asked for an alternative, kept a decision…), each with
   a quote, and a fixed published rule turns those into the level. A
   capability the chat did not show is "Not shown in this chat", never a
@@ -64,7 +64,7 @@ concrete to keep.
 
 Every result ends with this label:
 
-> Self-assessment by Claude using Modo rubric v1.1 — not verified.
+> Self-assessment by Claude using Modo rubric v1.2 — not verified.
 
 It is Claude's reading of one chat against a public rubric. It is not a test,
 a certificate or a comparison with other people.
@@ -94,7 +94,7 @@ outside service.
 
 ## Install
 
-This version (0.5.0, rubric v1.1) is on `main`. For the whole flow on one
+This version (0.5.0, rubric v1.2) is on `main`. For the whole flow on one
 page, see the [guide](../../docs/modo-ai-skills-guide.md). Ready-made zips
 are on the [releases page](https://github.com/modo-learning/modo-plugins/releases). The earlier rubric v1 build
 stays on the branch `modo-ai-skills-phase0` for comparison. A ChatGPT and
@@ -450,7 +450,7 @@ The full rules, and the readings pending Johnny's answer, are in
 ## The rubric
 
 The rubric is public and versioned:
-[skills/assess-my-ai-work/rubric-v1.1.md](skills/assess-my-ai-work/rubric-v1.1.md).
+[skills/assess-my-ai-work/rubric-v1.2.md](skills/assess-my-ai-work/rubric-v1.2.md).
 It is how scores are calculated: the behaviours checked in each message, the
 level rule, the scoring runs, "not shown", confidence and coverage. How its
 five capabilities map to Anthropic's AI Fluency Framework (4D) and AI Fluency

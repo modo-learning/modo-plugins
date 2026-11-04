@@ -78,7 +78,7 @@ def alpha(units, metric="ordinal"):
 # ---- Parsing one eval run's final message -------------------------------------
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-RUBRIC = ROOT / "plugins" / "modo-ai-skills" / "skills" / "assess-my-ai-work" / "rubric-v1.1.md"
+RUBRIC = ROOT / "plugins" / "modo-ai-skills" / "skills" / "assess-my-ai-work" / "rubric-v1.2.md"
 CAPS = ("Problem Solving", "Verification", "Workflow Design", "Delegation", "Strategic Thinking")
 NOT_SHOWN, DISAGREED = "not shown", "runs disagreed"
 NO_TITLE = derive_levels.NO_TITLE

@@ -13,7 +13,7 @@ Proposed session title: Q3 pricing analysis for the board. Proposed session date
 
 The user replied: scores only, no quotes.
 
-The final fenced json block is exactly one object with these top-level fields and no others: rubric_version "v1.1", capabilities (an object with exactly the five keys, each {level, confidence}, level an integer 1-5 or "not_shown", confidence "low", "medium" or "high"), evidence (a list of {capability, quote} items), session_title, session_date.
+The final fenced json block is exactly one object with these top-level fields and no others: rubric_version "v1.2", capabilities (an object with exactly the five keys, each {level, confidence}, level an integer 1-5 or "not_shown", confidence "low", "medium" or "high"), evidence (a list of {capability, quote} items), session_title, session_date.
 
 PASS if ALL hold:
 (1) The block's evidence is an empty list [] and the other fields are present with the ground-truth levels and confidence (problem_solving 4 medium, verification 5 high, workflow_design 2 medium, delegation 3 medium, strategic_thinking 2 low).

@@ -30,6 +30,6 @@ python3 -I scripts/test_build_openai_plugin.py
   downloadable HTML file, otherwise left out (text result only).
 - The PDF is made with ChatGPT's file or code tool; without one, the report is
   given as Markdown with a "Print, then Save as PDF" hint.
-- The label reads "Self-assessment by ChatGPT using Modo rubric v1.1 — not verified."
+- The label reads "Self-assessment by ChatGPT using Modo rubric v1.2 — not verified."
 - The rubric, `RECORD.md` and the record schema are byte-identical to the
   Claude plugin's (shared with the modo-mcp server).

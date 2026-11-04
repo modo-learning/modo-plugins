@@ -36,7 +36,7 @@ FIXTURE_DIRS = (SCRIPTS / "fixtures" / "chat-agent", SCRIPTS / "fixtures" / "mul
 SERVER = "chats"
 LIST_TOOL, READ_TOOL = "recent_chats", "read_conversation"
 READ_BODY = "{{file:fixtures/{input.chat_id}.json}}\n"
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 FLAGGED = "[Content redacted, chat flagged by safety classifier]"
 
 # The cases run on 2026-11-02 or soon after; "the last 30 days" then holds

@@ -5,7 +5,7 @@ One page for using, demoing and maintaining Modo AI Skills 0.5.0. The plugin's
 this guide puts the whole flow in order.
 
 Modo AI Skills tells you how well you work with AI, against Modo's public
-rubric (v1.1), on five capabilities: Problem Solving, Verification, Workflow
+rubric (v1.2), on five capabilities: Problem Solving, Verification, Workflow
 Design, Delegation and Strategic Thinking. It is for your own development, not
 for hiring or other employment decisions.
 
@@ -264,7 +264,7 @@ until Angelina and Keith confirm it).
 
 ### Open items (2026-11-04)
 
-- Modo server (modo-mcp, separate repo): serve rubric v1.1 and accept
+- Modo server (modo-mcp, separate repo): serve rubric v1.2 and accept
   `scope: "multi_chat"`; until then multi-chat saves are not possible.
 - Design sign-off: the aggregation rules and the multi-chat card and report.
 - Johnny's answer on three readings: what an agent session is, whether "reached

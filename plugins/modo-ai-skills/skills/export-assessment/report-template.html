@@ -135,7 +135,7 @@ pre {
     <p class="sub" id="date"></p>
   </header>
   <div class="body">
-    <p class="label">Self-assessment by Claude using Modo rubric v1.1 — not verified.</p>
+    <p class="label">Self-assessment by Claude using Modo rubric v1.2 — not verified.</p>
     <h2>Capabilities</h2>
     <table>
       <thead><tr id="head-row"><th>Capability</th><th>Level</th><th>Confidence</th></tr></thead>
@@ -167,7 +167,7 @@ pre {
 
 <!-- MODO-DATA-START -->
 <script type="application/json" id="passport-data">
-{"rubric_version": "v1.1", "capabilities": {}, "evidence": [], "session_title": "", "session_date": ""}
+{"rubric_version": "v1.2", "capabilities": {}, "evidence": [], "session_title": "", "session_date": ""}
 </script>
 <!-- MODO-DATA-END -->
 
@@ -206,7 +206,7 @@ pre {
   var sum = rec.chats_assessed || {};
   if (multi) {
     document.getElementById("date").textContent = "Chats: " + (sum.from === sum.to ? sum.from : sum.from + " to " + sum.to) +
-      ". Rubric: v1.1. Based on " + sum.scored + (sum.scored === 1 ? " chat." : " chats.");
+      ". Rubric: v1.2. Based on " + sum.scored + (sum.scored === 1 ? " chat." : " chats.");
     var head = document.getElementById("head-row");
     ["Proven level", "Trend", "Shown in"].forEach(function (h) { head.appendChild(el("th", null, h)); });
     document.getElementById("notes-single").hidden = true;
@@ -215,7 +215,7 @@ pre {
       'Note: for a capability that is not shown, the record gives confidence "low", because no scored chat supports a level.';
   } else {
     document.getElementById("date").textContent =
-      "Chat date: " + (rec.session_date || "") + ". Rubric: v1.1. Based on 1 chat.";
+      "Chat date: " + (rec.session_date || "") + ". Rubric: v1.2. Based on 1 chat.";
   }
 
   /* MODO-RULE-START */

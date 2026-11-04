@@ -95,10 +95,10 @@ class Invalid(unittest.TestCase):
         self.check(lambda r: r["capabilities"]["delegation"].update(behaviours=["D3a"]), "has no behaviours or quotes")
 
     def test_behaviour_of_another_capability(self):
-        self.check(lambda r: r["capabilities"]["verification"].update(behaviours=["D3a"]), "not a rubric v1.1 verification")
+        self.check(lambda r: r["capabilities"]["verification"].update(behaviours=["D3a"]), "not a rubric v1.2 verification")
 
     def test_unknown_behaviour(self):
-        self.check(lambda r: r["capabilities"]["verification"].update(behaviours=["V9z"]), "not a rubric v1.1")
+        self.check(lambda r: r["capabilities"]["verification"].update(behaviours=["V9z"]), "not a rubric v1.2")
 
     def test_level_out_of_range(self):
         self.check(lambda r: r["capabilities"]["verification"].update(level=6), "1 to 5")

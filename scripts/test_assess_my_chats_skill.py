@@ -273,7 +273,7 @@ def section(body, start, end):
     return body[body.index(start):body.index(end)]
 
 
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 
 class Answer(unittest.TestCase):
@@ -351,7 +351,7 @@ class ExportAndSave(unittest.TestCase):
         self.assertIn('"Chat 1"', body)
         self.assertIn('"with titles"', body)
         # Same header line as report-template.html renders.
-        self.assertIn("Chats: <from> to <to>. Rubric: v1.1. Based on <scored> chats.", body)
+        self.assertIn("Chats: <from> to <to>. Rubric: v1.2. Based on <scored> chats.", body)
 
     def test_save_skill_accepts_a_multi_chat_result_but_checks_the_server(self):
         body = folded(SAVE)

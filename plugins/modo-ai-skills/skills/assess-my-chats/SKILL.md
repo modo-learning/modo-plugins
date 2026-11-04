@@ -56,7 +56,7 @@ using Modo's public rubric. Each chat is read and scored by its own agent.
 The main chat only lists chats, asks, collects small results and combines
 them. **The main chat never holds a transcript.**
 
-The rubric is [rubric-v1.1.md](rubric-v1.1.md) in this skill's folder. The
+The rubric is [rubric-v1.2.md](rubric-v1.2.md) in this skill's folder. The
 instructions each chat agent gets are [chat-agent-brief.md](chat-agent-brief.md).
 Read both in full before step 3.
 
@@ -160,7 +160,7 @@ finish before you start the next. Give each agent exactly this, and nothing
 from other chats:
 
 1. the text of chat-agent-brief.md, word for word;
-2. the text of rubric-v1.1.md, word for word;
+2. the text of rubric-v1.2.md, word for word;
 3. the chat's `chat_id`, `title` and `updated_at` (the date the list gave).
 
 Agents can't start agents of their own, so the brief's `"one_response"`
@@ -282,7 +282,7 @@ instead:
 "Each chat was read and scored here in the main chat, one at a time, 3 or 5 times (agents could not be started, so at most 3 chats)."
 
 ```
-Assessment across <s> of your chats (<first date> to <last date>), against Modo rubric v1.1.
+Assessment across <s> of your chats (<first date> to <last date>), against Modo rubric v1.2.
 Each chat was read and scored by its own agent, 3 or 5 times in one response.
 Chats: <c> confirmed, <s> scored, <t> too short (fewer than 4 typed user messages), <f> could not be read; <k> skipped before the list.
 <coverage line>
@@ -387,4 +387,4 @@ progress updates, the work estimate, or a message that stops without a
 result (step 0, no chats left). When step 0 hands over to assess-my-ai-work,
 that skill's answer carries its own label.
 
-Self-assessment by Claude using Modo rubric v1.1 — not verified.
+Self-assessment by Claude using Modo rubric v1.2 — not verified.

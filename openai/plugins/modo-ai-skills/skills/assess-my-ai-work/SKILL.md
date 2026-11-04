@@ -9,7 +9,7 @@ Judge how the user worked with the AI assistant (ChatGPT) in this chat, using Mo
 rubric. The value is an honest score tied to their own words. A score without
 a quote, or a level the chat doesn't support, is worse than "not shown".
 
-The rubric is the file [rubric-v1.1.md](rubric-v1.1.md) in this skill's
+The rubric is the file [rubric-v1.2.md](rubric-v1.2.md) in this skill's
 folder. **Read it in full before scoring** and apply it exactly as written:
 its behaviour tables, its level rule, its rules for running more than once,
 "not shown", confidence and coverage. Don't score from memory or from your own
@@ -312,7 +312,7 @@ verified or official.
 Plain text that reads well in a terminal. No tables. Keep to this shape:
 
 ```
-Assessment of <which chat> (<n> messages from you; based on 1 chat), against Modo rubric v1.1.
+Assessment of <which chat> (<n> messages from you; based on 1 chat), against Modo rubric v1.2.
 Scored <3 or 5> times (<as separate sub-tasks | in this one response>); the runs agreed on <m> of 5 capabilities.
 <coverage line, if any>
 This chat: Delegator · Level 3 (at least 3 of 5 capabilities at Level 3 or higher, including Delegation).
@@ -467,4 +467,4 @@ one?", "can't open it" or "no chat with that name" message, and the reply to
 the skill offer (step 6), ends with this line exactly, on its own line, after
 everything else (including the improvements and the offer):
 
-Self-assessment by ChatGPT using Modo rubric v1.1 — not verified.
+Self-assessment by ChatGPT using Modo rubric v1.2 — not verified.

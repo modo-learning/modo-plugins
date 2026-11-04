@@ -35,7 +35,7 @@ Shape (design: Modo workspace doc docs/ai-skills/DESIGN-multi-chat-assessment.md
       "level": 3,                       1-5 or "not_shown"
       "confidence": "medium",           low | medium | high
       "agreement": "3 of 3 runs",       "k of n runs" or "runs disagreed"
-      "behaviours": ["V3b"],            rubric v1.1 ids
+      "behaviours": ["V3b"],            rubric v1.2 ids
       "quotes": [{"message": 4, "text": "exact words"}]
     },
     ... all five capabilities, in rubric order
@@ -239,7 +239,7 @@ def _capability(cap, c, too_short, runs, users, messages):
         errors.append(f"{where}.behaviours: at most 3")
     for b in behaviours:
         if b not in BEHAVIOURS or not str(b).startswith(PREFIX[cap]):
-            errors.append(f"{where}.behaviours: {b!r} is not a rubric v1.1 {cap} behaviour id")
+            errors.append(f"{where}.behaviours: {b!r} is not a rubric v1.2 {cap} behaviour id")
     quotes = c.get("quotes")
     if not isinstance(quotes, list):
         errors.append(f"{where}.quotes: must be a list")

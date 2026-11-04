@@ -20,10 +20,10 @@ from validate_assessment_record import validate  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "plugins" / "modo-ai-skills" / "skills" / "export-assessment" / "report-template.html"
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 RECORD = {
-    "rubric_version": "v1.1",
+    "rubric_version": "v1.2",
     "capabilities": {
         "problem_solving": {"level": 4, "confidence": "medium"},
         "verification": {"level": 5, "confidence": "high"},
@@ -81,7 +81,7 @@ class Rendered(unittest.TestCase):
 
     def test_title_and_date_line(self):
         self.assertIn("Modo AI Skills assessment: Q3 pricing analysis and board deck", self.text)
-        self.assertIn("Chat date: 2026-10-29. Rubric: v1.1. Based on 1 chat.", self.text)
+        self.assertIn("Chat date: 2026-10-29. Rubric: v1.2. Based on 1 chat.", self.text)
         self.assertIn(LABEL, self.text)
 
     def test_rows_in_rubric_order(self):
@@ -185,7 +185,7 @@ class RenderedMultiChat(unittest.TestCase):
     def test_title_and_chats_line(self):
         self.assertIn("Modo AI Skills assessment: Assessment across 4 chats", self.text)
         date_line = re.search(r'<p class="sub" id="date">(.*?)</p>', self.dom).group(1)
-        self.assertEqual(date_line, "Chats: 2026-10-06 to 2026-10-30. Rubric: v1.1. Based on 4 chats.")
+        self.assertEqual(date_line, "Chats: 2026-10-06 to 2026-10-30. Rubric: v1.2. Based on 4 chats.")
 
     def test_multi_chat_notes_replace_the_single_chat_notes(self):
         self.assertRegex(self.dom, r'<p id="notes-single" hidden="">')

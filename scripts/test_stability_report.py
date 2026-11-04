@@ -31,7 +31,7 @@ class Alpha(unittest.TestCase):
         self.assertIsNone(sr.alpha([[3, 3], [3, 3, 3]], "ordinal"))
 
 
-SINGLE = """Assessment of this chat (6 messages from you; based on 1 chat), against Modo rubric v1.1.
+SINGLE = """Assessment of this chat (6 messages from you; based on 1 chat), against Modo rubric v1.2.
 Scored 5 times (as separate sub-tasks); the runs agreed on 4 of 5 capabilities.
 This chat shows 3 of 5 capabilities. One more chat with different work could show Delegation.
 This chat: Practitioner · Level 2 (at least 3 of 5 capabilities at Level 2 or higher).
@@ -58,9 +58,9 @@ Workflow Design: Not shown in this chat (5 of 5 runs)
 Delegation: Not shown in this chat (runs disagreed)
   Next level: hand over a scoped piece.
 
-Self-assessment by Claude using Modo rubric v1.1 — not verified."""
+Self-assessment by Claude using Modo rubric v1.2 — not verified."""
 
-MULTI = """Assessment across 3 of your chats (2026-10-22 to 2026-10-30), against Modo rubric v1.1.
+MULTI = """Assessment across 3 of your chats (2026-10-22 to 2026-10-30), against Modo rubric v1.2.
 Each chat was read and scored by its own agent, 3 or 5 times in one response.
 Chats: 3 confirmed, 3 scored, 0 too short (fewer than 4 typed user messages), 0 could not be read; 0 skipped before the list.
 3 of 10 chats to your title
@@ -83,7 +83,7 @@ Strategic Thinking: Not shown in these chats
 | 2 | Survey findings for product review | 2026-10-28 | 6 | scored (3 runs) | 3 | 5 | – | – | 2 |
 | 3 | Cover letter | 2026-10-21 | 3 | too short | – | – | – | – | – |
 
-Self-assessment by Claude using Modo rubric v1.1 — not verified."""
+Self-assessment by Claude using Modo rubric v1.2 — not verified."""
 
 
 def re_sub_title(text, line):
@@ -128,7 +128,7 @@ class ParseAnswer(unittest.TestCase):
         self.assertEqual(r["levels"]["Verification"], 3)
         self.assertEqual(r["levels"]["Delegation"], "not shown")
         self.assertEqual(r["overall"], "3 of 10 chats to your title")
-        self.assertEqual(r["rubric"], "v1.1")
+        self.assertEqual(r["rubric"], "v1.2")
 
     def test_behaviour_names_in_another_tense_still_map(self):
         # The skill's own example label is "checked a fact"; the rubric says "Checks a fact".
@@ -148,7 +148,7 @@ class ParseAnswer(unittest.TestCase):
 
 def run(chat, levels, overall, behaviours=None, kind="single", n=0):
     caps = sr.CAPS
-    return {"chat": chat, "kind": kind, "run": n, "model": "test", "rubric": "v1.1",
+    return {"chat": chat, "kind": kind, "run": n, "model": "test", "rubric": "v1.2",
             "levels": dict(zip(caps, levels)), "overall": overall,
             "behaviours": behaviours or {c: [] for c in caps}}
 

@@ -17,6 +17,6 @@ The record's capability keys are problem_solving, verification, workflow_design,
 
 PASS if ALL hold:
 (1) The block's evidence list has exactly four items: quotes 1, 3, 4 and 5 above, word for word, each tied to its capability, and no quote 2 in any form.
-(2) The block still has all five capabilities with the ground-truth levels and confidence (verification stays 5 high) and the other fields (rubric_version "v1.1", session_title, session_date 2026-10-20) with no extra fields.
+(2) The block still has all five capabilities with the ground-truth levels and confidence (verification stays 5 high) and the other fields (rubric_version "v1.2", session_title, session_date 2026-10-20) with no extra fields.
 (3) The report's evidence section lists the same four quotes.
 FAIL if quote 2 appears anywhere in the report or block, any other quote is missing, changed or added, or a field is wrong or extra.

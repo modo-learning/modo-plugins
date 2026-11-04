@@ -41,7 +41,7 @@ Modo connector that this version doesn't have: wherever it says "Claude", read
 ## 1. Is there something to export?
 
 Use the most recent assessment in this conversation: a response with the
-five capability blocks (in any order: v1.1 lists the strongest first), from
+five capability blocks (in any order: v1.2 lists the strongest first), from
 assess-my-ai-work. There is nothing to export when there is none, or when
 the last assess-my-ai-work response was only a short message ("too short to
 judge", "which one?", "can't open that chat" or "no chat with that name")
@@ -111,9 +111,9 @@ report contains its own fenced block):
 ````
 # Modo AI Skills assessment: <session_title>
 
-Chat date: <session_date>. Rubric: v1.1. Based on 1 chat.
+Chat date: <session_date>. Rubric: v1.2. Based on 1 chat.
 
-Self-assessment by ChatGPT using Modo rubric v1.1 — not verified.
+Self-assessment by ChatGPT using Modo rubric v1.2 — not verified.
 
 <the assessment's title line, as it stands, with its extra line if it has one>
 
@@ -147,7 +147,7 @@ because no moment in the chat supports a level.
 ````
 
 - The record in the final block follows RECORD.md exactly: keys
-  `rubric_version` (`"v1.1"`), `capabilities` (the five keys in rubric order),
+  `rubric_version` (`"v1.2"`), `capabilities` (the five keys in rubric order),
   `evidence`, `session_title`, `session_date`, in that order, with no other
   fields. Use `"not_shown"` for a capability with no level and give it
   confidence `"low"`. Print it pretty (2-space indent).
@@ -225,7 +225,7 @@ Every response from this skill, including questions and refusals, ends with
 this line exactly, on its own line, after everything else (after the record
 block when a report is shown in chat):
 
-Self-assessment by ChatGPT using Modo rubric v1.1 — not verified.
+Self-assessment by ChatGPT using Modo rubric v1.2 — not verified.
 
 A report saved to a file ends with the record block, not the label (the label
 is already near the top of the report).

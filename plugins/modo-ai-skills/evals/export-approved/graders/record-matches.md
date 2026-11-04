@@ -16,7 +16,7 @@ The user replied: approve all five, title and date as proposed.
 The record's capability keys are problem_solving, verification, workflow_design, delegation, strategic_thinking (mapping to Problem Solving, Verification, Workflow Design, Delegation, Strategic Thinking). Only the final fenced json block and the evidence list in the report are graded for quotes; table cells, headings and fixed explanatory text are not.
 
 PASS if ALL hold:
-(1) The final fenced json block is exactly one object with these top-level fields and no others: rubric_version "v1.1", capabilities (an object with exactly the five keys, each {level, confidence}, level an integer 1-5 or "not_shown", confidence "low", "medium" or "high"), evidence (a list of {capability, quote} items), session_title, session_date.
+(1) The final fenced json block is exactly one object with these top-level fields and no others: rubric_version "v1.2", capabilities (an object with exactly the five keys, each {level, confidence}, level an integer 1-5 or "not_shown", confidence "low", "medium" or "high"), evidence (a list of {capability, quote} items), session_title, session_date.
 (2) The levels and confidence in the block match the ground truth: problem_solving 4 medium, verification 5 high, workflow_design 2 medium, delegation 3 medium, strategic_thinking 2 low.
 (3) evidence has exactly the five approved quotes, word for word as numbered above, each tied to the capability named next to it, in that order.
 (4) session_title is "Q3 pricing analysis for the board" and session_date is "2026-10-20".

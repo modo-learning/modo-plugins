@@ -1,8 +1,9 @@
 """python3 -m unittest scripts/test_record_contract.py
 
-Ticket 35, D7 and D13: the machine-readable record does not change. The title,
+The machine-readable record does not change shape (ticket 35). The title,
 Proven levels, task range and reuse are for people only. These tests pin the
-contract as it stood on main at 07fc233, which modo-mcp reads.
+contract as it stood on main at 07fc233, which modo-mcp reads, with one allowed
+change: rubric v1.2 moved the version value and the label's version, nothing else.
 """
 
 import hashlib
@@ -19,7 +20,8 @@ from validate_assessment_record import validate  # noqa: E402
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SKILLS = ROOT / "plugins" / "modo-ai-skills" / "skills"
 FIXTURE = ROOT / "scripts" / "fixtures" / "records" / "valid-multi-chat.json"
-# sha256 of each file at 07fc233. A change here is a change to what modo-mcp reads.
+# sha256 of each file at 07fc233, taken with "v1.2" read back as "v1.1". Any other
+# change here is a change to what modo-mcp reads.
 PINNED = {
     "plugins/modo-ai-skills/skills/export-assessment/RECORD.md":
         "f01e5961a86c111d8d7450b58eadfc28a5b04c78a2588eba800f678c16852d58",
@@ -53,7 +55,7 @@ def record_from(out, results):
     for i, r in enumerate(sorted(results, key=lambda x: x["updated_at"], reverse=True), 1):
         chats.append({"title": f"Chat {i}", "date": r["updated_at"][:10], "result": "scored",
                       "levels": {c: v["level"] for c, v in r["capabilities"].items()}})
-    return {"rubric_version": "v1.1", "scope": "multi_chat", "capabilities": out["capabilities"], "evidence": [],
+    return {"rubric_version": "v1.2", "scope": "multi_chat", "capabilities": out["capabilities"], "evidence": [],
             "session_title": f"Assessment across {len(results)} chats",
             "session_date": out["chats_assessed"]["to"], "chats_assessed": out["chats_assessed"],
             "chats": chats, "coverage": out["coverage"]}
@@ -63,7 +65,15 @@ class RecordContract(unittest.TestCase):
     def test_contract_files_are_the_ones_on_main(self):
         for rel, want in PINNED.items():
             with self.subTest(rel):
-                self.assertEqual(hashlib.sha256((ROOT / rel).read_bytes()).hexdigest(), want)
+                text = (ROOT / rel).read_text().replace("v1.2", "v1.1")
+                self.assertEqual(hashlib.sha256(text.encode()).hexdigest(), want)
+
+    def test_the_version_value_is_the_only_change(self):
+        for rel in ("plugins/modo-ai-skills/skills/export-assessment/RECORD.md",
+                    "scripts/validate_assessment_record.py"):
+            with self.subTest(rel):
+                self.assertIn("v1.2", (ROOT / rel).read_text())
+                self.assertNotIn("v1.1", (ROOT / rel).read_text())
 
     def build(self):
         results = [chat_levels(i, [3, 4, 2, 3, "not_shown"], agent=i % 2 == 0) for i in range(1, 13)]

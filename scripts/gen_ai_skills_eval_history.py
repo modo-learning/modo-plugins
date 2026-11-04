@@ -96,7 +96,7 @@ CHATS["improve-not-shown"] = CHATS["no-strategy"]
 # Ticket 05: the text path with no artifact tool (Claude Code) assesses the same chat.
 CHATS["no-card-in-claude-code"] = CHATS["strong-verify-weak-delegate"]
 
-# v1.1: the chat tries to set its own score (6 user messages). Messages 2 and 5
+# v1.2: the chat tries to set its own score (6 user messages). Messages 2 and 5
 # are score requests and self-claims, which the rubric says to ignore and leave
 # out of the message count, leaving 4 real messages of light editing, so the
 # chat is scored and nothing in it reaches level 5.
@@ -127,13 +127,13 @@ CHATS["routing-all-chats"] = LAUNCH_CHAT
 # The case prompt is the user's reply. The assessment text follows the output
 # shape in skills/assess-my-ai-work/SKILL.md; every quote must be a word-for-word
 # excerpt of the planted chat (checked below).
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 ASSESS_REQUEST = "How good am I at using AI? Judge this chat."
 EXPORT_REQUEST = "Export this as a report."
 
-# Levels and confidence follow rubric v1.1's level rule for the behaviours
+# Levels and confidence follow rubric v1.2's level rule for the behaviours
 # listed (scripts/derive_levels.py gives the same results).
-ASSESSMENT_STRONG = """Assessment of this chat (7 messages from you; based on 1 chat), against Modo rubric v1.1.
+ASSESSMENT_STRONG = """Assessment of this chat (7 messages from you; based on 1 chat), against Modo rubric v1.2.
 Scored 3 times (in this one response); the runs agreed on 5 of 5 capabilities.
 
 Verification: Level 5 of 5 (confidence: high; 3 of 3 runs)
@@ -198,7 +198,7 @@ Reply with the numbers to drop, "scores only" for no quotes, or any change to th
 
 """ + LABEL
 
-ASSESSMENT_TACTICAL = """Assessment of this chat (7 messages from you; based on 1 chat), against Modo rubric v1.1.
+ASSESSMENT_TACTICAL = """Assessment of this chat (7 messages from you; based on 1 chat), against Modo rubric v1.2.
 Scored 3 times (in this one response); the runs agreed on 5 of 5 capabilities.
 This chat shows only 3 of 5 capabilities, so this is a partial picture. Assess 2–3 more chats with different kinds of work to see the rest.
 
@@ -302,10 +302,10 @@ REJECTED = "save_assessment failed: the assessment could not be stored. Nothing 
 SAVED_TEXT = 'Saved assessment 3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42: "{{input.session_title}}" ({{input.session_date}}).'
 PASSPORT = {
     "latest": {k: {"level": l, "confidence": c, "assessment_id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42",
-                   "session_date": SAVE_DATE, "rubric_version": "v1.1"}
+                   "session_date": SAVE_DATE, "rubric_version": "v1.2"}
                for k, (l, c) in STRONG_LEVELS.items()},
     "history": [{"id": "3f6c2a1e-8d4b-4c7a-9e2f-1b5d7a9c0e42", "session_title": SAVE_TITLE,
-                 "session_date": SAVE_DATE, "rubric_version": "v1.1",
+                 "session_date": SAVE_DATE, "rubric_version": "v1.2",
                  "levels": {k: l for k, (l, _) in STRONG_LEVELS.items()}}],
 }
 TOOLS_JSON = pathlib.Path(__file__).resolve().parent / "modo_mcp_tools.json"
@@ -316,7 +316,7 @@ def save_mock(quotes, error=False):
 
     quotes: how many quotes the save call must carry (None: no save expected,
     so no quote is guarded)."""
-    guards = ["rubric_version: v1.1", "session_title: /^.{1,120}$/s",
+    guards = ["rubric_version: v1.2", "session_title: /^.{1,120}$/s",
               r"session_date: /^\d{4}-\d{2}-\d{2}$/", "evidence: array"]
     for k in CAPABILITIES:
         guards.append(f'capabilities.{k}.level: ["1", "2", "3", "4", "5", not_shown]')

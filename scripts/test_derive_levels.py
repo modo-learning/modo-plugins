@@ -1,6 +1,6 @@
 """python3 -m unittest scripts/test_derive_levels.py
 
-The expected values come from rubric v1.1 itself: its worked examples table
+The expected values come from rubric v1.2 itself: its worked examples table
 and its behaviour tables are parsed and replayed against the reference
 implementation, so the published rule and the code cannot drift apart. The
 run-combining and coverage cases are written out by hand from the rubric's
@@ -19,7 +19,7 @@ from derive_levels import (BEHAVIOURS, MULTIPLIER_NOTE, RunsError, assess, combi
                            overall, self_check)
 
 RUBRIC = (pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-skills"
-          / "skills" / "assess-my-ai-work" / "rubric-v1.1.md")
+          / "skills" / "assess-my-ai-work" / "rubric-v1.2.md")
 
 
 def worked_examples():
@@ -220,7 +220,7 @@ class Honesty(unittest.TestCase):
     def test_self_check_passes_and_is_reported(self):
         self.assertEqual(self_check(), "passed")
         out = assess({"user_messages": 7, "runs": [RUN] * 3})
-        self.assertEqual((out["self_check"], out["script_version"]), ("passed", "rubric-v1.1-levels-4"))
+        self.assertEqual((out["self_check"], out["script_version"]), ("passed", "rubric-v1.2-levels-1"))
 
 
 # The title for one chat (Johnny's scoring rules v1, 2026-11-04). His own

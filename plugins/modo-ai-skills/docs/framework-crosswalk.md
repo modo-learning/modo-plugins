@@ -1,6 +1,6 @@
 # How Modo's rubric maps to the AI Fluency Framework
 
-Rubric version: v1.1. Checked: 2026-10-29. Titles section updated: 2026-11-04.
+Rubric version: v1.2. Checked: 2026-10-29. Titles section updated: 2026-11-04.
 
 Modo scores five capabilities. This page shows how they line up with the
 **AI Fluency Framework** by Prof. Rick Dakan and Prof. Joseph Feller,
@@ -50,7 +50,7 @@ above is Modo's assignment.
   example, saying where AI was used in work you hand in), so a chat can't show
   it.
 - **Rarer behaviours say more.** Fact-checking appears in 8.7% of chats and
-  iterating in 85.7%. That is why rubric v1.1 never lets iterating back a
+  iterating in 85.7%. That is why rubric v1.2 never lets iterating back a
   higher level, and gives Verification extra weight.
 - Behaviour depends on the kind of chat: the Index found that chats where
   Claude produces an artifact show more goal-setting and formatting and less
@@ -61,7 +61,7 @@ above is Modo's assignment.
 
 Credit: Johnny, AI Fluency Levels scoring rules v1, 2026-11-04, an internal
 Modo document. His rules replaced the rule Modo used before, and they take
-priority over it. The five capabilities and rubric v1.1 stay as they are.
+priority over it. The five capabilities and rubric v1.2 stay as they are.
 
 The titles come from Modo's AI fluency ladder ("AI Fluency Levels", Modo,
 Johnny, 2026-11-02), which draws on four public sources, named here only: BCG,

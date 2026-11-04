@@ -18,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / "plugins" / "modo-ai-skills"
 TEMPLATE = PLUGIN / "skills" / "assess-my-ai-work" / "passport-card.html"
 HISTORY = PLUGIN / "evals" / "strong-verify-weak-delegate" / "history.jsonl"
-LABEL = "Self-assessment by Claude using Modo rubric v1.1 — not verified."
+LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from fill_passport_card import fill, MULTI_SAMPLE, SAMPLE  # noqa: E402
@@ -303,7 +303,7 @@ class RenderMultiChat(unittest.TestCase):
         return next(i for i in self.items if name_of(i) == name)
 
     def test_header_names_the_chat_count_and_date_range(self):
-        self.assertIn("Based on 4 chats, 2026-10-06 to 2026-10-30, against Modo rubric v1.1.", self.text)
+        self.assertIn("Based on 4 chats, 2026-10-06 to 2026-10-30, against Modo rubric v1.2.", self.text)
         self.assertIn("Strongest across these chats: Verification", self.text)
         self.assertNotIn("this chat", self.text.lower())
 

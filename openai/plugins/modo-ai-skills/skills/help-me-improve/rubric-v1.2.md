@@ -1,10 +1,10 @@
 # Modo AI Skills rubric
 
-**Rubric version: v1.1**
+**Rubric version: v1.2**
 
 This is the public rubric behind every Modo AI Skills assessment. Claude reads
 this file to score a chat, so what you read here is exactly what is applied.
-Every result is labelled "Self-assessment by Claude using Modo rubric v1.1 —
+Every result is labelled "Self-assessment by Claude using Modo rubric v1.2 —
 not verified."
 
 It is for your own development. It is not intended for hiring, promotion or

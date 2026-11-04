@@ -184,7 +184,7 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
       <p class="next"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span id="next"></span></p>
     </div>
   </div>
-  <p class="label">Self-assessment by ChatGPT using Modo rubric v1.1 — not verified.</p>
+  <p class="label">Self-assessment by ChatGPT using Modo rubric v1.2 — not verified.</p>
 </main>
 
 <!-- MODO-DATA-START -->
@@ -275,10 +275,10 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
     var range = data.date_range || [];
     document.getElementById("chat").textContent = "Based on " + sessions + (sessions === 1 ? " chat" : " chats") +
       (range.length === 2 ? ", " + (range[0] === range[1] ? range[0] : range[0] + " to " + range[1]) : "") +
-      ", against Modo rubric v1.1.";
+      ", against Modo rubric v1.2.";
   } else if (data.chat) {
     document.getElementById("chat").textContent = "Assessment of " + data.chat +
-      ". Based on " + sessions + (sessions === 1 ? " chat" : " chats") + ", against Modo rubric v1.1.";
+      ". Based on " + sessions + (sessions === 1 ? " chat" : " chats") + ", against Modo rubric v1.2.";
   }
   if (ordered.length === 5) {
     /* A capability withheld because the runs disagreed was shown; it is not missing. */

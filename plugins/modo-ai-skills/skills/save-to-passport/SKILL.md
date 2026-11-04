@@ -74,7 +74,7 @@ Follow RECORD.md (these are the same rules the export uses):
   from its quotes, title and date.
 - If the user already said what to include ("scores only", "without quote 3"),
   apply it now. It still has to be shown and confirmed (steps 3 and 4).
-- Fields, in this order and no others: `rubric_version` (`"v1.1"`),
+- Fields, in this order and no others: `rubric_version` (`"v1.2"`),
   `capabilities` (the five keys in rubric order, each `level` and
   `confidence`; `"not_shown"` gets confidence `"low"`), `evidence`,
   `session_title`, `session_date`. Check every limit in RECORD.md before
@@ -149,13 +149,13 @@ no arguments, then show what it returned, in plain text:
 ```
 Your Modo passport.
 
-Latest level per capability (rubric v1.1):
+Latest level per capability (rubric v1.2):
 Problem Solving: Level 4 of 5 (confidence: medium), from 2026-10-20
 ...
 Strategic Thinking: Not shown yet
 
 History (newest first):
-- 2026-10-20, "Q3 pricing analysis for the board" (rubric v1.1): Problem Solving 4, Verification 4, Workflow Design 2, Delegation 1, Strategic Thinking not shown
+- 2026-10-20, "Q3 pricing analysis for the board" (rubric v1.2): Problem Solving 4, Verification 4, Workflow Design 2, Delegation 1, Strategic Thinking not shown
 ```
 
 Use the five capabilities in rubric order; a capability with no latest level
@@ -190,4 +190,4 @@ shape is a proposal (decided 2026-11-02, flag for review).
 Every response from this skill, including questions, refusals and the
 passport, ends with this line exactly, on its own line, after everything else:
 
-Self-assessment by Claude using Modo rubric v1.1 — not verified.
+Self-assessment by Claude using Modo rubric v1.2 — not verified.
