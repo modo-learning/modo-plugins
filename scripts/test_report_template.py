@@ -73,6 +73,17 @@ class Template(unittest.TestCase):
 
 
 @unittest.skipUnless(CHROME, "no Chrome found")
+class Order(unittest.TestCase):
+    """The same order as export-assessment/SKILL.md step 4."""
+
+    def test_the_title_line_follows_the_label_and_comes_before_the_table(self):
+        text = TEMPLATE.read_text()
+        body = text[text.index("<main"):]
+        self.assertLess(body.index('class="label"'), body.index('id="fluency"'))
+        self.assertLess(body.index('id="fluency"'), body.index('id="rows"'))
+        self.assertLess(body.index('id="date"'), body.index('class="label"'))
+
+
 class Rendered(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -134,7 +145,7 @@ class RenderedOverall(unittest.TestCase):
 
     def test_single_chat_record_is_delegator(self):
         # Levels 4, 5, 3, 3, not shown: four at 3 or higher, including Delegation.
-        dom = render(RECORD)
+        dom = render(RECORD, {"agent_session": False})
         level, text = overall_of(dom)
         self.assertEqual(level, "3")
         self.assertIn("This chat: Delegator \u00b7 Level 3", text)
@@ -149,9 +160,16 @@ class RenderedOverall(unittest.TestCase):
         self.assertIn("no agent work visible in this chat", text)
 
     def test_no_title_yet(self):
-        level, text = overall_of(render(with_levels([2, "not_shown", "not_shown", "not_shown", 1])))
+        level, text = overall_of(render(with_levels([2, "not_shown", "not_shown", "not_shown", 1]),
+                                         {"agent_session": False}))
         self.assertEqual(level, "none")
         self.assertIn("This chat: No title yet", text)
+
+    def test_an_unfilled_summary_shows_instead_of_capping_the_title(self):
+        level, text = overall_of(render(with_levels([4, 5, 4, 4, 3])))
+        self.assertEqual(level, "unfilled")
+        self.assertIn("Title not filled in", text)
+        self.assertNotIn("stops at Delegator", text)
 
     def test_the_record_block_has_no_title_and_no_summary_field(self):
         block = re.search(r'<pre id="record">(.*?)</pre>', render(RECORD, {"agent_session": True}), re.S).group(1)
@@ -236,6 +254,21 @@ class RenderedMultiChat(unittest.TestCase):
         self.assertIn("Practitioner", first)
         self.assertIn("Delegator", text_of(rows[1][1]))
         self.assertEqual(re.findall(r"<td[^>]*>([^<]*)</td>", rows[3][1])[-5:], ["2", "3", "2", "3", "\u2013"])
+
+    def test_a_title_capped_for_lack_of_agent_work_says_so_in_its_row(self):
+        rec = copy.deepcopy(MULTI)
+        rec["chats"][0]["levels"] = {"problem_solving": 4, "verification": 4, "workflow_design": 4, "delegation": 4,
+                                     "strategic_thinking": 2}
+        dom = render(rec, {"chat_titles": [3, 3, None, 2, 2], "task_types": 3, "reused": 1})
+        rows = re.findall(r'<tr data-chat="(\d+)"[^>]*>(.*?)</tr>', dom, re.S)
+        self.assertIn("Delegator (no agent work visible in this chat)", text_of(rows[0][1]))
+        self.assertNotIn("no agent work", text_of(rows[3][1]))
+
+    def test_an_unfilled_summary_shows_instead_of_a_title(self):
+        rec = copy.deepcopy(MULTI)
+        level, text = overall_of(render(rec))
+        self.assertEqual(level, "unfilled")
+        self.assertIn("Title not filled in", text)
 
     def test_evidence_names_its_chat(self):
         self.assertIn("Verification \u00b7 Chat 4, 2026-10-14", self.text)

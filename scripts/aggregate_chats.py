@@ -154,7 +154,7 @@ def aggregate(results):
 
     "chats_assessed", "capabilities" and "coverage" are the record's. The
     output also holds the score sheet, which is not a record field:
-    "chat_titles" (one entry per result, None when not scored), "proven",
+    "title_per_chat" (overall() of each result, None when not scored), "proven",
     "person", "task_range" and "reuse".
 
     The counts use the multi-chat record's names (RECORD.md, chats_assessed):
@@ -173,7 +173,7 @@ def aggregate(results):
     titles = [None if failed(r) or r["too_short"] else
               overall({cap: r["capabilities"][cap]["level"] for cap in CAPABILITIES}, r["agent_session"]["value"])
               for r in results]
-    out["chat_titles"] = titles
+    out["title_per_chat"] = titles
     out["person"] = person_title([t["level"] for t in titles if t])
     out["proven"] = {cap: reached_in([r["capabilities"][cap]["level"] for r in scored
                                       if r["capabilities"][cap]["level"] != LEVEL_NOT_SHOWN])

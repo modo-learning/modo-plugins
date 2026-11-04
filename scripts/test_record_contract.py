@@ -35,7 +35,7 @@ PINNED = {
         "4aa3116e4c37cd651f5d79bfe7014ab4b7e7eba1f69691bd90f7d96900c2cc7c",
 }
 # Fields this build added for people; none may reach a record.
-PEOPLE_ONLY = ("chat_titles", "proven", "person", "task_range", "reuse", "agent_session", "task_type", "overall")
+PEOPLE_ONLY = ("title_per_chat", "chat_titles", "proven", "person", "task_range", "reuse", "agent_session", "task_type", "overall")
 
 
 def shape(value):

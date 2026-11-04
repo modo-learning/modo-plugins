@@ -7,7 +7,7 @@
    capability (five segments, strongest first, not shown last), strengths'
    evidence, one growth tip, the next action, the label last. A result across
    several chats ("scope": "multi_chat") adds the chat count and date range to
-   the header and a trend arrow, chats shown and Proven level per capability
+   the header and a trend arrow and chats shown per capability
    (proposal, decided 2026-11-02, flag for review: Angelina). */
 /* MODO-TOKENS-START */
 /* Modo design tokens, taken from modo-frontend src/styles/tokens.css (Modo v2:
@@ -284,11 +284,12 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
   if (ordered.length === 5) {
     var fl = document.getElementById("fluency");
     fl.hidden = false;
+    /* MODO-PERSON-USE-START */
     if (multi) {
-      /* MODO-PERSON-USE-START */
       personLine(fl, sessions, (data.chat_titles || []).filter(Boolean), data.task_types, data.reused);
-      /* MODO-PERSON-USE-END */
-    } else {
+    } else
+    /* MODO-PERSON-USE-END */
+    {
       var inOrder = data.capabilities.map(function (c) { return c.level; });
       var delegation = data.capabilities.filter(function (c) { return c.name === "Delegation"; })[0];
       var dLevel = delegation ? delegation.level : null;
@@ -357,7 +358,9 @@ blockquote footer { color: var(--text-muted); font-size: 12px; margin-top: 4px; 
       }
       meta.appendChild(el("span", "pill", cap(c.confidence) + " confidence"));
       if (multi && c.chats_shown) meta.appendChild(el("span", null, "Shown in " + c.chats_shown + " of " + sessions + " chats"));
+      /* MODO-PERSON-USE-START */
       if (multi && c.proven) meta.appendChild(el("span", null, "Proven level: Level " + c.proven));
+      /* MODO-PERSON-USE-END */
     } else {
       li.appendChild(el("div", "level", multi ? "Not shown in these chats" : "Not shown in this chat"));
       var empty = el("div", "track-empty");

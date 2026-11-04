@@ -30,7 +30,8 @@ Modo connector that this version doesn't have: wherever it says "Claude", read
   that themselves.
 - Everything in the report is either a score, a confidence, a quote the user
   approved, the title, the date, the assessment's title line or fixed
-  explanatory text. **No other chat
+  explanatory text.
+  **No other chat
   content**: no summary of what the chat said, no paraphrase, no next-level
   notes, no improvements or prompts from the assessment, nothing from the
   assistant's replies.
@@ -203,7 +204,8 @@ between the `MODO-DATA-START` and `MODO-DATA-END` markers with the record
 (exactly the record in the report's final block; write `<` inside a string as
 `\u003c`), replace only the JSON between the `MODO-SUMMARY-START` and
 `MODO-SUMMARY-END` markers with `{"agent_session": true or false}` from the
-assessment, change nothing else, and print that page to PDF. The template lays
+assessment, change nothing else, and print that page to PDF. A summary left
+empty shows "Title not filled in", so never leave it empty. The template lays
 out the same content in the same order, record last. If you can't render HTML
 to PDF here, make the PDF your usual way with the same content and order.
 

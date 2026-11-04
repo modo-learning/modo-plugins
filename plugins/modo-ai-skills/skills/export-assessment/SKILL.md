@@ -29,8 +29,9 @@ limits exactly.
   call external services. This skill never uploads anything; the user does
   that themselves.
 - Everything in the report is either a score, a confidence, a quote the user
-  approved, the title, the date, the assessment's title line or fixed
-  explanatory text. **No other chat
+  approved, the title, the date, the assessment's title line, its task range
+  and reuse line (a multi-chat result, counts only) or fixed explanatory text.
+  **No other chat
   content**: no summary of what the chat said, no paraphrase, no next-level
   notes, no improvements or prompts from the assessment, nothing from Claude's
   replies.
@@ -199,7 +200,8 @@ between the `MODO-DATA-START` and `MODO-DATA-END` markers with the record
 (exactly the record in the report's final block; write `<` inside a string as
 `\u003c`), replace only the JSON between the `MODO-SUMMARY-START` and
 `MODO-SUMMARY-END` markers with `{"agent_session": true or false}` from the
-assessment, change nothing else, and print that page to PDF. The template lays
+assessment, change nothing else, and print that page to PDF. A summary left
+empty shows "Title not filled in", so never leave it empty. The template lays
 out the same content in the same order, record last. If you can't render HTML
 to PDF here, make the PDF your usual way with the same content and order.
 
@@ -271,12 +273,14 @@ changes. This shape is a proposal (decided 2026-11-02, flag for review).
   ```
 
   After the notes, a "Chats assessed" table: `| # | Chat | Date | Result | Title | P | V | W | D | S |`,
-  newest first, the chat's title, a level or – per capability. Each evidence line ends with
+  newest first, the chat's title, its Title cell as the result shows it, a level
+  or – per capability. Each evidence line ends with
   its chat: `- Verification: "<quote>" (Chat 4, 2026-10-14)`.
 - The PDF uses the same report-template.html; it lays out a multi-chat record
   itself. Its summary block holds `{"chat_titles": [one entry per row of
   `chats`, the title level 1 to 4, 0 for no title, null for a chat not scored],
-  "task_types": <n>, "reused": <r>}`.
+  "task_types": <n>, "reused": <r>}`. The template adds the "no agent work
+  visible" words to a Title cell itself.
 <!-- MODO-PERSON-END -->
 
 ## 7. The label

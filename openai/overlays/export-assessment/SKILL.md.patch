@@ -94,3 +94,11 @@ assess-my-ai-work or, across several chats, from assess-my-chats. There is nothi
 five capability blocks (in any order: v1.2 lists the strongest first), from
 assess-my-ai-work. There is nothing to export when there is none, or when
 >>>>>>> REPLACE
+
+<<<<<<< FIND
+  approved, the title, the date, the assessment's title line, its task range
+  and reuse line (a multi-chat result, counts only) or fixed explanatory text.
+=======
+  approved, the title, the date, the assessment's title line or fixed
+  explanatory text.
+>>>>>>> REPLACE

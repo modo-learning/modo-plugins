@@ -143,7 +143,7 @@ def coverage(levels):
 #   Explorer, Level 1: 3 of 5 shown at any level.
 #   No title yet: fewer than 3 shown.
 # "not shown" and "runs disagreed" reach no level. Scores that reach Orchestrator
-# with no agent session give Delegator with a note (ticket 35, D9). Multiplier
+# with no agent session give Delegator with a note. Multiplier
 # comes later: it needs Modo sharing data, and a claim in a chat is not evidence.
 # The title is not stored in the record.
 LADDER = {1: "Explorer", 2: "Practitioner", 3: "Delegator", 4: "Orchestrator", 5: "Multiplier"}

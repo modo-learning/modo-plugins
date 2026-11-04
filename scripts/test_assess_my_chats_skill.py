@@ -276,6 +276,18 @@ def section(body, start, end):
 LABEL = "Self-assessment by Claude using Modo rubric v1.2 — not verified."
 
 
+class WordingFromTheReview(unittest.TestCase):
+    def test_a_capped_title_shows_in_the_per_chat_table(self):
+        self.assertIn('"Delegator (no agent work visible in this chat)"', folded(SKILL))
+
+    def test_the_export_ground_rule_lists_the_task_range_and_reuse_line(self):
+        self.assertIn("its task range and reuse line (a multi-chat result, counts only)", folded(EXPORT))
+
+    def test_chat_titles_mean_the_same_in_the_card_and_the_report(self):
+        for path in (SKILL, EXPORT):
+            self.assertIn("null for a chat not scored", folded(path))
+
+
 class Answer(unittest.TestCase):
     AGENTS_LINE = "Each chat was read and scored by its own agent, 3 or 5 times in one response."
     FALLBACK_LINE = ("Each chat was read and scored here in the main chat, one at a time, 3 or 5 times "

@@ -103,17 +103,17 @@ class ChatTitles(unittest.TestCase):
     def test_each_scored_chat_gets_its_title_and_others_none(self):
         results = sheet(D, P) + [chat(3, 4, user_messages=2), {"chat_id": "c9", "error": "tool error"}]
         out = aggregate(results)
-        self.assertEqual([t and t["title"] for t in out["chat_titles"]], ["Delegator", "Practitioner", None, None])
+        self.assertEqual([t and t["title"] for t in out["title_per_chat"]], ["Delegator", "Practitioner", None, None])
 
     def test_orchestrator_needs_that_chats_agent_session(self):
         out = aggregate([chat_levels(1, O, agent=False), chat_levels(2, O, agent=True)])
-        self.assertEqual([t["title"] for t in out["chat_titles"]], ["Delegator", "Orchestrator"])
-        self.assertIn("no agent work visible", out["chat_titles"][0]["note"])
+        self.assertEqual([t["title"] for t in out["title_per_chat"]], ["Delegator", "Orchestrator"])
+        self.assertIn("no agent work visible", out["title_per_chat"][0]["note"])
 
     def test_a_scored_chat_with_no_title_is_still_listed(self):
         out = aggregate(sheet(NONE))
-        self.assertEqual(out["chat_titles"][0]["title"], None)
-        self.assertEqual(out["chat_titles"][0]["level"], None)
+        self.assertEqual(out["title_per_chat"][0]["title"], None)
+        self.assertEqual(out["title_per_chat"][0]["level"], None)
 
 
 class PersonTitle(unittest.TestCase):

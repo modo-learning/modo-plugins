@@ -119,9 +119,17 @@ Johnny's file leaves these open. Modo reads them this way until he answers:
 
 - **Agent session** (his "directing an agent or tools"): at least 2 tool-driven
   steps with the user directing or reviewing them, on any surface. One web
-  search doesn't count, nor does a tool the assistant picked by itself that the
-  user neither directed nor reviewed. Evidence is tool names or the user's own messages, and
-  most of the 3 to 5 scoring runs decide. No evidence means no.
+  search doesn't count. A tool the assistant picked itself doesn't count unless
+  the user directs or reviews those steps. Evidence is tool names or the user's
+  own messages. No evidence means no.
+- **Most runs decide:** agent session, task type and reuse each take the answer
+  of most of the 3 to 5 scoring runs. His file doesn't say how to decide them
+  when runs differ.
+- **Task type tie:** when runs tie, the earliest run's choice among the tied
+  types. His file gives one type per chat and doesn't cover a tie.
+- **A list of 15 chats by default, 25 at most:** his title needs 10 scored chats,
+  and some listed chats come back too short. The default of 15 and the maximum
+  of 25 are Modo's, not his.
 - **"Reached in at least 3 chats" is cumulative:** a higher chat title also
   counts toward lower ones, and the same goes for Proven level. His example
   (Delegator in 3 chats, Practitioner in 6, Explorer in 3) reads the same either

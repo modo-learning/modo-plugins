@@ -200,17 +200,17 @@ def analyse(runs, golden):
                         "accuracy": (sum(k for t, k in seen.items() if t in g["overall"]) / len(rs)) if g else None}
     single = [c for c in cells if c["kind"] == "single"]
     multi = [c for c in cells if c["kind"] == "multi"]
-    johnny, signals = [], {}
+    independent, signals = [], {}
     for (chat, kind), rs in sorted(groups.items()):
         g = golden.get(chat) or {}
-        if g.get("title_source") == "johnny":
+        if g.get("independent"):
             off = []
             for cap, his in g.get("scores", {}).items():
                 far = Counter(r["levels"][cap] for r in rs if not _shown(r["levels"][cap])
                               or abs(r["levels"][cap] - his) >= 2)
                 if far:
-                    off.append({"capability": cap, "johnny": his, "seen": dict(far)})
-            johnny.append({"chat": chat, "expected": g["overall"], "titles": dict(titles[chat]["seen"]),
+                    off.append({"capability": cap, "given": his, "seen": dict(far)})
+            independent.append({"chat": chat, "expected": g["overall"], "titles": dict(titles[chat]["seen"]),
                            "title_match": set(titles[chat]["seen"]) <= set(g["overall"]), "off": off})
         said = [r["signals"] for r in rs if r.get("signals")]
         if said:
@@ -251,7 +251,7 @@ def analyse(runs, golden):
                     f"worst {mt:.0%}; pass ≥ 90%")]
     models = sorted({str(r.get("model")) for r in runs})
     return {"cells": cells, "titles": titles, "accuracy": accuracy, "alpha": a, "bar": bar,
-            "johnny": johnny, "signals": signals,
+            "independent": independent, "signals": signals,
             "runs": len(runs), "models": models,
             "rubric": sorted({str(r.get("rubric")) for r in runs})}
 
@@ -291,15 +291,14 @@ def markdown(m):
                 f"{_pct(t['agreement'])} | {_pct(t['accuracy'])} |"
                 for chat, t in m["titles"].items() if t["kind"] == kind]
         out.append("")
-    if m["johnny"]:
+    if m["independent"]:
         out += ["## Johnny's examples (ticket 35, D8)", "",
                 "His titles must match exactly and his levels within 1. These titles come from his file, not from "
-                "our rule. Where they disagree, nothing is changed here: Sumeet decides (rubric wording in v1.2, or "
-                "ask Johnny whether the example changes).", "",
+                "our rule. Where they disagree, nothing is changed here: Sumeet decides.", "",
                 "| Chat | His title | Titles seen | Title match | Off by 2+ or not shown |",
                 "| --- | --- | --- | --- | --- |"]
-        for r in m["johnny"]:
-            off = "; ".join(f"{o['capability']}: his {o['johnny']}, seen {_counts(o['seen'])}" for o in r["off"])
+        for r in m["independent"]:
+            off = "; ".join(f"{o['capability']}: his {o['given']}, seen {_counts(o['seen'])}" for o in r["off"])
             out.append(f"| {r['chat']} | {' or '.join(r['expected'])} | {_counts(r['titles'])} | "
                        f"{'yes' if r['title_match'] else 'no'} | {off or '–'} |")
         out.append("")
@@ -327,6 +326,7 @@ def markdown(m):
 # ---- Golden set ---------------------------------------------------------------
 GOLDEN_DIR = ROOT / "scripts" / "fixtures" / "stability"
 MULTI_SET = "multi-set"
+INDEPENDENT_SOURCE = "johnny"  # expected titles written outside our rule; the value as the fixtures hold it
 KEYS = dict(zip(CAPS, ("problem_solving", "verification", "workflow_design", "delegation", "strategic_thinking")))
 
 
@@ -341,6 +341,8 @@ def multi_expected(chats):
     its band (combined by aggregate_chats.combine, the published rule). Each
     capability is combined on its own, so the bands are found per capability.
     With fewer than 10 chats there is no person title, only the count."""
+    if len(chats) >= aggregate_chats.TITLE_MIN_CHATS:
+        raise ValueError("expected person titles for 10 or more chats are not specified")
     bands = {}
     for cap in CAPS:
         reach = set()
@@ -350,10 +352,7 @@ def multi_expected(chats):
             got = aggregate_chats.combine(levels)["capabilities"][KEYS[cap]]["level"]
             reach.add(NOT_SHOWN if got == "not_shown" else got)
         bands[cap] = sorted(reach, key=str)
-    title = aggregate_chats.person_title([None] * len(chats))["line"]
-    if len(chats) >= aggregate_chats.TITLE_MIN_CHATS:
-        raise ValueError("expected person titles for 10 or more chats are not specified")
-    return {"bands": bands, "overall": [title]}
+    return {"bands": bands, "overall": [aggregate_chats.person_title([None] * len(chats))["line"]]}
 
 
 def load_golden(folder=GOLDEN_DIR, multi_set=None):
@@ -361,7 +360,8 @@ def load_golden(folder=GOLDEN_DIR, multi_set=None):
     (the expected combined result over the multi-chat set's chats)."""
     chats = golden_chats(folder)
     out = {k: {"bands": v["expected"]["bands"], "overall": v["expected"]["overall"],
-               "title_source": v["expected"].get("title_source"), "scores": v["expected"].get("johnny_scores", {})}
+               "independent": v["expected"].get("title_source") == INDEPENDENT_SOURCE,
+               "scores": v["expected"].get("johnny_scores", {})}
            for k, v in chats.items()}
     members = multi_set or MULTI_SET_CHATS
     out[MULTI_SET] = multi_expected([chats[k] for k in members])

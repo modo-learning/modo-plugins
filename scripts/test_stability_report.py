@@ -220,7 +220,7 @@ def johnny_golden():
     bands = {c: None for c in sr.CAPS}
     bands["Verification"] = [3, 4, 5]
     bands["Delegation"] = [1, 2, 3]
-    return {"j": {"bands": bands, "overall": ["Delegator"], "title_source": "johnny",
+    return {"j": {"bands": bands, "overall": ["Delegator"], "independent": True,
                   "scores": {"Verification": 4, "Delegation": 2}}}
 
 
@@ -232,21 +232,21 @@ class JohnnysExamples(unittest.TestCase):
 
     def test_a_match_lists_nothing(self):
         m = sr.analyse(self.runs(([3, 4, 3, 3, 2], "Delegator"), ([3, 5, 3, 1, 2], "Delegator")), johnny_golden())
-        row = m["johnny"][0]
+        row = m["independent"][0]
         self.assertEqual((row["chat"], row["title_match"], row["off"]), ("j", True, []))
 
     def test_a_wrong_title_in_any_run_is_listed(self):
         m = sr.analyse(self.runs(([3, 4, 3, 3, 2], "Delegator"), ([3, 4, 3, 3, 2], "Practitioner")), johnny_golden())
-        self.assertFalse(m["johnny"][0]["title_match"])
-        self.assertEqual(m["johnny"][0]["titles"], {"Delegator": 1, "Practitioner": 1})
+        self.assertFalse(m["independent"][0]["title_match"])
+        self.assertEqual(m["independent"][0]["titles"], {"Delegator": 1, "Practitioner": 1})
 
     def test_a_level_off_by_two_is_listed(self):
         m = sr.analyse(self.runs(([3, 2, 3, 2, 2], "Delegator"), ([3, 4, 3, 2, 2], "Delegator")), johnny_golden())
-        self.assertEqual(m["johnny"][0]["off"], [{"capability": "Verification", "johnny": 4, "seen": {2: 1}}])
+        self.assertEqual(m["independent"][0]["off"], [{"capability": "Verification", "given": 4, "seen": {2: 1}}])
 
     def test_not_shown_where_he_gave_a_score_is_off(self):
         m = sr.analyse(self.runs(([3, 4, 3, "not shown", 2], "Delegator"),), johnny_golden())
-        self.assertEqual(m["johnny"][0]["off"], [{"capability": "Delegation", "johnny": 2, "seen": {"not shown": 1}}])
+        self.assertEqual(m["independent"][0]["off"], [{"capability": "Delegation", "given": 2, "seen": {"not shown": 1}}])
 
     def test_markdown_section(self):
         md = sr.markdown(sr.analyse(self.runs(([3, 2, 3, 2, 2], "Practitioner"),), johnny_golden()))
@@ -256,7 +256,7 @@ class JohnnysExamples(unittest.TestCase):
 
     def test_titles_from_johnny_are_not_taken_from_our_rule(self):
         golden = sr.load_golden()
-        self.assertEqual(golden["johnny-d1"]["title_source"], "johnny")
+        self.assertTrue(golden["johnny-d1"]["independent"])
         self.assertEqual(golden["johnny-d1"]["overall"], ["Delegator"])
         self.assertEqual(golden["johnny-o1"]["overall"], ["Orchestrator"])
         self.assertIsNone(golden["johnny-e1"]["bands"]["Verification"])

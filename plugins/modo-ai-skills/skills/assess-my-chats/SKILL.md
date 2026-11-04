@@ -312,7 +312,9 @@ Next step: <one line>
   order, as "Not shown in these chats", never with a level or a zero.
 - Leave out "proven level" when there is none and "trend" when there is none.
 - **Per-chat table**: the Title column holds that chat's title by name, or "No
-  title yet"; – for a chat that was not scored.
+  title yet"; – for a chat that was not scored. When a chat's title stops at
+  Delegator because its scores reach Orchestrator with no agent session, the
+  cell reads "Delegator (no agent work visible in this chat)".
 - **Evidence**: one or two quotes per capability, copied exactly from a chat
   whose level equals the combined level, newest chat first. Name the chat by
   title and date.
@@ -357,8 +359,9 @@ never say a card exists.
    `<!-- MODO-DATA-END -->`; change nothing else. The JSON holds exactly:
    `{"scope": "multi_chat", "sessions": <s, the scored chats>,
    "date_range": ["<first date>", "<last date>"],
-   "chat_titles": [one number per scored chat, its title level 1 to 4, or 0
-   for no title], "task_types": <n>, "reused": <r>,
+   "chat_titles": [one entry per row of the per-chat table, the title level 1
+   to 4, 0 for no title, null for a chat not scored], "task_types": <n>,
+   "reused": <r>,
    "capabilities": [five objects in rubric order, each {"name": "<capability
    name>", "level": 1-5 or "not_shown", "confidence": "low|medium|high",
    "proven": 1-5 or null, "trend": "up|flat|down" or null,

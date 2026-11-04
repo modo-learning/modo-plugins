@@ -71,29 +71,25 @@ START = "<!-- MODO-DATA-START -->"
 END = "<!-- MODO-DATA-END -->"
 
 
-def fill(template: str, data: dict) -> str:
-    """Replace the data block between the markers. `<` is escaped so a quote
-    can never close the script element."""
+def _fill_block(template: str, start: str, end: str, script_id: str, data: dict) -> str:
+    """Replace one block between two markers. `<` is escaped so a quote can
+    never close the script element."""
     block = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
-    new = (f'{START}\n<script type="application/json" id="passport-data">\n'
-           f"{block}\n</script>\n{END}")
-    out, n = re.subn(re.escape(START) + ".*?" + re.escape(END),
-                     lambda _: new, template, flags=re.S)
+    new = f'{start}\n<script type="application/json" id="{script_id}">\n{block}\n</script>\n{end}'
+    out, n = re.subn(re.escape(start) + ".*?" + re.escape(end), lambda _: new, template, flags=re.S)
     if n != 1:
-        raise ValueError("data markers not found exactly once")
+        raise ValueError(f"{start} markers not found exactly once")
     return out
+
+
+def fill(template: str, data: dict) -> str:
+    """Replace the data block."""
+    return _fill_block(template, START, END, "passport-data", data)
 
 
 def fill_summary(template: str, summary: dict) -> str:
     """Replace the report's summary block (the report template only)."""
-    block = json.dumps(summary, ensure_ascii=False).replace("<", "\\u003c")
-    new = (f'{SUMMARY_START}\n<script type="application/json" id="report-summary">\n'
-           f"{block}\n</script>\n{SUMMARY_END}")
-    out, n = re.subn(re.escape(SUMMARY_START) + ".*?" + re.escape(SUMMARY_END),
-                     lambda _: new, template, flags=re.S)
-    if n != 1:
-        raise ValueError("summary markers not found exactly once")
-    return out
+    return _fill_block(template, SUMMARY_START, SUMMARY_END, "report-summary", summary)
 
 
 if __name__ == "__main__":
