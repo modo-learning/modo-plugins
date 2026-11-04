@@ -1,0 +1,67 @@
+{
+  "id": "johnny-e2",
+  "title": "Finance: benchmark taken on trust",
+  "updated_at": "2026-11-04T09:00:00Z",
+  "source": "Johnny, AI Fluency Levels scoring rules v1, 2026-11-04, example E2: his user messages word for word. Claude's replies are a placeholder: his file shows only the user's messages.",
+  "turns": [
+    {
+      "user": "what's the average SaaS churn rate",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "ok so 5% monthly is normal?",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "put that in a sentence for my CFO update",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "thanks",
+      "assistant": "(Claude's reply is not part of this example.)"
+    }
+  ],
+  "expected": {
+    "bands": {
+      "Problem Solving": [
+        1,
+        2
+      ],
+      "Verification": [
+        1,
+        2
+      ],
+      "Workflow Design": [
+        1,
+        2,
+        3
+      ],
+      "Delegation": [
+        1,
+        2,
+        3
+      ],
+      "Strategic Thinking": null
+    },
+    "overall": [
+      "Explorer"
+    ],
+    "agent_session": false,
+    "title_source": "johnny",
+    "johnny_scores": {
+      "Problem Solving": 1,
+      "Verification": 1,
+      "Delegation": 2,
+      "Workflow Design": 2
+    },
+    "reasons": {
+      "Problem Solving": "Johnny scored 1; band is within 1 (ticket 35, D8).",
+      "Verification": "Johnny scored 1; band is within 1 (ticket 35, D8).",
+      "Workflow Design": "Johnny scored 2; band is within 1 (ticket 35, D8).",
+      "Delegation": "Johnny scored 2; band is within 1 (ticket 35, D8).",
+      "Strategic Thinking": "Johnny gave no score: not specified, so no band.",
+      "overall": "Johnny's title for this chat. It must match exactly (D8). His note: A benchmark goes to the CFO with no source."
+    },
+    "review": "Johnny's own scores and title"
+  }
+}

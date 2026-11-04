@@ -1,0 +1,79 @@
+{
+  "id": "johnny-o2",
+  "title": "Ops: weekly report agent (non-engineer)",
+  "updated_at": "2026-11-04T09:00:00Z",
+  "source": "Johnny, AI Fluency Levels scoring rules v1, 2026-11-04, example O2: his user messages word for word. Claude's replies are a placeholder: his file shows only the user's messages.",
+  "turns": [
+    {
+      "user": "Every Monday I build an ops report from Linear tickets, the Stripe export and our incident doc. Plan an agent run for it. Show me the plan, don't run it yet.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Join on account ID, not company name. Names don't match across systems. Run steps 1 and 2 only, then stop.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Before step 3, add a check: revenue must match the Stripe export to the dollar, and every incident needs a ticket link. Run the check.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Two rows fail. Show them to me, don't fix them.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Those are refunds. Exclude refunds, rerun the check, then finish the tables. I'll write the summary myself.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Save this as a skill with the checks built in. Input: the week's start date.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    }
+  ],
+  "expected": {
+    "bands": {
+      "Problem Solving": [
+        3,
+        4,
+        5
+      ],
+      "Verification": [
+        4,
+        5
+      ],
+      "Workflow Design": [
+        4,
+        5
+      ],
+      "Delegation": [
+        4,
+        5
+      ],
+      "Strategic Thinking": [
+        2,
+        3,
+        4
+      ]
+    },
+    "overall": [
+      "Orchestrator"
+    ],
+    "agent_session": true,
+    "title_source": "johnny",
+    "johnny_scores": {
+      "Delegation": 5,
+      "Verification": 5,
+      "Workflow Design": 5,
+      "Problem Solving": 4,
+      "Strategic Thinking": 3
+    },
+    "reasons": {
+      "Problem Solving": "Johnny scored 4; band is within 1 (ticket 35, D8).",
+      "Verification": "Johnny scored 5; band is within 1 (ticket 35, D8).",
+      "Workflow Design": "Johnny scored 5; band is within 1 (ticket 35, D8).",
+      "Delegation": "Johnny scored 5; band is within 1 (ticket 35, D8).",
+      "Strategic Thinking": "Johnny scored 3; band is within 1 (ticket 35, D8).",
+      "overall": "Johnny's title for this chat. It must match exactly (D8)."
+    },
+    "review": "Johnny's own scores and title"
+  }
+}

@@ -5,7 +5,9 @@ stab-* cases (plugins/modo-ai-skills/evals-stability/, written by
 scripts/gen_stability_evals.py), reads each run's final answer, and writes a
 Markdown report with every metric of the ticket and pass or fail against the
 proposed pass bar, using the golden chats' expected bands
-(scripts/fixtures/stability/*/chat.json). Exit 1 if any metric fails.
+(scripts/fixtures/stability/*/chat.json). Johnny's examples get their own
+section: every title that differs and every level off by 2 or more is listed,
+for Sumeet to decide (ticket 35, D8). Exit 1 if any metric fails.
 
     claude plugin eval plugins/modo-ai-skills --eval-dir evals-stability --case 'stab-*' \
         --runs 5 --model opus --ablation none --no-publish --output-dir /tmp/stab
@@ -79,7 +81,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 RUBRIC = ROOT / "plugins" / "modo-ai-skills" / "skills" / "assess-my-ai-work" / "rubric-v1.1.md"
 CAPS = ("Problem Solving", "Verification", "Workflow Design", "Delegation", "Strategic Thinking")
 NOT_SHOWN, DISAGREED = "not shown", "runs disagreed"
-NOT_ENOUGH = "not enough shown"
+NO_TITLE = derive_levels.NO_TITLE
 TITLES = ("Explorer", "Practitioner", "Delegator", "Orchestrator")
 
 
@@ -105,15 +107,19 @@ def behaviour_names(rubric=RUBRIC):
 _CAP = "|".join(CAPS)
 _LEVEL = re.compile(rf"^[*_ ]*({_CAP})[*_ ]*:[*_ ]*Level ([1-5]) of 5[*_ ]*\((?:confidence: (\w+))?", re.M)
 _NOT = re.compile(rf"^[*_ ]*({_CAP})[*_ ]*:[*_ ]*Not shown in (?:this chat|these chats)[*_ ]*(\(runs disagreed\))?", re.M)
-_OVERALL = re.compile(r"^[*_ ]*Overall:[*_ ]*(?:(" + "|".join(TITLES) + r") \(Level [1-4]|(not enough shown))", re.M)
+_OVERALL = re.compile(r"^[*_ ]*(?:(?:This chat|Your title):[*_ ]*(" + "|".join(TITLES + (NO_TITLE,)) + r")\b"
+                      r"|(\d+ of \d+ chats to your title))", re.M)
+_SIGNALS = re.compile(r"Task type:[*_ ]*([^.\n]+?)[*_ ]*\.[*_ ]*Agent session:[*_ ]*(yes|no)\b.*?"
+                      r"Reused saved work:[*_ ]*(yes|no)\b", re.I)
 _EVIDENCE = re.compile(r"^\s*Evidence \(([^,()]+), message \d+\)", re.M)
 _RUBRIC = re.compile(r"against Modo rubric (v[\d.]+?)\.?\s*$", re.M)
 
 
 def parse_answer(text, names=None):
     """One assessment answer (single-chat or multi-chat shape) -> run record:
-    {"levels", "confidence", "behaviours", "overall", "rubric"}.
-    Raises ParseError when a capability or the overall line is missing."""
+    {"levels", "confidence", "behaviours", "overall", "signals", "rubric"}.
+    "signals" is None when the answer has no signals line (a multi-chat answer).
+    Raises ParseError when a capability or the title line is missing."""
     names = names or behaviour_names()
     levels, confidence, spans = {}, {}, []
     for m in _LEVEL.finditer(text):
@@ -129,7 +135,7 @@ def parse_answer(text, names=None):
         raise ParseError("no level line for " + ", ".join(missing))
     overall = _OVERALL.search(text)
     if not overall:
-        raise ParseError("no Overall line")
+        raise ParseError("no title line")
     spans.sort()
     behaviours = {c: [] for c in CAPS}
     for i, (start, cap) in enumerate(spans):
@@ -141,6 +147,9 @@ def parse_answer(text, names=None):
                 behaviours[cap].append(bid)
     record = {"levels": {c: levels[c] for c in CAPS}, "confidence": {c: confidence[c] for c in CAPS},
               "behaviours": behaviours, "overall": overall.group(1) or overall.group(2)}
+    signals = _SIGNALS.search(text)
+    record["signals"] = signals and {"task": signals.group(1).strip(), "agent": signals.group(2).lower(),
+                                     "reuse": signals.group(3).lower()}
     rubric = _RUBRIC.search(text)
     record["rubric"] = rubric.group(1) if rubric else "not specified"
     return record
@@ -179,7 +188,7 @@ def analyse(runs, golden):
         g = golden.get(chat)
         for cap in CAPS:
             values = [r["levels"][cap] for r in rs]
-            c = _cell_metrics(values, g["bands"][cap] if g else None)
+            c = _cell_metrics(values, g["bands"].get(cap) if g else None)
             c["numeric"] = [v for v in values if _shown(v)]
             ids = Counter(b for r in rs for b in set(r.get("behaviours", {}).get(cap, [])))
             c.update(chat=chat, kind=kind, capability=cap,
@@ -191,6 +200,21 @@ def analyse(runs, golden):
                         "accuracy": (sum(k for t, k in seen.items() if t in g["overall"]) / len(rs)) if g else None}
     single = [c for c in cells if c["kind"] == "single"]
     multi = [c for c in cells if c["kind"] == "multi"]
+    johnny, signals = [], {}
+    for (chat, kind), rs in sorted(groups.items()):
+        g = golden.get(chat) or {}
+        if g.get("title_source") == "johnny":
+            off = []
+            for cap, his in g.get("scores", {}).items():
+                far = Counter(r["levels"][cap] for r in rs if not _shown(r["levels"][cap])
+                              or abs(r["levels"][cap] - his) >= 2)
+                if far:
+                    off.append({"capability": cap, "johnny": his, "seen": dict(far)})
+            johnny.append({"chat": chat, "expected": g["overall"], "titles": dict(titles[chat]["seen"]),
+                           "title_match": set(titles[chat]["seen"]) <= set(g["overall"]), "off": off})
+        said = [r["signals"] for r in rs if r.get("signals")]
+        if said:
+            signals[chat] = {k: dict(Counter(x[k] for x in said)) for k in ("agent", "task", "reuse")}
     banded = [c for c in single if c["accuracy"] is not None]
     accuracy = (sum(c["accuracy"] * c["n"] for c in banded) / sum(c["n"] for c in banded)) if banded else None
     a = alpha([c["numeric"] for c in single], "ordinal")
@@ -227,6 +251,7 @@ def analyse(runs, golden):
                     f"worst {mt:.0%}; pass ≥ 90%")]
     models = sorted({str(r.get("model")) for r in runs})
     return {"cells": cells, "titles": titles, "accuracy": accuracy, "alpha": a, "bar": bar,
+            "johnny": johnny, "signals": signals,
             "runs": len(runs), "models": models,
             "rubric": sorted({str(r.get("rubric")) for r in runs})}
 
@@ -239,6 +264,10 @@ def _levels(seen):
 
 def _pct(x):
     return "–" if x is None else f"{x:.0%}"
+
+
+def _counts(seen):
+    return ", ".join(f"{k} ×{v}" for k, v in sorted(seen.items(), key=lambda kv: (-kv[1], str(kv[0]))))
 
 
 def markdown(m):
@@ -261,6 +290,24 @@ def markdown(m):
         out += [f"| {chat} | {t['n']} | {', '.join(f'{k} ×{v}' for k, v in t['seen'].items())} | "
                 f"{_pct(t['agreement'])} | {_pct(t['accuracy'])} |"
                 for chat, t in m["titles"].items() if t["kind"] == kind]
+        out.append("")
+    if m["johnny"]:
+        out += ["## Johnny's examples (ticket 35, D8)", "",
+                "His titles must match exactly and his levels within 1. These titles come from his file, not from "
+                "our rule. Where they disagree, nothing is changed here: Sumeet decides (rubric wording in v1.2, or "
+                "ask Johnny whether the example changes).", "",
+                "| Chat | His title | Titles seen | Title match | Off by 2+ or not shown |",
+                "| --- | --- | --- | --- | --- |"]
+        for r in m["johnny"]:
+            off = "; ".join(f"{o['capability']}: his {o['johnny']}, seen {_counts(o['seen'])}" for o in r["off"])
+            out.append(f"| {r['chat']} | {' or '.join(r['expected'])} | {_counts(r['titles'])} | "
+                       f"{'yes' if r['title_match'] else 'no'} | {off or '–'} |")
+        out.append("")
+    if m["signals"]:
+        out += ["## Agent session, task type and reuse", "", "What each run's answer said.", "",
+                "| Chat | Agent session | Task type | Reused saved work |", "| --- | --- | --- | --- |"]
+        out += [f"| {chat} | {_counts(s['agent'])} | {_counts(s['task'])} | {_counts(s['reuse'])} |"
+                for chat, s in sorted(m["signals"].items())]
         out.append("")
     out += ["## Behaviour agreement", "",
             "Share of runs whose evidence lines named each behaviour (the answer shows 1 to 3 behaviours per "
@@ -288,17 +335,12 @@ def golden_chats(folder=GOLDEN_DIR):
     return {d["id"]: d for d in (json.loads(p.read_text()) for p in sorted(folder.glob("*/chat.json")))}
 
 
-def _title(levels):
-    t = derive_levels.overall(list(levels))
-    return t["title"] or NOT_ENOUGH
-
-
 def multi_expected(chats):
     """Expected band and titles of the combined result over these chats: every
     combined level and title reachable when each chat's level is any value in
     its band (combined by aggregate_chats.combine, the published rule). Each
-    capability is combined on its own, so the bands are found per capability
-    and the titles over every mix of them."""
+    capability is combined on its own, so the bands are found per capability.
+    With fewer than 10 chats there is no person title, only the count."""
     bands = {}
     for cap in CAPS:
         reach = set()
@@ -308,15 +350,19 @@ def multi_expected(chats):
             got = aggregate_chats.combine(levels)["capabilities"][KEYS[cap]]["level"]
             reach.add(NOT_SHOWN if got == "not_shown" else got)
         bands[cap] = sorted(reach, key=str)
-    titles = {_title(combo) for combo in itertools.product(*(bands[cap] for cap in CAPS))}
-    return {"bands": bands, "overall": sorted(titles)}
+    title = aggregate_chats.person_title([None] * len(chats))["line"]
+    if len(chats) >= aggregate_chats.TITLE_MIN_CHATS:
+        raise ValueError("expected person titles for 10 or more chats are not specified")
+    return {"bands": bands, "overall": [title]}
 
 
 def load_golden(folder=GOLDEN_DIR, multi_set=None):
     """{chat id: {"bands", "overall"}} for every golden chat, plus MULTI_SET
     (the expected combined result over the multi-chat set's chats)."""
     chats = golden_chats(folder)
-    out = {k: {"bands": v["expected"]["bands"], "overall": v["expected"]["overall"]} for k, v in chats.items()}
+    out = {k: {"bands": v["expected"]["bands"], "overall": v["expected"]["overall"],
+               "title_source": v["expected"].get("title_source"), "scores": v["expected"].get("johnny_scores", {})}
+           for k, v in chats.items()}
     members = multi_set or MULTI_SET_CHATS
     out[MULTI_SET] = multi_expected([chats[k] for k in members])
     return out

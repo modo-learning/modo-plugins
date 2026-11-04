@@ -9,6 +9,8 @@ with a marketplace install and push the plugin over the 512-file store limit.
 
 - stab-<id>: the chat as the current chat's history, then "How good am I at
   using AI? Judge this chat." (as strong-verify-weak-delegate).
+  Johnny's examples show only the user's messages, so Claude's turns there are
+  a placeholder.
 - stab-multi-set: assess-my-chats over the multi-chat set, with the two
   past-chat tools mocked as in the chats-* cases (gen_multi_chat_evals.py):
   the history holds the list already shown, and the user says yes.
@@ -45,14 +47,16 @@ RUNS = 5
 
 SHAPE_SINGLE = gm.g_llm("""
 PASS if the response is an assessment that gives all five capabilities (Problem Solving, Verification,
-Workflow Design, Delegation, Strategic Thinking), each as "Level N of 5" or "Not shown in this chat", and
-one line starting "Overall:".
+Workflow Design, Delegation, Strategic Thinking), each as "Level N of 5" or "Not shown in this chat", one
+line starting "This chat:" with a title or "No title yet", and one line with the task type, agent session and
+reused saved work.
 FAIL otherwise. This grader only checks the shape; the levels are compared across runs elsewhere.
 """)
 SHAPE_MULTI = gm.g_llm("""
 PASS if the response is an assessment across several chats that gives all five capabilities, each as
-"Level N of 5" or "Not shown in these chats", one line starting "Overall:", and a per-chat table with
-columns P, V, W, D and S.
+"Level N of 5" or "Not shown in these chats", one line with the title ("Your title:") or "N of 10 chats to
+your title", one line with the task range and reused saved work, and a per-chat table with columns Title, P, V,
+W, D and S.
 FAIL otherwise. This grader only checks the shape; the levels are compared across runs elsewhere.
 """)
 
@@ -100,7 +104,7 @@ def multi_case(chats):
     chats = sorted(chats, key=lambda c: c["updated_at"], reverse=True)
     listing = {"chats": [{"chat_id": chat_id(c), "title": c["title"], "updated_at": c["updated_at"]} for c in chats]}
     reply = "\n".join(
-        ["Here are your chats from the last 30 days, up to 10 chats, newest first. Nothing has been read yet.", ""]
+        ["Here are your chats from the last 30 days, up to 15 chats, newest first. Nothing has been read yet.", ""]
         + [f"{n}. {c['title']} ({c['updated_at'][:10]})" for n, c in enumerate(chats, 1)]
         + ["", "The current chat is left out.",
            "Chats with fewer than 4 typed user messages are listed but will come back as too short to score.",

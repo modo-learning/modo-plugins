@@ -34,8 +34,9 @@ class Alpha(unittest.TestCase):
 SINGLE = """Assessment of this chat (6 messages from you; based on 1 chat), against Modo rubric v1.1.
 Scored 5 times (as separate sub-tasks); the runs agreed on 4 of 5 capabilities.
 This chat shows 3 of 5 capabilities. One more chat with different work could show Delegation.
-Overall: Practitioner (Level 2 of 4 on Modo's AI fluency ladder from chats; at least 3 of your 5 capabilities are at Level 2 or higher).
-One chat is a thin sample: Modo's ladder scores a level that holds for 30 days, so to see yours across several chats, run /assess-my-chats in claude.ai.
+This chat: Practitioner · Level 2 (at least 3 of 5 capabilities at Level 2 or higher).
+One chat is a thin sample: your title comes from 10 scored chats. Run /assess-my-chats in claude.ai.
+Task type: Data analysis. Agent session: yes (tools: Bash, Edit). Reused saved work: no.
 
 Verification: Level 5 of 5 (confidence: high; 4 of 5 runs)
   Evidence (checks planned first, message 4): "I'll recompute them in my spreadsheet"
@@ -62,9 +63,10 @@ Self-assessment by Claude using Modo rubric v1.1 — not verified."""
 MULTI = """Assessment across 3 of your chats (2026-10-22 to 2026-10-30), against Modo rubric v1.1.
 Each chat was read and scored by its own agent, 3 or 5 times in one response.
 Chats: 3 confirmed, 3 scored, 0 too short (fewer than 4 typed user messages), 0 could not be read; 0 skipped before the list.
-Overall: not enough shown (only 2 of your 5 capabilities have a level; an overall level needs at least 3).
+3 of 10 chats to your title
+Task range: 2 of 8 types. Reused saved work: 0 of 3 chats.
 
-Verification: Level 3 of 5 (confidence: medium; shown in 2 of 3 chats; best shown: Level 3)
+Verification: Level 3 of 5 (confidence: medium; shown in 2 of 3 chats; proven level: Level 3)
   Evidence ("Survey findings", 2026-10-28, message 2): "Show me how you decided that."
   Next level: ...
 
@@ -84,6 +86,10 @@ Strategic Thinking: Not shown in these chats
 Self-assessment by Claude using Modo rubric v1.1 — not verified."""
 
 
+def re_sub_title(text, line):
+    return "\n".join(line if x.startswith("This chat:") else x for x in text.split("\n"))
+
+
 class ParseAnswer(unittest.TestCase):
     def test_single_chat_levels_confidence_and_overall(self):
         r = sr.parse_answer(SINGLE)
@@ -92,6 +98,23 @@ class ParseAnswer(unittest.TestCase):
         self.assertEqual(r["confidence"]["Verification"], "high")
         self.assertIsNone(r["confidence"]["Workflow Design"])
         self.assertEqual(r["overall"], "Practitioner")
+
+    def test_single_chat_signals(self):
+        self.assertEqual(sr.parse_answer(SINGLE)["signals"],
+                         {"task": "Data analysis", "agent": "yes", "reuse": "no"})
+
+    def test_a_missing_signals_line_is_not_an_error(self):
+        self.assertIsNone(sr.parse_answer(SINGLE.replace("Task type:", "Kind:"))["signals"])
+
+    def test_the_other_title_forms(self):
+        for line, want in (("This chat: No title yet (only 2 of 5 capabilities shown; a title needs at least 3).",
+                            "No title yet"),
+                           ("**This chat: Delegator · Level 3** (at least 3 of 5 capabilities)", "Delegator"),
+                           ("Your title: Orchestrator · Level 4 (reached in at least 3 chats).", "Orchestrator"),
+                           ("Your title: No title yet (no title reached in 3 chats).", "No title yet"),
+                           ("12 of 10 chats to your title", "12 of 10 chats to your title")):
+            text = re_sub_title(SINGLE, line)
+            self.assertEqual(sr.parse_answer(text)["overall"], want)
 
     def test_single_chat_behaviours_by_id_or_short_name(self):
         r = sr.parse_answer(SINGLE)
@@ -104,7 +127,7 @@ class ParseAnswer(unittest.TestCase):
         r = sr.parse_answer(MULTI)
         self.assertEqual(r["levels"]["Verification"], 3)
         self.assertEqual(r["levels"]["Delegation"], "not shown")
-        self.assertEqual(r["overall"], "not enough shown")
+        self.assertEqual(r["overall"], "3 of 10 chats to your title")
         self.assertEqual(r["rubric"], "v1.1")
 
     def test_behaviour_names_in_another_tense_still_map(self):
@@ -120,7 +143,7 @@ class ParseAnswer(unittest.TestCase):
 
     def test_missing_overall_is_an_error(self):
         with self.assertRaises(sr.ParseError):
-            sr.parse_answer(SINGLE.replace("Overall:", "Overall level"))
+            sr.parse_answer(SINGLE.replace("This chat:", "The chat:"))
 
 
 def run(chat, levels, overall, behaviours=None, kind="single", n=0):
@@ -193,6 +216,67 @@ class Analyse(unittest.TestCase):
                                                     if c["kind"] == "single"})
 
 
+def johnny_golden():
+    bands = {c: None for c in sr.CAPS}
+    bands["Verification"] = [3, 4, 5]
+    bands["Delegation"] = [1, 2, 3]
+    return {"j": {"bands": bands, "overall": ["Delegator"], "title_source": "johnny",
+                  "scores": {"Verification": 4, "Delegation": 2}}}
+
+
+class JohnnysExamples(unittest.TestCase):
+    """Every disagreement with his title or a level off by 2+ is listed (ticket 35, D8)."""
+
+    def runs(self, *rows):
+        return [run("j", levels, title, n=i) for i, (levels, title) in enumerate(rows)]
+
+    def test_a_match_lists_nothing(self):
+        m = sr.analyse(self.runs(([3, 4, 3, 3, 2], "Delegator"), ([3, 5, 3, 1, 2], "Delegator")), johnny_golden())
+        row = m["johnny"][0]
+        self.assertEqual((row["chat"], row["title_match"], row["off"]), ("j", True, []))
+
+    def test_a_wrong_title_in_any_run_is_listed(self):
+        m = sr.analyse(self.runs(([3, 4, 3, 3, 2], "Delegator"), ([3, 4, 3, 3, 2], "Practitioner")), johnny_golden())
+        self.assertFalse(m["johnny"][0]["title_match"])
+        self.assertEqual(m["johnny"][0]["titles"], {"Delegator": 1, "Practitioner": 1})
+
+    def test_a_level_off_by_two_is_listed(self):
+        m = sr.analyse(self.runs(([3, 2, 3, 2, 2], "Delegator"), ([3, 4, 3, 2, 2], "Delegator")), johnny_golden())
+        self.assertEqual(m["johnny"][0]["off"], [{"capability": "Verification", "johnny": 4, "seen": {2: 1}}])
+
+    def test_not_shown_where_he_gave_a_score_is_off(self):
+        m = sr.analyse(self.runs(([3, 4, 3, "not shown", 2], "Delegator"),), johnny_golden())
+        self.assertEqual(m["johnny"][0]["off"], [{"capability": "Delegation", "johnny": 2, "seen": {"not shown": 1}}])
+
+    def test_markdown_section(self):
+        md = sr.markdown(sr.analyse(self.runs(([3, 2, 3, 2, 2], "Practitioner"),), johnny_golden()))
+        self.assertIn("## Johnny's examples", md)
+        self.assertIn("| j | Delegator | Practitioner ×1 | no | Verification: his 4, seen 2 ×1 |", md)
+        self.assertIn("Sumeet decides", md)
+
+    def test_titles_from_johnny_are_not_taken_from_our_rule(self):
+        golden = sr.load_golden()
+        self.assertEqual(golden["johnny-d1"]["title_source"], "johnny")
+        self.assertEqual(golden["johnny-d1"]["overall"], ["Delegator"])
+        self.assertEqual(golden["johnny-o1"]["overall"], ["Orchestrator"])
+        self.assertIsNone(golden["johnny-e1"]["bands"]["Verification"])
+        self.assertEqual(golden["johnny-e1"]["bands"]["Problem Solving"], [1, 2])
+
+    def test_a_chat_with_no_band_counts_for_no_accuracy(self):
+        m = sr.analyse(self.runs(([3, 4, 3, 2, 2], "Delegator"),), johnny_golden())
+        cell = next(c for c in m["cells"] if c["capability"] == "Problem Solving")
+        self.assertIsNone(cell["accuracy"])
+
+
+class Signals(unittest.TestCase):
+    def test_table_of_what_each_run_said(self):
+        runs = [dict(run("a", [3, 3, 3, 3, 3], "Delegator", n=i),
+                     signals={"task": "Coding", "agent": a, "reuse": "no"}) for i, a in enumerate(("yes", "yes", "no"))]
+        m = sr.analyse(runs, {})
+        self.assertEqual(m["signals"]["a"], {"agent": {"yes": 2, "no": 1}, "task": {"Coding": 3}, "reuse": {"no": 3}})
+        self.assertIn("| a | yes ×2, no ×1 | Coding ×3 | no ×3 |", sr.markdown(m))
+
+
 class Markdown(unittest.TestCase):
     def test_report_lists_every_metric_with_pass_or_fail(self):
         md = sr.markdown(sr.analyse(A, GOLDEN))
@@ -248,24 +332,67 @@ class GoldenSet(unittest.TestCase):
     def test_planted_behaviours_give_levels_inside_the_bands_and_an_expected_title(self):
         from derive_levels import derive, overall
         for cid, chat in sr.golden_chats().items():
+            if "planted" not in chat:
+                continue
             with self.subTest(chat=cid):
                 n = len(chat["turns"])
                 self.assertGreaterEqual(n, 4)
                 levels = {cap: derive([tuple(x) for x in chat["planted"][cap]], n)[0] for cap in sr.CAPS}
                 for cap in sr.CAPS:
                     self.assertIn(levels[cap], chat["expected"]["bands"][cap], cap)
-                title = overall(list(levels.values()))["title"] or sr.NOT_ENOUGH
+                title = overall(levels, chat["expected"]["agent_session"])["title"] or sr.NO_TITLE
                 self.assertIn(title, chat["expected"]["overall"])
                 self.assertTrue(set(chat["expected"]["reasons"]) >= set(sr.CAPS) | {"overall"})
 
-    def test_expected_titles_are_exactly_the_titles_the_bands_allow(self):
+    def test_our_expected_titles_are_exactly_the_titles_the_bands_allow(self):
         import itertools
         from derive_levels import overall
         for cid, chat in sr.golden_chats().items():
+            if chat["expected"].get("title_source") == "johnny":
+                continue
             with self.subTest(chat=cid):
-                reach = {overall(list(combo))["title"] or sr.NOT_ENOUGH
+                reach = {overall(dict(zip(sr.CAPS, combo)), chat["expected"]["agent_session"])["title"] or sr.NO_TITLE
                          for combo in itertools.product(*(chat["expected"]["bands"][cap] for cap in sr.CAPS))}
                 self.assertEqual(reach, set(chat["expected"]["overall"]))
+
+    def test_johnnys_eight_examples_with_his_scores_bands_and_titles(self):
+        from derive_levels import overall
+        from test_johnny_rules import EXAMPLES
+        chats = sr.golden_chats()
+        for name, (levels, agent, title, _) in EXAMPLES.items():
+            with self.subTest(name):
+                e = chats["johnny-" + name.lower()]["expected"]
+                self.assertEqual(e["overall"], [title])
+                self.assertEqual(e["agent_session"], agent)
+                self.assertEqual(e["title_source"], "johnny")
+                scored = {c: lv for c, lv in zip(sr.CAPS, levels) if isinstance(lv, int)}
+                self.assertEqual(e["johnny_scores"], scored)
+                for cap in sr.CAPS:
+                    if cap in scored:
+                        self.assertEqual(e["bands"][cap], [v for v in (scored[cap] - 1, scored[cap], scored[cap] + 1)
+                                                           if 1 <= v <= 5])
+                    else:
+                        self.assertIsNone(e["bands"][cap])
+                self.assertEqual(overall(e["johnny_scores"], agent)["title"], title)
+
+    def test_johnnys_edge_cases_are_in_the_set(self):
+        chats = sr.golden_chats()
+        self.assertEqual(chats["johnny-edge-fact-check"]["expected"]["overall"], ["No title yet"])
+        self.assertEqual(chats["johnny-edge-plain-chat"]["expected"]["overall"], ["Delegator"])
+        claim = chats["johnny-edge-claim"]
+        self.assertFalse(claim["expected"]["agent_session"])
+        self.assertIn("12 people on my team use my agent", claim["turns"][0]["user"])
+        for cid in ("johnny-edge-fact-check", "johnny-edge-plain-chat", "johnny-edge-claim"):
+            self.assertIn("written for ticket 35", chats[cid]["source"])
+            self.assertGreaterEqual(len(chats[cid]["turns"]), 4)
+
+    def test_johnnys_chats_are_user_messages_with_a_placeholder_reply(self):
+        for cid, chat in sr.golden_chats().items():
+            if cid.startswith("johnny-") and "edge" not in cid:
+                with self.subTest(cid):
+                    self.assertIn("Johnny, AI Fluency Levels scoring rules v1", chat["source"])
+                    self.assertEqual({t["assistant"] for t in chat["turns"]},
+                                     {"(Claude's reply is not part of this example.)"})
 
     def test_multi_set_expectation_holds_the_planted_combined_result(self):
         import aggregate_chats
@@ -280,6 +407,7 @@ class GoldenSet(unittest.TestCase):
         exp = sr.load_golden()[sr.MULTI_SET]
         for cap in sr.CAPS:
             self.assertIn(got[sr.KEYS[cap]]["level"], exp["bands"][cap], cap)
+        self.assertEqual(exp["overall"], ["6 of 10 chats to your title"])
 
 
 

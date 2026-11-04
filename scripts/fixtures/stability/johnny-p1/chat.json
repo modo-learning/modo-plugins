@@ -1,0 +1,69 @@
+{
+  "id": "johnny-p1",
+  "title": "Customer success: at-risk renewal",
+  "updated_at": "2026-11-04T09:00:00Z",
+  "source": "Johnny, AI Fluency Levels scoring rules v1, 2026-11-04, example P1: his user messages word for word. Claude's replies are a placeholder: his file shows only the user's messages.",
+  "turns": [
+    {
+      "user": "Draft a reply to a customer upset that our Salesforce sync broke twice this month. Reader is their VP Ops, direct, hates fluff. Goal: keep them on our call Thursday. Under 150 words.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Too formal. Open with the apology itself, not \"Thank you for reaching out.\"",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Here's a reply I liked from last quarter: [pasted]. Closer to that tone.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    },
+    {
+      "user": "Good. End by asking for a 20-minute slot Thursday.",
+      "assistant": "(Claude's reply is not part of this example.)"
+    }
+  ],
+  "expected": {
+    "bands": {
+      "Problem Solving": [
+        2,
+        3,
+        4
+      ],
+      "Verification": null,
+      "Workflow Design": [
+        1,
+        2,
+        3
+      ],
+      "Delegation": [
+        1,
+        2,
+        3
+      ],
+      "Strategic Thinking": [
+        2,
+        3,
+        4
+      ]
+    },
+    "overall": [
+      "Practitioner"
+    ],
+    "agent_session": false,
+    "title_source": "johnny",
+    "johnny_scores": {
+      "Problem Solving": 3,
+      "Strategic Thinking": 3,
+      "Delegation": 2,
+      "Workflow Design": 2
+    },
+    "reasons": {
+      "Problem Solving": "Johnny scored 3; band is within 1 (ticket 35, D8).",
+      "Verification": "Johnny gave no score: not specified, so no band.",
+      "Workflow Design": "Johnny scored 2; band is within 1 (ticket 35, D8).",
+      "Delegation": "Johnny scored 2; band is within 1 (ticket 35, D8).",
+      "Strategic Thinking": "Johnny scored 3; band is within 1 (ticket 35, D8).",
+      "overall": "Johnny's title for this chat. It must match exactly (D8). His note: Clear brief and sharp edits, but nothing checked and nothing kept for themselves."
+    },
+    "review": "Johnny's own scores and title"
+  }
+}
