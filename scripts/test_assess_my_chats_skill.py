@@ -102,6 +102,16 @@ class ScopeAndConsent(unittest.TestCase):
         self.assertIn("up to 15 chats, at most 25", body)
         self.assertIn("up to 25", body)
 
+    def test_the_default_is_15_and_the_maximum_25_everywhere_it_is_stated(self):
+        root = PLUGIN.parent.parent
+        readme = re.sub(r"\s+", " ", (PLUGIN / "README.md").read_text())
+        guide = re.sub(r"\s+", " ", (root / "docs" / "modo-ai-skills-guide.md").read_text())
+        self.assertIn("up to 25 of your past claude.ai chats (by default the 15 newest", readme)
+        self.assertIn("up to 15 of your newest chats", guide)
+        self.assertIn("at most 25", guide)
+        for body in (text(), readme, guide):
+            self.assertNotRegex(body, r"(?:up to|at most) 10 (?:of your )?(?:newest )?chats|the 10 newest")
+
     def test_minimum_length_is_the_validators(self):
         self.assertIn(f"fewer than {MIN_USER_MESSAGES} typed user messages", text())
         self.assertNotIn("fewer than 3 typed", text())
