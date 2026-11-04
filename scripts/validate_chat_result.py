@@ -20,6 +20,16 @@ Shape (design: Modo workspace doc docs/ai-skills/DESIGN-multi-chat-assessment.md
   "too_short": false,                   fewer than 4 user messages: nothing scored
   "runs": 3,                            0 when too short, else 3 or 5
   "run_kind": "subagents",              "subagents" | "one_response" | "none"
+  "agent_session": {                    the user directed an agent or tools; most runs decide
+    "value": true,
+    "quote": null,                      {"message": n, "text": "exact words"}, or null
+    "tools": ["Bash", "Edit"]           tool names; a yes has a quote or tool names, a no has neither
+  },
+  "task_type": "Coding",                one of the 8 in TASK_TYPES; null when too short
+  "reuse": {                            saved work was used; most runs decide
+    "value": false,
+    "quote": null                       a yes has a quote, a no has none
+  },
   "capabilities": {
     "verification": {
       "level": 3,                       1-5 or "not_shown"
@@ -45,14 +55,16 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from derive_levels import BEHAVIOURS  # noqa: E402
-from rubric_common import CAPABILITIES, CONFIDENCE, LEVEL_NOT_SHOWN, MAX_QUOTE, is_date, is_int, is_level  # noqa: E402
+from rubric_common import (CAPABILITIES, CONFIDENCE, LEVEL_NOT_SHOWN, MAX_QUOTE, TASK_TYPES, is_date,  # noqa: E402
+                           is_int, is_level)
 
 PREFIX = {"problem_solving": "P", "verification": "V", "workflow_design": "W",
           "delegation": "D", "strategic_thinking": "S"}
 RUN_KINDS = ("subagents", "one_response", "none")
 MIN_USER_MESSAGES = 4
 TOP = {"chat_id", "title", "updated_at", "turns_total", "user_messages", "unreadable_turns",
-       "attachments_seen", "truncated_turns", "too_short", "runs", "run_kind", "capabilities"}
+       "attachments_seen", "truncated_turns", "too_short", "runs", "run_kind", "agent_session",
+       "task_type", "reuse", "capabilities"}
 CAP_FIELDS = {"level", "confidence", "agreement", "behaviours", "quotes"}
 AGREEMENT = re.compile(r"^([1-5]) of ([35]) runs$|^runs disagreed$")
 # The past-chat tools put this before typed user messages (verified 2026-11-01).
@@ -111,6 +123,9 @@ def validate(result, messages=None):
     if too_short is False and result.get("run_kind") == "none":
         errors.append('run_kind: "none" only for a chat that is too short')
 
+    cleaned = [clean_user_message(m) for m in messages] if messages is not None else None
+    errors += _signals(result, too_short, users, cleaned)
+
     caps = result.get("capabilities")
     if "capabilities" in result:
         if not isinstance(caps, dict):
@@ -118,13 +133,72 @@ def validate(result, messages=None):
         else:
             if list(caps) != list(CAPABILITIES):
                 errors.append(f"capabilities: must have exactly {list(CAPABILITIES)} in that order")
-            cleaned = [clean_user_message(m) for m in messages] if messages is not None else None
             for cap in CAPABILITIES:
                 if isinstance(caps.get(cap), dict):
                     errors += _capability(cap, caps[cap], too_short, runs, users, cleaned)
                 elif cap in caps:
                     errors.append(f"capabilities.{cap}: must be an object")
     return errors
+
+
+def _signals(result, too_short, users, messages):
+    """Agent session, task type and reuse (the brief, "Per chat, from the runs")."""
+    errors = []
+    agent = result.get("agent_session")
+    if "agent_session" in result:
+        if not (isinstance(agent, dict) and set(agent) == {"value", "quote", "tools"}
+                and isinstance(agent["value"], bool)):
+            errors.append("agent_session: must be exactly {value, quote, tools}")
+        else:
+            tools, quote = agent["tools"], agent["quote"]
+            if not (isinstance(tools, list) and all(isinstance(t, str) and t.strip() for t in tools)):
+                errors.append("agent_session.tools: must be a list of tool names")
+                tools = []
+            if agent["value"] and not (quote or tools):
+                errors.append("agent_session: yes needs one exact quote or the tool names")
+            if not agent["value"] and (quote or tools):
+                errors.append("agent_session: no carries no quote or tools")
+            if agent["value"] and too_short is True:
+                errors.append("agent_session: must be no for a chat that is too short")
+            if quote is not None:
+                errors += _quote("agent_session.quote", quote, users, messages)
+    if "task_type" in result:
+        if too_short is True:
+            if result["task_type"] is not None:
+                errors.append("task_type: must be null for a chat that is too short")
+        elif result["task_type"] not in TASK_TYPES:
+            errors.append(f"task_type: must be one of {list(TASK_TYPES)}")
+    reuse = result.get("reuse")
+    if "reuse" in result:
+        if not (isinstance(reuse, dict) and set(reuse) == {"value", "quote"} and isinstance(reuse["value"], bool)):
+            errors.append("reuse: must be an object, exactly {value, quote}")
+        else:
+            if reuse["value"] and too_short is True:
+                errors.append("reuse: must be no for a chat that is too short")
+            if reuse["value"] and not reuse["quote"]:
+                errors.append("reuse: yes needs a quote")
+            if not reuse["value"] and reuse["quote"]:
+                errors.append("reuse: no carries no quote")
+            if reuse["quote"] is not None:
+                errors += _quote("reuse.quote", reuse["quote"], users, messages)
+    return errors
+
+
+def _quote(where, q, users, messages):
+    """Errors for one {message, text} quote; messages, when given, are the cleaned user messages."""
+    if not (isinstance(q, dict) and set(q) == {"message", "text"}):
+        return [f"{where}: must be exactly {{message, text}}"]
+    text, n = q["text"], q["message"]
+    if not (isinstance(text, str) and text.strip() and len(text) <= MAX_QUOTE):
+        return [f"{where}.text: must be 1 to {MAX_QUOTE} characters and not blank"]
+    if not (is_int(n, 1) and (not is_int(users, 0) or n <= users)):
+        return [f"{where}.message: must be a user message number from 1 to user_messages"]
+    if messages is not None:
+        if n > len(messages):
+            return [f"{where}.message: the chat has only {len(messages)} user messages"]
+        if text not in messages[n - 1]:
+            return [f"{where}.text: not a word-for-word excerpt of user message {n}"]
+    return []
 
 
 def _capability(cap, c, too_short, runs, users, messages):
@@ -177,22 +251,7 @@ def _capability(cap, c, too_short, runs, users, messages):
     if len(quotes) > 3:
         errors.append(f"{where}.quotes: at most 3")
     for i, q in enumerate(quotes):
-        qw = f"{where}.quotes.{i}"
-        if not (isinstance(q, dict) and set(q) == {"message", "text"}):
-            errors.append(f"{qw}: must be exactly {{message, text}}")
-            continue
-        text, n = q["text"], q["message"]
-        if not (isinstance(text, str) and text.strip() and len(text) <= MAX_QUOTE):
-            errors.append(f"{qw}.text: must be 1 to {MAX_QUOTE} characters and not blank")
-            continue
-        if not (is_int(n, 1) and (not is_int(users, 0) or n <= users)):
-            errors.append(f"{qw}.message: must be a user message number from 1 to user_messages")
-            continue
-        if messages is not None:
-            if n > len(messages):
-                errors.append(f"{qw}.message: the chat has only {len(messages)} user messages")
-            elif text not in messages[n - 1]:
-                errors.append(f"{qw}.text: not a word-for-word excerpt of user message {n}")
+        errors += _quote(f"{where}.quotes.{i}", q, users, messages)
     return errors
 
 

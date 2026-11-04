@@ -89,6 +89,25 @@ class InSyncWithRubricAndValidator(unittest.TestCase):
     rubric_file = next((SKILLS / "assess-my-ai-work").glob("rubric-v*.md"))
     rubric = rubric_file.read_text()
 
+    def test_lists_the_eight_task_types_word_for_word(self):
+        from validate_chat_result import TASK_TYPES
+        body = re.sub(r"\s+", " ", self.brief)
+        self.assertIn(" · ".join(TASK_TYPES), body)
+        self.assertIn('There is no "Other"', body)
+
+    def test_agent_session_rule_is_d2_and_d9(self):
+        body = re.sub(r"\s+", " ", self.brief)
+        self.assertIn("at least 2 tool-driven steps", body)
+        self.assertIn("One web search doesn't count", body)
+        self.assertIn("No evidence means no", body)
+        self.assertIn("A claim doesn't count", body)
+        self.assertIn("Most runs decide", body)
+
+    def test_reuse_lists_johnnys_signals(self):
+        body = re.sub(r"\s+", " ", self.brief)
+        self.assertIn('a skill or slash command, a pasted or named saved prompt or template, a project '
+                      'with saved instructions, or "use my usual format"', body)
+
     def test_names_the_rubric_version_in_use(self):
         version = re.search(r"\*\*Rubric version: (v[\d.]+)\*\*", self.rubric).group(1)
         self.assertIn(f"Modo rubric {version}", self.brief)

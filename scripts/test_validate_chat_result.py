@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from validate_chat_result import CAPABILITIES, clean_user_message, validate  # noqa: E402
+from validate_chat_result import CAPABILITIES, TASK_TYPES, clean_user_message, validate  # noqa: E402
 
 MESSAGES = [
     "Read the RHP and tell me if it is an offer for sale or a fresh issue.",
@@ -31,12 +31,14 @@ def good():
                                "quotes": [{"message": 4, "text": "same format as before"}]}
     return {"chat_id": "4d30a8de", "title": "NSE company financial analysis", "updated_at": "2026-10-30T12:01:00Z",
             "turns_total": 9, "user_messages": 4, "unreadable_turns": 1, "attachments_seen": True,
-            "truncated_turns": [], "too_short": False, "runs": 3, "run_kind": "subagents", "capabilities": caps}
+            "truncated_turns": [], "too_short": False, "runs": 3, "run_kind": "subagents",
+            "agent_session": {"value": False, "quote": None, "tools": []}, "task_type": "Research and summarizing",
+            "reuse": {"value": False, "quote": None}, "capabilities": caps}
 
 
 def too_short():
     r = good()
-    r.update(user_messages=3, too_short=True, runs=0, run_kind="none")
+    r.update(user_messages=3, too_short=True, runs=0, run_kind="none", task_type=None)
     for c in CAPABILITIES:
         r["capabilities"][c] = dict(not_shown(), agreement="")
     return r
@@ -131,6 +133,66 @@ class Invalid(unittest.TestCase):
 
     def test_bool_is_not_a_count(self):
         self.check(lambda r: r.update(turns_total=True), "turns_total: must be an integer")
+
+
+class PerChatSignals(unittest.TestCase):
+    """Agent session, task type and reuse (ticket 35, D9 and D11; Johnny's rules, section 3)."""
+
+    def check(self, mutate, expected, messages=None, base=good):
+        r = base()
+        mutate(r)
+        errors = validate(r, messages)
+        self.assertTrue(any(expected in e for e in errors), errors)
+
+    def valid(self, mutate):
+        r = good()
+        mutate(r)
+        self.assertEqual(validate(r, MESSAGES), [])
+
+    def test_agent_session_yes_with_tool_names_or_a_quote(self):
+        self.valid(lambda r: r.update(agent_session={"value": True, "quote": None, "tools": ["Bash", "Edit"]}))
+        self.valid(lambda r: r.update(agent_session={"value": True, "tools": [],
+                                                     "quote": {"message": 3, "text": "Now do the same"}}))
+
+    def test_agent_session_yes_needs_evidence(self):
+        self.check(lambda r: r.update(agent_session={"value": True, "quote": None, "tools": []}),
+                   "agent_session: yes needs one exact quote or the tool names")
+
+    def test_agent_session_no_carries_no_evidence(self):
+        self.check(lambda r: r.update(agent_session={"value": False, "quote": None, "tools": ["Bash"]}),
+                   "agent_session: no carries no quote or tools")
+
+    def test_agent_quote_must_be_the_users_words(self):
+        self.check(lambda r: r.update(agent_session={"value": True, "tools": [],
+                                                     "quote": {"message": 1, "text": "ran my agent"}}),
+                   "agent_session.quote.text: not a word-for-word excerpt of user message 1", MESSAGES)
+
+    def test_tool_names_must_be_names(self):
+        self.check(lambda r: r.update(agent_session={"value": True, "quote": None, "tools": [""]}),
+                   "agent_session.tools")
+
+    def test_task_type_is_one_of_johnnys_eight(self):
+        for t in TASK_TYPES:
+            self.valid(lambda r: r.update(task_type=t))
+        self.check(lambda r: r.update(task_type="Other"), "task_type: must be one of")
+        self.check(lambda r: r.update(task_type=None), "task_type: must be one of")
+
+    def test_exactly_johnnys_eight(self):
+        self.assertEqual(TASK_TYPES, ("Writing and editing", "Research and summarizing", "Data analysis", "Coding",
+                                      "Planning and decisions", "Brainstorming", "Learning",
+                                      "Operations and admin"))
+
+    def test_reuse_yes_needs_a_quote(self):
+        self.valid(lambda r: r.update(reuse={"value": True, "quote": {"message": 4, "text": "same format as before"}}))
+        self.check(lambda r: r.update(reuse={"value": True, "quote": None}), "reuse: yes needs a quote")
+        self.check(lambda r: r.update(reuse={"value": False, "quote": {"message": 1, "text": "Read"}}),
+                   "reuse: no carries no quote")
+        self.check(lambda r: r.update(reuse=True), "reuse: must be an object")
+
+    def test_a_too_short_chat_has_no_signals(self):
+        self.check(lambda r: r.update(task_type="Coding"), "task_type: must be null", base=too_short)
+        self.check(lambda r: r.update(reuse={"value": True, "quote": {"message": 1, "text": "x"}}),
+                   "must be no for a chat that is too short", base=too_short)
 
 
 class Clean(unittest.TestCase):

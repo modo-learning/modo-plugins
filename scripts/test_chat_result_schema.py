@@ -21,8 +21,8 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from test_chat_agent_brief import BRIEF, json_blocks  # noqa: E402
-from validate_chat_result import (CAP_FIELDS, CAPABILITIES, CONFIDENCE, MAX_QUOTE, RUN_KINDS, TOP,  # noqa: E402
-                                  validate)
+from validate_chat_result import (CAP_FIELDS, CAPABILITIES, CONFIDENCE, MAX_QUOTE, RUN_KINDS, TASK_TYPES,  # noqa: E402
+                                  TOP, validate)
 
 SCHEMA_PATH = BRIEF.parent / "chat-result.schema.json"
 FIXTURES = pathlib.Path(__file__).resolve().parent / "fixtures"
@@ -129,6 +129,7 @@ class Schema(unittest.TestCase):
         self.assertEqual(tuple(cap["properties"]["confidence"]["enum"]), CONFIDENCE)
         self.assertEqual(tuple(s["properties"]["run_kind"]["enum"]), RUN_KINDS)
         self.assertEqual(s["$defs"]["quote"]["properties"]["text"]["maxLength"], MAX_QUOTE)
+        self.assertEqual(tuple(s["properties"]["task_type"]["enum"]), TASK_TYPES + (None,))
 
     def test_the_schema_rejects_what_the_validator_rejects(self):
         good = examples()[0][1]
@@ -139,6 +140,9 @@ class Schema(unittest.TestCase):
                ("long quote", lambda r: r["capabilities"]["verification"]["quotes"][0].update(text="x" * 241)),
                ("bad behaviour id", lambda r: r["capabilities"]["verification"].update(behaviours=["X9"])),
                ("runs 4", lambda r: r.update(runs=4)),
+               ("task type Other", lambda r: r.update(task_type="Other")),
+               ("agent session as a bare yes", lambda r: r.update(agent_session=True)),
+               ("reuse without its quote field", lambda r: r.update(reuse={"value": False})),
                ("bad agreement", lambda r: r["capabilities"]["verification"].update(agreement="most runs"))]
         for name, change in bad:
             with self.subTest(change=name):
