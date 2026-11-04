@@ -167,9 +167,11 @@ scores.
 - **Agent session** (`agent_session`): did the user direct an agent or tools
   through at least 2 tool-driven steps, directing or reviewing them, on any
   surface? Evidence is the tool names in Claude's turns or the user's own
-  messages. One web search doesn't count. A claim doesn't count ("my agent does
-  this", "12 people on my team use my agent"): only what this chat shows. No
-  evidence means no.
+  messages. One web search doesn't count. A tool Claude picked by itself to
+  answer or to show a draft, such as a quick code run or an artifact, doesn't
+  count unless the user directs or reviews those steps. A claim doesn't count
+  ("my agent does this", "12 people on my team use my agent"): only what this
+  chat shows. No evidence means no.
   `"value": true` gives one exact `quote` (`{"message": m, "text": "…"}`) or
   the `tools` names, or both; `"value": false` gives `"quote": null` and
   `"tools": []`.

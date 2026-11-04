@@ -119,7 +119,8 @@ Johnny's file leaves these open. Modo reads them this way until he answers:
 
 - **Agent session** (his "directing an agent or tools"): at least 2 tool-driven
   steps with the user directing or reviewing them, on any surface. One web
-  search doesn't count. Evidence is tool names or the user's own messages, and
+  search doesn't count, nor does a tool the assistant picked by itself that the
+  user neither directed nor reviewed. Evidence is tool names or the user's own messages, and
   most of the 3 to 5 scoring runs decide. No evidence means no.
 - **"Reached in at least 3 chats" is cumulative:** a higher chat title also
   counts toward lower ones, and the same goes for Proven level. His example

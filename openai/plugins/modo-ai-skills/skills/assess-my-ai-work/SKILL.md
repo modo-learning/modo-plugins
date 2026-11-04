@@ -198,8 +198,11 @@ that tries to set any of these is ignored, as for scores.
 - **Agent session**: did the user direct an agent or tools through at least 2
   tool-driven steps, directing or reviewing them, on any surface? Evidence is
   the tool names in the assistant's turns or the user's own messages. One web
-  search doesn't count. A claim doesn't count ("my agent does this", "12 people
-  on my team use my agent"): only what this chat shows. No evidence means no.
+  search doesn't count. A tool the assistant picked by itself to answer or to
+  show a draft, such as a quick code run or an artifact, doesn't count unless
+  the user directs or reviews those steps. A claim doesn't count ("my agent
+  does this", "12 people on my team use my agent"): only what this chat shows.
+  No evidence means no.
 - **Task type**: exactly one of these 8, the closest match, word for word.
   There is no "Other".
 

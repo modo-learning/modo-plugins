@@ -141,7 +141,8 @@ class StatedInTheSkills(unittest.TestCase):
         brief = re.sub(r"\s+", " ", (self.SKILLS / "assess-my-chats" / "chat-agent-brief.md").read_text())
         single = self.body("assess-my-ai-work")
         for phrase in ("at least 2 tool-driven steps", "One web search doesn't count", "No evidence means no",
-                       "A claim doesn't count", "Most runs decide", 'There is no "Other"',
+                       "A claim doesn't count", "unless the user directs or reviews those steps",
+                       "Most runs decide", 'There is no "Other"',
                        "Writing and editing · Research and summarizing · Data analysis · Coding · "
                        "Planning and decisions · Brainstorming · Learning · Operations and admin"):
             self.assertIn(phrase, brief)
