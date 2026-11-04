@@ -10,7 +10,8 @@ not verified."
 It is for your own development. It is not intended for hiring, promotion or
 any other employment decision about you or anyone else.
 
-What changed from v1 is listed at the end ([Changes from v1](#changes-from-v1)).
+What changed is listed at the end ([Changes from v1.1](#changes-from-v11),
+[Changes from v1](#changes-from-v1)).
 How the five capabilities map to Anthropic's AI Fluency Framework (the "4D"
 framework) is published in
 `docs/framework-crosswalk.md` in the plugin.
@@ -93,6 +94,20 @@ not work.
 P2b is common in nearly every chat; like every tier 2 behaviour, it never
 backs a level in rule 4.
 
+**Counts and doesn't count.**
+
+- **P1.** A plain factual question with no goal behind it is P1 ("what's a
+  typical margin for a café?"). Follow-up questions about the answer add no
+  Problem Solving behaviour.
+- **P2a and P3a** come from how the user sets up the task. Counts: "this is for
+  new hires with no finance background, one page, plain words". Doesn't count:
+  naming only the kind of output ("write a blog post about our office move"), or
+  a follow-up that only says where a short text will go ("turn that into a line
+  for my manager"). That follow-up is a next step (W2a) and a minimal brief (D2a).
+- **P3b** names a flaw. Counts: "the second paragraph ignores the budget", "too
+  stiff, lead with the deadline". Doesn't count: a change with no flaw named
+  ("make it shorter", "add some colour"). That is P2b.
+
 ### 2. Verification
 
 Checking what Claude produces before relying on it.
@@ -121,13 +136,30 @@ Structuring multi-step work, and making a process reusable.
 | Id | Tier | Behaviour | What the message shows | Source |
 |---|---|---|---|---|
 | W1 | 1 | Starts from scratch | Re-explains context or setup already given earlier in the chat, treating the request as stand-alone. | |
-| W2a | 2 | Next step, no plan | Moves to a next step that builds on earlier work, with no plan stated. | |
+| W2a | 2 | Next step, no plan | Works further on the earlier output, or moves to a next step that builds on it, with no plan stated. | |
 | W3a | 3 | Orders the steps | States an order of steps for the work (outline, then draft, then revise). | |
 | W3b | 3 | Feeds forward | Explicitly feeds an earlier output into a later step. | |
 | W4a | 4 | Fixes a format | Fixes a format, rules or a template and applies it to several items. | |
 | W4b | 4 | Checks between stages | Puts a check between stages ("show me the outline before you draft"). | |
 | W5a | 5 | Makes it reusable | Asks to save the process as a template, prompt or skill. | |
 | W5b | 5 | Plans the stages | Defines inputs and outputs for each stage, or plans for variants and failures. | |
+
+**Counts and doesn't count.**
+
+- **W2a.** Counts: any follow-up that works on the earlier output or takes the
+  next step ("make it shorter", "now turn it into an email"). Doesn't count:
+  thanks alone, or a new question on another subject.
+- **W3a.** Counts: stages stated before they are done ("outline first, then we
+  draft, then you review"). Doesn't count: two parts of one output ("a chart,
+  then one line under it"), or a fix followed by another ("fix it, then check
+  the rest").
+- **W3b.** Counts: a named earlier output used as the input of a different step
+  ("use the totals from the table as the budget in the note"). Doesn't count:
+  "now do this with that". That is W2a.
+- **W4a.** Counts: a format or rules set once and used again on more items, in a
+  later message or for a stated batch ("same rules on this month's file").
+  Doesn't count: one format for one output, however many columns it has, or one
+  correction repeated elsewhere ("check the others for the same mistake").
 
 ### 4. Delegation
 
@@ -137,16 +169,41 @@ are about handing off **and checking**, not about handing off more.
 
 | Id | Tier | Behaviour | What the message shows | Source |
 |---|---|---|---|---|
-| D1 | 1 | Vague handoff | Hands over a whole job vaguely ("do my report", "whatever you think is best") with no scope, role or output, or moves on without looking at what came back. | |
+| D1 | 1 | Vague handoff | Hands over a job vaguely ("do my report", "whatever you think is best", or only the thing and its topic) with no scope, role or limits, or moves on without looking at what came back. | |
 | D1u | 1 | Unchecked handoff | A D1 handoff whose result no later message reviews, corrects or checks. Code it instead of D1 for that message. | |
-| D2a | 2 | Minimal brief | Hands over a task with a minimal brief (a topic, perhaps a length) and no review point. | |
-| D3a | 3 | Scoped handoff | Hands over a task with its scope and output format. | |
+| D2a | 2 | Minimal brief | Hands over a task with at least one limit of their own (a length, a format, a reader) but no rules for doing the work and no review point. | |
+| D3a | 3 | Scoped handoff | Hands over a whole piece of work with its scope and rules for doing it: what to use, what to leave alone, what to do when something is missing. | |
 | D3b | 3 | Keeps a decision | Keeps a decision or sets how Claude should work ("give me three options, I'll choose", "ask me questions first"). | Sets interaction mode, 30% |
 | D3c | 3 | Consults on approach | Asks Claude for an approach before Claude starts the work. | Consults AI on approach before execution, 10.1% |
 | D4a | 4 | Hands off and checks | Hands over a defined piece with inputs, constraints and what done looks like, and sets a review point before Claude carries on. | |
 | D4b | 4 | Reviews the handoff | Reviews what came back from a handoff and accepts, corrects or takes back specific parts. | |
 | D5a | 5 | Calibrates the split | Says why a part stays with them or why a part suits AI, based on where AI is or isn't reliable. | |
 | D5b | 5 | Keeps the final call | Checks a handoff against stated acceptance criteria, has failing parts redone, and keeps the final decision. | |
+
+**Counts and doesn't count.**
+
+Delegation is about what the user hands over and what they keep. A clear request
+is not a handoff by itself: goal, reader, format and length are Problem Solving
+(P3a).
+
+- **D1.** Counts: only the thing and its topic ("write a blog post about our
+  office move").
+- **D2a.** Counts: a task with a limit of the user's own ("turn that into a line
+  for my manager"), and a clear brief for one draft or one answer ("draft a note
+  to our landlord, friendly, under 100 words"). Doesn't count: an edit to a draft
+  ("make it shorter"). No new task is handed over.
+- **D3a.** Counts: rules for doing the work ("use only these reports; if a figure
+  isn't there, leave it blank"). Doesn't count: a brief for one draft or one
+  answer, however clear, or a format request ("a table, then one line under it").
+  Those are D2a.
+- **D3b.** Counts: "give me three options, I'll choose", "I'll make the call".
+  Doesn't count: saying what the output should contain or how to work out a figure
+  ("use net revenue, not gross").
+- **D4b needs a real handoff of a defined piece**: a batch, a set of items or an
+  analysis given with rules, then a review of what came back ("row 4 breaks your
+  rule: that date isn't in the notes, remove it"). Correcting the tone or content
+  of a draft is refining, not reviewing a handoff ("too formal", "open with the
+  price"). That is P3b. Checking a fact or a fix is Verification.
 
 ### 5. Strategic Thinking
 
@@ -160,6 +217,12 @@ Deciding where AI is worth using, and tying the work to a larger goal.
 | S4a | 4 | Weighs trade-offs | Weighs options and trade-offs (time, cost, risk, quality). | |
 | S4b | 4 | Tests the plan | Uses Claude to test the plan: alternatives, counter-arguments, risks. | |
 | S5a | 5 | Places AI in the plan | Decides which parts are worth AI and which are not, has Claude challenge their own assumptions, or ties the work to an outcome that can be measured. | |
+
+**Counts and doesn't count.**
+
+- **S2a.** Counts: the purpose or audience as part of setting up the task ("this
+  goes to new hires"). Doesn't count: a follow-up that only says where a short
+  text will go ("turn that into a line for my manager").
 
 Doing small, well-specified tasks is not itself a low-level behaviour in any
 capability. When a chat is only mechanical tasks with no goal, choice,
@@ -274,6 +337,23 @@ one chat.
 
 ---
 
+## Changes from v1.1
+
+- The behaviour descriptions of W2a, D1, D2a and D3a are tighter, and four
+  "Counts and doesn't count" notes draw the lines for P1, P2a, P3a, P3b, W2a, W3a,
+  W3b, W4a, D1, D2a, D3a, D3b, D4b and S2a.
+- A clear request is no longer read as a handoff: goal, reader, format and length
+  are Problem Solving, and a scoped handoff needs rules for doing the work.
+- Reviewing a handoff needs a real handoff of a defined piece. Editing a draft is
+  refining.
+- A plain factual question is a bare request, and a follow-up that only says where
+  a text will go is a next step, not a goal, context or purpose.
+- Any follow-up on earlier output shows Workflow Design at tier 2. A format used
+  once is not a format applied to several items.
+- The ids, tiers, level rule, run rules and record are unchanged. Levels from v1.1
+  and v1.2 are not comparable, and they are not mixed: results always record the
+  rubric version they used.
+
 ## Changes from v1
 
 - Scoring is behaviour by behaviour, prompt by prompt, with a fixed level rule
@@ -304,5 +384,7 @@ changed:
   limits) are judgement calls, not taken from any source.
 - The extra weight for Verification follows the Index's base rates and
   research on who gains from AI use; the size of the weight is Modo's choice.
+- The lines in the "Counts and doesn't count" notes are Modo's reading of its own
+  behaviours, not taken from any source.
 - Changing any wording means a new version string; results always record the
   rubric version they used.

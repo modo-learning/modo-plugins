@@ -46,6 +46,25 @@ def rubric_behaviours():
             for m in re.finditer(r"^\| ([PVWDS][1-5][a-z]?) \| ([1-5]) \|", text, re.M)}
 
 
+class RubricWordingV12(unittest.TestCase):
+    """The limits rubric v1.2 added, each stated with what counts and what doesn't."""
+
+    def test_each_capability_with_a_limit_has_its_note(self):
+        text = RUBRIC.read_text()
+        self.assertEqual(text.count("**Counts and doesn't count.**"), 4)
+
+    def test_reviewing_a_handoff_needs_a_real_handoff(self):
+        text = " ".join(RUBRIC.read_text().split())
+        self.assertIn("D4b needs a real handoff of a defined piece", text)
+        self.assertIn("Correcting the tone or content of a draft is refining", text)
+
+    def test_a_factual_question_is_a_bare_request(self):
+        self.assertIn("A plain factual question with no goal behind it is P1", " ".join(RUBRIC.read_text().split()))
+
+    def test_it_says_what_changed(self):
+        self.assertIn("## Changes from v1.1", RUBRIC.read_text())
+
+
 class Derive(unittest.TestCase):
     def test_every_worked_example_in_the_rubric(self):
         rows = worked_examples()

@@ -458,6 +458,21 @@ Index is in [docs/framework-crosswalk.md](docs/framework-crosswalk.md). The help
 copy so each skill folder is self-contained; a check in the plugin's source
 repository keeps the two copies identical.
 
+## What changed in v1.2
+
+| | Rubric v1.1 | Rubric v1.2 (0.5 and later) |
+|---|---|---|
+| Handing work to Claude | A task with scope and format counted as a scoped handoff | A clear brief for one draft is a minimal brief; a scoped handoff needs rules for doing the work |
+| Reviewing a handoff | Any correction could count | Needs a real handoff of a defined piece; editing a draft is refining |
+| Plain questions | A question with a reader named later could read as context | A plain factual question is a bare request; a follow-up that only says where a text goes is a next step |
+| Workflow Design | Some follow-ups read as nothing, and one format as a repeated format | Any follow-up on earlier output is a next step; a format counts as repeated only when it is used again |
+
+Each change comes with "counts and doesn't count" examples in the rubric. The
+ids, tiers, level rule, run rules and record shape are unchanged, and only the
+version value moves: an export from v1.2 records `"rubric_version": "v1.2"`.
+Levels read lower than under v1.1 on the same chat, so results from v1.1 and v1.2
+are not mixed: the record always says which rubric it used.
+
 ## What changed in v1.1
 
 | | Rubric v1 (`modo-ai-skills-phase0`) | Rubric v1.1 (0.2 and later) |

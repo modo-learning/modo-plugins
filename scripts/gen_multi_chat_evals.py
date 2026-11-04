@@ -161,7 +161,7 @@ def g_llm(criteria, weight=None, focus=None):
 READ = f"mcp__{SERVER}__{READ_TOOL}"
 LIST = f"mcp__{SERVER}__{LIST_TOOL}"
 # The label ends only a response that shows levels (assess-my-chats, step 7).
-LABEL_LAST = g_regex(r"Self-assessment by Claude using Modo rubric v1\.1 — not verified\.\s*$")
+LABEL_LAST = g_regex(r"Self-assessment by Claude using Modo rubric v1\.2 — not verified\.\s*$")
 NO_LABEL = g_regex(r"Self-assessment by Claude using Modo rubric", match="not_contains")
 SKILL_FIRED = g_tool("Skill", r'"skill"\s*:\s*"(?:[\w-]+:)?assess-my-chats"')
 
@@ -237,7 +237,7 @@ does not count the skipped chats, or starts work without asking.""", weight=2),
             "skill-fired.md": SKILL_FIRED,
             **{f"reads-{i.split('-')[1]}.md": reads(i) for i in ids(*SCORED_CHATS)},
             "reads-only-confirmed.md": never_reads(ids("Weekly team update", "Salary negotiation") + list(NEVER_READ)),
-            "opening-line.md": g_regex(r"Assessment across 3 of your chats \(2026-10-24 to 2026-10-30\), against Modo rubric v1\.1"),
+            "opening-line.md": g_regex(r"Assessment across 3 of your chats \(2026-10-24 to 2026-10-30\), against Modo rubric v1\.2"),
             "chats-line.md": chats_line(4, 3, 1, 0, 2),
             "no-level-5.md": NO_LEVEL_5,
             "per-chat-table.md": g_llm(
@@ -342,7 +342,7 @@ FAIL if it does any of these.""", weight=2),
             "no-glob.md": g_tool("Glob", lo=0, hi=0),
             "no-grep.md": g_tool("Grep", lo=0, hi=0),
             "no-agent.md": g_tool("Agent", lo=0, hi=0, arm="both"),
-            "reads-only-plugin-files.md": g_tool("Read", r"^(?!.*(?:rubric-v1\.1\.md|chat-agent-brief\.md|SKILL\.md))", lo=0, hi=0),
+            "reads-only-plugin-files.md": g_tool("Read", r"^(?!.*(?:rubric-v1\.2\.md|chat-agent-brief\.md|SKILL\.md))", lo=0, hi=0),
             "no-levels.md": g_regex(r"Level\s*[1-5]\b|confidence:", match="not_contains", flags="i"),
             "names-claude-ai.md": g_regex(r"claude\.ai", flags="i"),
             "offers-single.md": g_regex(r"/assess-my-ai-work"),

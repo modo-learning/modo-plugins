@@ -1,6 +1,6 @@
 # How Modo's rubric maps to the AI Fluency Framework
 
-Rubric version: v1.2. Checked: 2026-10-29. Titles section updated: 2026-11-04.
+Rubric version: v1.2. Checked: 2026-11-04.
 
 Modo scores five capabilities. This page shows how they line up with the
 **AI Fluency Framework** by Prof. Rick Dakan and Prof. Joseph Feller,
@@ -61,7 +61,11 @@ above is Modo's assignment.
 
 Credit: Johnny, AI Fluency Levels scoring rules v1, 2026-11-04, an internal
 Modo document. His rules replaced the rule Modo used before, and they take
-priority over it. The five capabilities and rubric v1.2 stay as they are.
+priority over it. The five capabilities stay as they are. Rubric v1.2 tightens
+what counts for some behaviours, so that levels read closer to his example chats;
+its ids, tiers and level rule are the same as in v1.1, and the mapping above does
+not change. The lines it draws are Modo's reading, not his. Results from v1.1 and
+v1.2 are not mixed.
 
 The titles come from Modo's AI fluency ladder ("AI Fluency Levels", Modo,
 Johnny, 2026-11-02), which draws on four public sources, named here only: BCG,

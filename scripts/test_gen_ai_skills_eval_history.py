@@ -17,6 +17,13 @@ EVALS = pathlib.Path(__file__).resolve().parent.parent / "plugins" / "modo-ai-sk
 STORE_FAILURE = "save_assessment failed: the assessment could not be stored. Nothing was saved; try again later."
 
 
+class GradersAndCases(unittest.TestCase):
+    def test_graders_name_the_current_rubric_only(self):
+        for path in EVALS.glob("*/graders/*.md"):
+            with self.subTest(path=str(path)):
+                self.assertNotRegex(path.read_text(), r"v1(?:\\)?\.1\b")
+
+
 class SaveMock(unittest.TestCase):
     def test_guards_every_expected_quote_and_no_more(self):
         mock = gen.save_mock(4)
