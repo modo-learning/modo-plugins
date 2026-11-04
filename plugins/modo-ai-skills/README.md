@@ -14,10 +14,11 @@ self-assessment for your own development. It is not intended for hiring,
 promotion, performance reviews or any other employment decision about you or
 anyone else.
 
-This version (0.4.0) carries **rubric v1.1**: scoring prompt by prompt against
+This version (0.5.0) carries **rubric v1.1**: scoring prompt by prompt against
 published behaviours, a fixed level rule, 3 to 5 scoring runs with their
 agreement shown, honest coverage for thin chats, and a redesigned card. New
-in 0.4.0: one [overall level](#overall-level) on Modo's AI fluency ladder.
+in 0.5.0: [titles](#titles) by Johnny's AI Fluency Levels scoring rules v1, with
+a title for each chat and, across 10 scored chats, one for you.
 See [What changed in v1.1](#what-changed-in-v11).
 
 It's made for people who use Claude every day for real work and want honest
@@ -36,8 +37,9 @@ concrete to keep.
   made-up score and never level 1.
 - **A confidence label** (low, medium or high) on each level, set by how much
   the chat showed, as defined in the rubric.
-- **An overall level** on Modo's AI fluency ladder, such as "Overall:
-  Delegator (Level 3 of 4 …)", by a fixed rule (see [Overall level](#overall-level)).
+- **A title for the chat**, such as "This chat: Delegator · Level 3", by a fixed
+  rule (see [Titles](#titles)). Its task type, whether it was an agent session
+  and whether you reused saved work come with it.
 - **Run agreement**: the scoring runs 3 times (5 when the first 3 disagree),
   and each level says how many runs gave it. When runs disagree, confidence
   drops, or the capability is "not shown" instead of a guess.
@@ -170,7 +172,7 @@ app:
 ## Assess several chats at once
 
 `assess-my-chats` scores up to 25 of your past claude.ai chats (by default
-the 10 newest from the last 30 days) and combines them into one result.
+the 15 newest from the last 30 days) and combines them into one result.
 
 1. It lists the chats it would read, by title and date, and reads nothing
    until you say yes. You can untick chats by number, change the date range
@@ -181,12 +183,17 @@ the 10 newest from the last 30 days) and combines them into one result.
    only receives each chat's levels, quotes and coverage, never the
    transcript. Chats with fewer than 4 typed messages are counted as too short.
 3. For each capability, the level is the middle of the chat levels (the lower
-   one on a tie). You also see the best level shown in at least 2 chats, how
-   many chats show it, a confidence label from how close the levels are, and
-   a trend (older against newer chats, with 4 or more chats).
-4. You get one card ("Based on N chats, date range"), a table with a row per
-   chat, and a coverage line naming what could not be read (attachments, tool
-   results, answers picked in Claude's question widgets).
+   one on a tie). You also see your Proven level (the highest level reached in
+   at least 3 chats), how many chats show it, a confidence label from how close
+   the levels are, and a trend (older against newer chats, with 4 or more
+   chats).
+4. Each chat gets its own title. From 10 scored chats you get [your title](#titles);
+   before that the result says "8 of 10 chats to your title". You also see your
+   task range ("Task range: 5 of 8 types") and reuse ("Reused saved work: 3 of 8
+   chats"), as counts only.
+5. You get one card ("Based on N chats, date range"), a table with a row per
+   chat and its title, and a coverage line naming what could not be read
+   (attachments, tool results, answers picked in Claude's question widgets).
 
 Export works as for one chat: you approve every quote, and chat titles are
 left out ("Chat 1…N") unless you say "with titles". Saving a multi-chat
@@ -246,7 +253,8 @@ You choose the chat in one of these ways:
 
 In claude.ai and Cowork, when Claude can create an artifact, the result is
 also shown as an **AI capability card** beside the chat. It leads with your
-strongest capability, then shows one row per capability, strongest first:
+strongest capability under a title line ("This chat: Delegator · Level 3"),
+then shows one row per capability, strongest first:
 five segments filled to the level, the confidence (as a label and as the fill:
 solid for high, lighter for medium, striped for low) and how many scoring runs
 agreed. A capability that was not shown is a dashed empty track marked "Not
@@ -410,29 +418,34 @@ result and make no network calls). It
 contains no connectors and no background processes. You can read all of it
 in the `skills/` folder.
 
-## Overall level
+## Titles
 
-Besides a level per capability, each result shows one **overall level** on
-Modo's AI fluency ladder (from "AI Fluency Levels", Modo, 2026-11-02): Level 1
-Explorer, Level 2 Practitioner, Level 3 Delegator, Level 4 Orchestrator,
-Level 5 Multiplier. The rule is fixed and published:
+Credit: Johnny, AI Fluency Levels scoring rules v1. Each chat gets the highest
+title whose rule is met:
 
-- The overall level is the highest level L from 1 to 4 such that at least 3
-  of your 5 capabilities are at Level L or higher. "Not shown" reaches no
-  level.
-- If fewer than 3 capabilities have a level, there is no overall level ("not
-  enough shown").
-- Level 5, Multiplier, is never given from chats. It needs evidence a chat
-  doesn't hold, such as assets or agents your colleagues adopt and tracked
-  time saved.
+| Title | Rule |
+|---|---|
+| Orchestrator · Level 4 | at least 3 of your 5 capabilities at Level 4 or higher, including Delegation, and you directed an agent or tools |
+| Delegator · Level 3 | at least 3 at Level 3 or higher, including Delegation |
+| Practitioner · Level 2 | at least 3 at Level 2 or higher |
+| Explorer · Level 1 | at least 3 shown, at any level |
+| No title yet | fewer than 3 shown |
 
-For example, levels 4, 4, 3, 2 and not shown give Delegator (Level 3). For
-several chats, the rule uses the combined levels. One chat is a thin sample:
-the ladder scores a level that holds for 30 days, so /assess-my-chats gives
-the better picture. The overall level is worked out from the capability
-levels wherever it is shown (the text, the card, the PDF report). It is not a
-separate field in the exported record. How the ladder maps to the rubric is
-in [docs/framework-crosswalk.md](docs/framework-crosswalk.md#modos-ai-fluency-ladder-overall-level).
+Scores that reach Orchestrator with no agent session give Delegator, with the
+note "no agent work visible in this chat". An agent session is at least 2
+tool-driven steps that you direct or review, on any surface; one web search
+doesn't count. Multiplier, Level 5, comes later: it needs Modo sharing data, and
+a claim in a chat is not evidence.
+
+**Your title** is the highest chat title you reached in at least 3 chats, shown
+once 10 chats are scored. It takes `assess-my-chats`, and it comes from the chats
+in that run: nothing is stored. A single chat says "One chat is a thin sample:
+your title comes from 10 scored chats."
+
+The title is worked out from the levels wherever it is shown (the text, the
+card, the Markdown and PDF reports). It is not a field in the exported record.
+The full rules, and the readings pending Johnny's answer, are in
+[docs/framework-crosswalk.md](docs/framework-crosswalk.md#titles-modos-ai-fluency-levels).
 
 ## The rubric
 

@@ -1,6 +1,6 @@
 # Modo AI Skills: guide
 
-One page for using, demoing and maintaining Modo AI Skills 0.4.0. The plugin's
+One page for using, demoing and maintaining Modo AI Skills 0.5.0. The plugin's
 [README](../plugins/modo-ai-skills/README.md) has the full detail on each part;
 this guide puts the whole flow in order.
 
@@ -82,25 +82,26 @@ a confidence label, how far 3 to 5 scoring runs agreed, a quote from your own
 messages, why that level, and what the next level looks like. Then two
 improvements with a prompt to try, and in claude.ai a card.
 
-**Overall level.** Near the top, one line gives an overall level on Modo's AI
-fluency ladder ("AI Fluency Levels", Modo, 2026-11-02): 1 Explorer, 2
-Practitioner, 3 Delegator, 4 Orchestrator, 5 Multiplier. It is the highest
-level L from 1 to 4 that at least 3 of the 5 capabilities reach ("not shown"
-reaches none). Fewer than 3 with a level: "not enough shown". Level 5 is never
-given from chats, because it needs evidence chats don't hold (assets and
-agents colleagues adopt, tracked time saved). Example: 4, 4, 3, 2, not shown
-gives Delegator. For several chats it uses the combined levels. It is worked
-out from the levels and is not stored in the record. The rule is in
-`scripts/derive_levels.py` (`overall`) and
-`plugins/modo-ai-skills/docs/framework-crosswalk.md`; decided 2026-11-03, flag
-for review (Angelina, Johnny).
+**Title.** Near the top, one line gives the chat a title, such as "This chat:
+Delegator · Level 3". Credit: Johnny, AI Fluency Levels scoring rules v1. The
+highest title whose rule is met: Orchestrator (3 of 5 capabilities at 4+,
+including Delegation, and an agent session), Delegator (3 of 5 at 3+, including
+Delegation), Practitioner (3 of 5 at 2+), Explorer (3 of 5 shown), otherwise No
+title yet. Orchestrator scores with no agent session give Delegator, with the
+note "no agent work visible in this chat". Multiplier comes later. One more line
+gives the chat's task type (one of 8), the agent session and reuse. In ChatGPT
+the rule is the same, with its own thin-sample line and no person title. The
+title is worked out from the levels and is not stored in the record. The rule is
+in `scripts/derive_levels.py` (`overall`) and
+`plugins/modo-ai-skills/docs/framework-crosswalk.md`, which records the readings
+pending Johnny's answer.
 
 ## 4. Assess several chats at once (claude.ai only)
 
 Ask "How good am I at working with AI across my recent chats?" or run
 `/modo-ai-skills:assess-my-chats`.
 
-1. **The list.** It shows up to 10 of your newest chats from the last 30 days,
+1. **The list.** It shows up to 15 of your newest chats from the last 30 days,
    by title and date, and reads nothing yet. The chat you are in, empty chats
    and chats flagged by the safety classifier are left out and counted.
    Incognito chats never appear.
@@ -112,12 +113,16 @@ Ask "How good am I at working with AI across my recent chats?" or run
    transcript. 10 chats took about 6 minutes in testing.
 4. **The result.**
    - For each capability: the level, which is the middle of the chat levels (the lower one on a
-     tie); the best level shown in at least 2 chats; in how many chats it was
-     shown; confidence (high when 3 or more chats are within 1 level, medium
+     tie); the Proven level, the highest level reached in at least 3 chats; in how
+     many chats it was shown; confidence (high when 3 or more chats are within 1 level, medium
      when 2 chats are within 1 level or 3 or more are exactly 2 apart,
      otherwise low); and a trend, older chats against newer ones, with 4 or
      more chats.
-   - A table with one row per chat, and a coverage line: chats too short (fewer
+   - A title for each chat, and from 10 scored chats your title: the highest
+     chat title reached in at least 3 chats. Before that: "8 of 10 chats to your
+     title". A chat with no title counts toward the 10. Task range ("Task range:
+     5 of 8 types") and reuse ("Reused saved work: 3 of 8 chats"), counts only.
+   - A table with one row per chat, with its title, and a coverage line: chats too short (fewer
      than 4 typed messages), chats that could not be read, and what the chat
      tool does not return (attachments, tool results, answers picked in
      Claude's question widgets, older edited versions).
@@ -229,10 +234,10 @@ full paid assessment; keep the output outside the repo:
 
 ```sh
 python3 -I scripts/gen_stability_evals.py           # writes the cases (git-ignored)
-# smoke pass: 4 chats x 5 runs (ticket 33 estimates about $20)
-for c in strong-verifier weak-delegator all-level-1 mixed; do
+# smoke pass: Johnny's 8 examples + our 2 edge cases x 3 runs (ticket 35, D14)
+for c in johnny-e1 johnny-e2 johnny-p1 johnny-p2 johnny-d1 johnny-d2 johnny-o1 johnny-o2 borderline thin; do
   claude plugin eval plugins/modo-ai-skills --eval-dir evals-stability --case "stab-$c" \
-    --runs 5 --model opus --ablation none --no-publish --output-dir "../stability-runs/<date>/$c"
+    --runs 3 --model opus --ablation none --no-publish --output-dir "../stability-runs/<date>/$c"
 done
 python3 scripts/stability_report.py --model=opus ../stability-runs/<date>/*/aggregate-result.json \
   > docs/stability/<date>.md
@@ -251,17 +256,18 @@ until Angelina and Keith confirm it).
    the same version).
 2. Run every check above.
 3. Stability: run the stability cases and keep the report in
-   `docs/stability/<date>.md` (smoke pass, 4 chats × 5 runs, before every
+   `docs/stability/<date>.md` (smoke pass, 10 chats × 3 runs, before every
    release and after any change to the rubric, the chat-agent brief or the
    assess skills; the full pass before a minor or major version). It must
    pass.
 4. PR to `main`. No AI attribution in commits or the PR body.
 
-### Open items (2026-11-03)
+### Open items (2026-11-04)
 
 - Modo server (modo-mcp, separate repo): serve rubric v1.1 and accept
   `scope: "multi_chat"`; until then multi-chat saves are not possible.
 - Design sign-off: the aggregation rules and the multi-chat card and report.
-- Review the overall level rule and its title on the card and report
-  (Angelina, Johnny); decided 2026-11-03.
+- Johnny's answer on three readings: what an agent session is, whether "reached
+  in 3 chats" is cumulative, and Proven level replacing Best shown.
+- Stored score sheet: needs the backend. Multiplier: needs Modo sharing data.
 - Codex install and ChatGPT save-to-passport: not built or tested yet.

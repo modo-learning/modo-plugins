@@ -23,6 +23,9 @@ python3 -I scripts/test_build_openai_plugin.py
 - Ships assess-my-ai-work, help-me-improve, export-assessment and modo-design.
   save-to-passport and the Modo connector come later.
 - Assesses this chat or a pasted chat; ChatGPT plugins can't open past chats.
+- The one-chat title rule is the same (Johnny's scoring rules v1). There is no
+  person title, Proven level or task range, and the thin-sample line has its own
+  wording. The build leaves out everything between MODO-PERSON markers.
 - The card is shown in a canvas if one is available, otherwise offered as a
   downloadable HTML file, otherwise left out (text result only).
 - The PDF is made with ChatGPT's file or code tool; without one, the report is
