@@ -28,7 +28,7 @@ Claude Code has no chat tools, and ChatGPT plugins cannot open past chats.
 
 ### claude.ai, the desktop app and Cowork
 
-Easiest: download `modo-ai-skills-0.4.0-claude.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases) and upload it (below). Or add the marketplace (Customize → Plugins → Add marketplace →
+Easiest: download `modo-ai-skills-0.5.0-claude.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases) and upload it (below). Or add the marketplace (Customize → Plugins → Add marketplace →
 `https://github.com/modo-learning/modo-plugins`, then install Modo AI Skills),
 or upload a zip:
 
@@ -52,7 +52,7 @@ claude plugin install modo-ai-skills@modo-plugins
 ### ChatGPT
 
 The ChatGPT build is generated in `openai/plugins/modo-ai-skills` (never edit
-it by hand; see section 8). Download `modo-ai-skills-0.4.0-chatgpt.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases), or make the zip:
+it by hand; see section 8). Download `modo-ai-skills-0.5.0-chatgpt.zip` from the [releases page](https://github.com/modo-learning/modo-plugins/releases), or make the zip:
 
 ```sh
 git archive --format=zip -o modo-ai-skills-chatgpt.zip HEAD:openai/plugins/modo-ai-skills

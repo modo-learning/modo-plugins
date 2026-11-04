@@ -94,7 +94,7 @@ outside service.
 
 ## Install
 
-This version (0.4.0, rubric v1.1) is on `main`. For the whole flow on one
+This version (0.5.0, rubric v1.1) is on `main`. For the whole flow on one
 page, see the [guide](../../docs/modo-ai-skills-guide.md). Ready-made zips
 are on the [releases page](https://github.com/modo-learning/modo-plugins/releases). The earlier rubric v1 build
 stays on the branch `modo-ai-skills-phase0` for comparison. A ChatGPT and
@@ -104,7 +104,7 @@ Codex build is generated from this plugin; see [openai/README.md](../../openai/R
 
 The marketplace there reads only `main`, so upload the plugin as a zip:
 
-1. Download `modo-ai-skills-0.4.0-claude.zip` from the
+1. Download `modo-ai-skills-0.5.0-claude.zip` from the
    [releases page](https://github.com/modo-learning/modo-plugins/releases),
    or build it from a clone as below (the older v0.1.0 test build there is
    rubric v1). Don't use GitHub's "Download ZIP" for the whole repository:
